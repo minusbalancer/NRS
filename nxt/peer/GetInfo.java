@@ -11,7 +11,7 @@
 /* 11:   */ {
 /* 12: 9 */   static final GetInfo instance = new GetInfo();
 /* 13:   */   
-/* 14:   */   public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+/* 14:   */   JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
 /* 15:   */   {
 /* 16:17 */     JSONObject localJSONObject = new JSONObject();
 /* 17:19 */     if (paramPeer != null)
@@ -21,69 +21,45 @@
 /* 21:   */       {
 /* 22:22 */         str1 = str1.trim();
 /* 23:23 */         if (str1.length() > 0) {
-/* 24:25 */           paramPeer.setAnnouncedAddress(str1);
+/* 24:24 */           paramPeer.setAnnouncedAddress(str1);
 /* 25:   */         }
 /* 26:   */       }
-/* 27:29 */       String str2 = (String)paramJSONObject.get("application");
-/* 28:30 */       if (str2 == null)
-/* 29:   */       {
-/* 30:32 */         str2 = "?";
-/* 31:   */       }
-/* 32:   */       else
-/* 33:   */       {
-/* 34:36 */         str2 = str2.trim();
-/* 35:37 */         if (str2.length() > 20) {
-/* 36:39 */           str2 = str2.substring(0, 20) + "...";
-/* 37:   */         }
-/* 38:   */       }
-/* 39:44 */       paramPeer.setApplication(str2);
-/* 40:   */       
-/* 41:46 */       String str3 = (String)paramJSONObject.get("version");
-/* 42:47 */       if (str3 == null)
-/* 43:   */       {
-/* 44:49 */         str3 = "?";
-/* 45:   */       }
-/* 46:   */       else
-/* 47:   */       {
-/* 48:53 */         str3 = str3.trim();
-/* 49:54 */         if (str3.length() > 10) {
-/* 50:56 */           str3 = str3.substring(0, 10) + "...";
-/* 51:   */         }
-/* 52:   */       }
-/* 53:61 */       paramPeer.setVersion(str3);
-/* 54:   */       
-/* 55:63 */       String str4 = (String)paramJSONObject.get("platform");
-/* 56:64 */       if (str4 == null)
-/* 57:   */       {
-/* 58:66 */         str4 = "?";
-/* 59:   */       }
-/* 60:   */       else
-/* 61:   */       {
-/* 62:70 */         str4 = str4.trim();
-/* 63:71 */         if (str4.length() > 10) {
-/* 64:73 */           str4 = str4.substring(0, 10) + "...";
-/* 65:   */         }
-/* 66:   */       }
-/* 67:78 */       paramPeer.setPlatform(str4);
-/* 68:   */       
-/* 69:80 */       paramPeer.setShareAddress(Boolean.TRUE.equals(paramJSONObject.get("shareAddress")));
-/* 70:   */     }
-/* 71:84 */     if ((Nxt.myHallmark != null) && (Nxt.myHallmark.length() > 0)) {
-/* 72:86 */       localJSONObject.put("hallmark", Nxt.myHallmark);
-/* 73:   */     }
-/* 74:89 */     localJSONObject.put("application", "NRS");
-/* 75:90 */     localJSONObject.put("version", "0.7.0e");
-/* 76:91 */     localJSONObject.put("platform", Nxt.myPlatform);
-/* 77:92 */     localJSONObject.put("shareAddress", Boolean.valueOf(Nxt.shareMyAddress));
-/* 78:   */     
-/* 79:94 */     localJSONObject.put("cumulativeDifficulty", Blockchain.getLastBlock().getCumulativeDifficulty().toString());
-/* 80:   */     
-/* 81:96 */     return localJSONObject;
-/* 82:   */   }
-/* 83:   */ }
+/* 27:27 */       String str2 = (String)paramJSONObject.get("application");
+/* 28:28 */       if (str2 == null) {
+/* 29:29 */         str2 = "?";
+/* 30:   */       }
+/* 31:31 */       paramPeer.setApplication(str2.trim());
+/* 32:   */       
+/* 33:33 */       String str3 = (String)paramJSONObject.get("version");
+/* 34:34 */       if (str3 == null) {
+/* 35:35 */         str3 = "?";
+/* 36:   */       }
+/* 37:37 */       paramPeer.setVersion(str3.trim());
+/* 38:   */       
+/* 39:39 */       String str4 = (String)paramJSONObject.get("platform");
+/* 40:40 */       if (str4 == null) {
+/* 41:41 */         str4 = "?";
+/* 42:   */       }
+/* 43:43 */       paramPeer.setPlatform(str4.trim());
+/* 44:   */       
+/* 45:45 */       paramPeer.setShareAddress(Boolean.TRUE.equals(paramJSONObject.get("shareAddress")));
+/* 46:   */     }
+/* 47:49 */     if ((Nxt.myHallmark != null) && (Nxt.myHallmark.length() > 0)) {
+/* 48:51 */       localJSONObject.put("hallmark", Nxt.myHallmark);
+/* 49:   */     }
+/* 50:54 */     localJSONObject.put("application", "NRS");
+/* 51:55 */     localJSONObject.put("version", "0.7.1");
+/* 52:56 */     localJSONObject.put("platform", Nxt.myPlatform);
+/* 53:57 */     localJSONObject.put("shareAddress", Boolean.valueOf(Nxt.shareMyAddress));
+/* 54:   */     
+/* 55:59 */     localJSONObject.put("cumulativeDifficulty", Blockchain.getLastBlock().getCumulativeDifficulty().toString());
+/* 56:   */     
+/* 57:61 */     return localJSONObject;
+/* 58:   */   }
+/* 59:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.peer.GetInfo
  * JD-Core Version:    0.7.0.1
  */

@@ -13,12 +13,12 @@
 /*  13:    */ import org.json.simple.JSONObject;
 /*  14:    */ import org.json.simple.JSONStreamAware;
 /*  15:    */ 
-/*  16:    */ final class IssueAsset
+/*  16:    */ public final class IssueAsset
 /*  17:    */   extends HttpRequestHandler
 /*  18:    */ {
 /*  19: 34 */   static final IssueAsset instance = new IssueAsset();
 /*  20:    */   
-/*  21:    */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/*  21:    */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /*  22:    */     throws NxtException.ValidationException
 /*  23:    */   {
 /*  24: 41 */     String str1 = paramHttpServletRequest.getParameter("secretPhrase");
@@ -97,7 +97,7 @@
 /*  97:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.IssueAsset
  * JD-Core Version:    0.7.0.1
  */

@@ -10,12 +10,12 @@
 /*  10:    */ import org.json.simple.JSONObject;
 /*  11:    */ import org.json.simple.JSONStreamAware;
 /*  12:    */ 
-/*  13:    */ final class SendMoney
+/*  13:    */ public final class SendMoney
 /*  14:    */   extends HttpRequestHandler
 /*  15:    */ {
 /*  16: 29 */   static final SendMoney instance = new SendMoney();
 /*  17:    */   
-/*  18:    */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/*  18:    */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /*  19:    */     throws NxtException.ValidationException
 /*  20:    */   {
 /*  21: 36 */     String str1 = paramHttpServletRequest.getParameter("secretPhrase");
@@ -114,7 +114,7 @@
 /* 114:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.SendMoney
  * JD-Core Version:    0.7.0.1
  */

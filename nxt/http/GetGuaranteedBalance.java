@@ -6,12 +6,12 @@
 /*  6:   */ import org.json.simple.JSONObject;
 /*  7:   */ import org.json.simple.JSONStreamAware;
 /*  8:   */ 
-/*  9:   */ final class GetGuaranteedBalance
+/*  9:   */ public final class GetGuaranteedBalance
 /* 10:   */   extends HttpRequestHandler
 /* 11:   */ {
 /* 12:17 */   static final GetGuaranteedBalance instance = new GetGuaranteedBalance();
 /* 13:   */   
-/* 14:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 14:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 15:   */   {
 /* 16:24 */     String str1 = paramHttpServletRequest.getParameter("account");
 /* 17:25 */     String str2 = paramHttpServletRequest.getParameter("numberOfConfirmations");
@@ -49,7 +49,7 @@
 /* 49:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetGuaranteedBalance
  * JD-Core Version:    0.7.0.1
  */

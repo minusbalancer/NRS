@@ -10,12 +10,12 @@
 /* 10:   */ import org.json.simple.JSONObject;
 /* 11:   */ import org.json.simple.JSONStreamAware;
 /* 12:   */ 
-/* 13:   */ final class GetBidOrderIds
+/* 13:   */ public final class GetBidOrderIds
 /* 14:   */   extends HttpRequestHandler
 /* 15:   */ {
 /* 16:19 */   static final GetBidOrderIds instance = new GetBidOrderIds();
 /* 17:   */   
-/* 18:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 18:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 19:   */   {
 /* 20:26 */     String str = paramHttpServletRequest.getParameter("asset");
 /* 21:27 */     if (str == null) {
@@ -45,7 +45,7 @@
 /* 45:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetBidOrderIds
  * JD-Core Version:    0.7.0.1
  */

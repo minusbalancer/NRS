@@ -11,7 +11,7 @@
 /* 11:   */ {
 /* 12:11 */   static final GetMilestoneBlockIds instance = new GetMilestoneBlockIds();
 /* 13:   */   
-/* 14:   */   public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+/* 14:   */   JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
 /* 15:   */   {
 /* 16:19 */     JSONObject localJSONObject = new JSONObject();
 /* 17:   */     
@@ -34,7 +34,7 @@
 /* 34:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.peer.GetMilestoneBlockIds
  * JD-Core Version:    0.7.0.1
  */

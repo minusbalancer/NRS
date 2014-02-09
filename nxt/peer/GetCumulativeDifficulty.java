@@ -10,7 +10,7 @@
 /* 10:   */ {
 /* 11: 8 */   static final GetCumulativeDifficulty instance = new GetCumulativeDifficulty();
 /* 12:   */   
-/* 13:   */   public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+/* 13:   */   JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
 /* 14:   */   {
 /* 15:16 */     JSONObject localJSONObject = new JSONObject();
 /* 16:   */     
@@ -21,7 +21,7 @@
 /* 21:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.peer.GetCumulativeDifficulty
  * JD-Core Version:    0.7.0.1
  */

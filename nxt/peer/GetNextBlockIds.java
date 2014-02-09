@@ -11,7 +11,7 @@
 /* 11:   */ {
 /* 12:12 */   static final GetNextBlockIds instance = new GetNextBlockIds();
 /* 13:   */   
-/* 14:   */   public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+/* 14:   */   JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
 /* 15:   */   {
 /* 16:20 */     JSONObject localJSONObject = new JSONObject();
 /* 17:   */     
@@ -28,7 +28,7 @@
 /* 28:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.peer.GetNextBlockIds
  * JD-Core Version:    0.7.0.1
  */

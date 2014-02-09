@@ -261,2299 +261,2367 @@
 /*  261: 281 */                               for (int n = 0; n < arrayOfTransaction.length; n++) {
 /*  262: 282 */                                 arrayOfTransaction[n] = Transaction.getTransaction((JSONObject)localJSONArray3.get(n));
 /*  263:     */                               }
-/*  264: 284 */                               if (!Blockchain.pushBlock(localBlock2, arrayOfTransaction))
+/*  264:     */                               try
 /*  265:     */                               {
-/*  266: 285 */                                 Logger.logDebugMessage("Failed to accept block received from " + localPeer.getPeerAddress() + ", blacklisting");
-/*  267: 286 */                                 localPeer.blacklist();
-/*  268: 287 */                                 return;
-/*  269:     */                               }
-/*  270:     */                             }
-/*  271:     */                             catch (NxtException.ValidationException localValidationException2)
-/*  272:     */                             {
-/*  273: 290 */                               localPeer.blacklist(localValidationException2);
-/*  274: 291 */                               return;
-/*  275:     */                             }
-/*  276:     */                           }
-/*  277: 294 */                           else if ((!Block.hasBlock(localBlock2.getId())) && (localBlock2.transactionIds.length <= 255))
-/*  278:     */                           {
-/*  279: 296 */                             ((LinkedList)localObject4).add(localBlock2);
-/*  280:     */                             
-/*  281: 298 */                             localJSONArray3 = (JSONArray)localJSONObject2.get("transactions");
-/*  282:     */                             try
-/*  283:     */                             {
-/*  284: 300 */                               for (int m = 0; m < localBlock2.transactionIds.length; m++)
-/*  285:     */                               {
-/*  286: 302 */                                 Transaction localTransaction = Transaction.getTransaction((JSONObject)localJSONArray3.get(m));
-/*  287: 303 */                                 localBlock2.transactionIds[m] = localTransaction.getId();
-/*  288: 304 */                                 localBlock2.blockTransactions[m] = localTransaction;
-/*  289: 305 */                                 ((HashMap)localObject5).put(localBlock2.transactionIds[m], localTransaction);
-/*  290:     */                               }
-/*  291:     */                             }
-/*  292:     */                             catch (NxtException.ValidationException localValidationException3)
-/*  293:     */                             {
-/*  294: 309 */                               localPeer.blacklist(localValidationException3);
-/*  295: 310 */                               return;
-/*  296:     */                             }
-/*  297:     */                           }
-/*  298:     */                         }
-/*  299:     */                       }
-/*  300:     */                     }
-/*  301: 320 */                     if ((!((LinkedList)localObject4).isEmpty()) && (((Block)Blockchain.lastBlock.get()).getHeight() - localBlock1.getHeight() < 720)) {
-/*  302: 322 */                       synchronized (Blockchain.class)
-/*  303:     */                       {
-/*  304: 323 */                         localBigInteger1 = ((Block)Blockchain.lastBlock.get()).getCumulativeDifficulty();
-/*  305:     */                         for (;;)
-/*  306:     */                         {
-/*  307:     */                           int k;
-/*  308:     */                           try
-/*  309:     */                           {
-/*  310: 327 */                             while ((!((Block)Blockchain.lastBlock.get()).getId().equals(localObject1)) && (Blockchain.access$500())) {}
-/*  311: 329 */                             if (((Block)Blockchain.lastBlock.get()).getId().equals(localObject1)) {
-/*  312: 330 */                               for (??? = ((LinkedList)localObject4).iterator(); ((Iterator)???).hasNext();)
-/*  313:     */                               {
-/*  314: 330 */                                 localObject7 = (Block)((Iterator)???).next();
-/*  315: 331 */                                 if ((((Block)Blockchain.lastBlock.get()).getId().equals(((Block)localObject7).getPreviousBlockId())) && 
-/*  316: 332 */                                   (!Blockchain.pushBlock((Block)localObject7, ((Block)localObject7).blockTransactions))) {
-/*  317:     */                                   break;
-/*  318:     */                                 }
-/*  319:     */                               }
-/*  320:     */                             }
-/*  321: 339 */                             k = ((Block)Blockchain.lastBlock.get()).getCumulativeDifficulty().compareTo(localBigInteger1) < 0 ? 1 : 0;
-/*  322: 340 */                             if (k != 0)
-/*  323:     */                             {
-/*  324: 341 */                               Logger.logDebugMessage("Rescan caused by peer " + localPeer.getPeerAddress() + ", blacklisting");
-/*  325: 342 */                               localPeer.blacklist();
-/*  326:     */                             }
-/*  327:     */                           }
-/*  328:     */                           catch (Transaction.UndoNotSupportedException localUndoNotSupportedException)
-/*  329:     */                           {
-/*  330: 345 */                             Logger.logDebugMessage(localUndoNotSupportedException.getMessage());
-/*  331: 346 */                             Logger.logDebugMessage("Popping off last block not possible, will do a rescan");
-/*  332: 347 */                             k = 1;
-/*  333:     */                           }
-/*  334:     */                         }
-/*  335: 350 */                         if (k != 0)
-/*  336:     */                         {
-/*  337: 352 */                           if (localBlock1.getNextBlockId() != null) {
-/*  338: 353 */                             Block.deleteBlock(localBlock1.getNextBlockId());
-/*  339:     */                           }
-/*  340: 355 */                           Logger.logMessage("Re-scanning blockchain...");
-/*  341: 356 */                           Blockchain.access$600();
-/*  342: 357 */                           Logger.logMessage("...Done");
-/*  343:     */                         }
-/*  344:     */                       }
-/*  345:     */                     }
-/*  346:     */                   }
-/*  347:     */                 }
-/*  348:     */               }
-/*  349:     */             }
-/*  350:     */           }
-/*  351:     */         }
-/*  352:     */         catch (Exception localException)
-/*  353:     */         {
-/*  354: 368 */           Logger.logDebugMessage("Error in milestone blocks processing thread", localException);
-/*  355:     */         }
-/*  356:     */       }
-/*  357:     */       catch (Throwable localThrowable)
-/*  358:     */       {
-/*  359: 371 */         Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + localThrowable.toString());
-/*  360: 372 */         localThrowable.printStackTrace();
-/*  361: 373 */         System.exit(1);
-/*  362:     */       }
-/*  363:     */     }
-/*  364:     */   };
-/*  365: 380 */   static final Runnable generateBlockThread = new Runnable()
-/*  366:     */   {
-/*  367: 382 */     private final ConcurrentMap<Account, Block> lastBlocks = new ConcurrentHashMap();
-/*  368: 383 */     private final ConcurrentMap<Account, BigInteger> hits = new ConcurrentHashMap();
-/*  369:     */     
-/*  370:     */     public void run()
-/*  371:     */     {
-/*  372:     */       try
+/*  266: 285 */                                 Blockchain.pushBlock(localBlock2, arrayOfTransaction);
+/*  267:     */                               }
+/*  268:     */                               catch (Blockchain.BlockNotAcceptedException localBlockNotAcceptedException2)
+/*  269:     */                               {
+/*  270: 287 */                                 Logger.logDebugMessage("Failed to accept block " + localBlock2.getStringId() + " at height " + ((Block)Blockchain.lastBlock.get()).getHeight() + " received from " + localPeer.getPeerAddress() + ", blacklisting");
+/*  271:     */                                 
+/*  272:     */ 
+/*  273: 290 */                                 localPeer.blacklist(localBlockNotAcceptedException2);
+/*  274: 291 */                                 return;
+/*  275:     */                               }
+/*  276:     */                             }
+/*  277:     */                             catch (NxtException.ValidationException localValidationException2)
+/*  278:     */                             {
+/*  279: 294 */                               localPeer.blacklist(localValidationException2);
+/*  280: 295 */                               return;
+/*  281:     */                             }
+/*  282:     */                           }
+/*  283: 298 */                           else if ((!Block.hasBlock(localBlock2.getId())) && (localBlock2.transactionIds.length <= 255))
+/*  284:     */                           {
+/*  285: 300 */                             ((LinkedList)localObject4).add(localBlock2);
+/*  286:     */                             
+/*  287: 302 */                             localJSONArray3 = (JSONArray)localJSONObject2.get("transactions");
+/*  288:     */                             try
+/*  289:     */                             {
+/*  290: 304 */                               for (int m = 0; m < localBlock2.transactionIds.length; m++)
+/*  291:     */                               {
+/*  292: 306 */                                 Transaction localTransaction = Transaction.getTransaction((JSONObject)localJSONArray3.get(m));
+/*  293: 307 */                                 localBlock2.transactionIds[m] = localTransaction.getId();
+/*  294: 308 */                                 localBlock2.blockTransactions[m] = localTransaction;
+/*  295: 309 */                                 ((HashMap)localObject5).put(localBlock2.transactionIds[m], localTransaction);
+/*  296:     */                               }
+/*  297:     */                             }
+/*  298:     */                             catch (NxtException.ValidationException localValidationException3)
+/*  299:     */                             {
+/*  300: 313 */                               localPeer.blacklist(localValidationException3);
+/*  301: 314 */                               return;
+/*  302:     */                             }
+/*  303:     */                           }
+/*  304:     */                         }
+/*  305:     */                       }
+/*  306:     */                     }
+/*  307: 324 */                     if ((!((LinkedList)localObject4).isEmpty()) && (((Block)Blockchain.lastBlock.get()).getHeight() - localBlock1.getHeight() < 720)) {
+/*  308: 326 */                       synchronized (Blockchain.class)
+/*  309:     */                       {
+/*  310: 327 */                         localBigInteger1 = ((Block)Blockchain.lastBlock.get()).getCumulativeDifficulty();
+/*  311:     */                         for (;;)
+/*  312:     */                         {
+/*  313:     */                           int k;
+/*  314:     */                           try
+/*  315:     */                           {
+/*  316: 331 */                             while ((!((Block)Blockchain.lastBlock.get()).getId().equals(localObject1)) && (Blockchain.access$500())) {}
+/*  317: 333 */                             if (((Block)Blockchain.lastBlock.get()).getId().equals(localObject1)) {
+/*  318: 334 */                               for (??? = ((LinkedList)localObject4).iterator(); ((Iterator)???).hasNext();)
+/*  319:     */                               {
+/*  320: 334 */                                 localObject7 = (Block)((Iterator)???).next();
+/*  321: 335 */                                 if (((Block)Blockchain.lastBlock.get()).getId().equals(((Block)localObject7).getPreviousBlockId())) {
+/*  322:     */                                   try
+/*  323:     */                                   {
+/*  324: 337 */                                     Blockchain.pushBlock((Block)localObject7, ((Block)localObject7).blockTransactions);
+/*  325:     */                                   }
+/*  326:     */                                   catch (Blockchain.BlockNotAcceptedException localBlockNotAcceptedException1)
+/*  327:     */                                   {
+/*  328: 339 */                                     Logger.logDebugMessage("Failed to push future block " + ((Block)localObject7).getStringId() + " received from " + localPeer.getPeerAddress() + ", blacklisting");
+/*  329:     */                                     
+/*  330: 341 */                                     localPeer.blacklist(localBlockNotAcceptedException1);
+/*  331: 342 */                                     break;
+/*  332:     */                                   }
+/*  333:     */                                 }
+/*  334:     */                               }
+/*  335:     */                             }
+/*  336: 348 */                             k = ((Block)Blockchain.lastBlock.get()).getCumulativeDifficulty().compareTo(localBigInteger1) < 0 ? 1 : 0;
+/*  337: 349 */                             if (k != 0)
+/*  338:     */                             {
+/*  339: 350 */                               Logger.logDebugMessage("Rescan caused by peer " + localPeer.getPeerAddress() + ", blacklisting");
+/*  340: 351 */                               localPeer.blacklist();
+/*  341:     */                             }
+/*  342:     */                           }
+/*  343:     */                           catch (Transaction.UndoNotSupportedException localUndoNotSupportedException)
+/*  344:     */                           {
+/*  345: 354 */                             Logger.logDebugMessage(localUndoNotSupportedException.getMessage());
+/*  346: 355 */                             Logger.logDebugMessage("Popping off last block not possible, will do a rescan");
+/*  347: 356 */                             k = 1;
+/*  348:     */                           }
+/*  349:     */                         }
+/*  350: 359 */                         if (k != 0)
+/*  351:     */                         {
+/*  352: 361 */                           if (localBlock1.getNextBlockId() != null) {
+/*  353: 362 */                             Block.deleteBlock(localBlock1.getNextBlockId());
+/*  354:     */                           }
+/*  355: 364 */                           Logger.logMessage("Re-scanning blockchain...");
+/*  356: 365 */                           Blockchain.access$600();
+/*  357: 366 */                           Logger.logMessage("...Done");
+/*  358:     */                         }
+/*  359:     */                       }
+/*  360:     */                     }
+/*  361:     */                   }
+/*  362:     */                 }
+/*  363:     */               }
+/*  364:     */             }
+/*  365:     */           }
+/*  366:     */         }
+/*  367:     */         catch (Exception localException)
+/*  368:     */         {
+/*  369: 377 */           Logger.logDebugMessage("Error in milestone blocks processing thread", localException);
+/*  370:     */         }
+/*  371:     */       }
+/*  372:     */       catch (Throwable localThrowable)
 /*  373:     */       {
-/*  374:     */         try
-/*  375:     */         {
-/*  376: 391 */           HashMap localHashMap = new HashMap();
-/*  377: 392 */           for (localIterator = User.getAllUsers().iterator(); localIterator.hasNext();)
-/*  378:     */           {
-/*  379: 392 */             localObject1 = (User)localIterator.next();
-/*  380: 393 */             if (((User)localObject1).getSecretPhrase() != null)
-/*  381:     */             {
-/*  382: 394 */               localAccount = Account.getAccount(((User)localObject1).getPublicKey());
-/*  383: 395 */               if ((localAccount != null) && (localAccount.getEffectiveBalance() > 0)) {
-/*  384: 396 */                 localHashMap.put(localAccount, localObject1);
-/*  385:     */               }
-/*  386:     */             }
-/*  387:     */           }
-/*  388: 401 */           for (localIterator = localHashMap.entrySet().iterator(); localIterator.hasNext();)
-/*  389:     */           {
-/*  390: 401 */             localObject1 = (Map.Entry)localIterator.next();
-/*  391:     */             
-/*  392: 403 */             localAccount = (Account)((Map.Entry)localObject1).getKey();
-/*  393: 404 */             User localUser = (User)((Map.Entry)localObject1).getValue();
-/*  394: 405 */             Block localBlock = (Block)Blockchain.lastBlock.get();
-/*  395: 406 */             if (this.lastBlocks.get(localAccount) != localBlock)
+/*  374: 380 */         Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + localThrowable.toString());
+/*  375: 381 */         localThrowable.printStackTrace();
+/*  376: 382 */         System.exit(1);
+/*  377:     */       }
+/*  378:     */     }
+/*  379:     */   };
+/*  380: 389 */   static final Runnable generateBlockThread = new Runnable()
+/*  381:     */   {
+/*  382: 391 */     private final ConcurrentMap<Account, Block> lastBlocks = new ConcurrentHashMap();
+/*  383: 392 */     private final ConcurrentMap<Account, BigInteger> hits = new ConcurrentHashMap();
+/*  384:     */     
+/*  385:     */     public void run()
+/*  386:     */     {
+/*  387:     */       try
+/*  388:     */       {
+/*  389:     */         try
+/*  390:     */         {
+/*  391: 400 */           HashMap localHashMap = new HashMap();
+/*  392: 401 */           for (localIterator = User.getAllUsers().iterator(); localIterator.hasNext();)
+/*  393:     */           {
+/*  394: 401 */             localObject1 = (User)localIterator.next();
+/*  395: 402 */             if (((User)localObject1).getSecretPhrase() != null)
 /*  396:     */             {
-/*  397: 408 */               long l = localAccount.getEffectiveBalance();
-/*  398: 409 */               if (l > 0L)
-/*  399:     */               {
-/*  400: 412 */                 MessageDigest localMessageDigest = Crypto.sha256();
-/*  401:     */                 byte[] arrayOfByte;
-/*  402: 414 */                 if (localBlock.getHeight() < 30000)
-/*  403:     */                 {
-/*  404: 416 */                   localObject2 = Crypto.sign(localBlock.getGenerationSignature(), localUser.getSecretPhrase());
-/*  405: 417 */                   arrayOfByte = localMessageDigest.digest((byte[])localObject2);
-/*  406:     */                 }
-/*  407:     */                 else
-/*  408:     */                 {
-/*  409: 421 */                   localMessageDigest.update(localBlock.getGenerationSignature());
-/*  410: 422 */                   arrayOfByte = localMessageDigest.digest(localUser.getPublicKey());
-/*  411:     */                 }
-/*  412: 425 */                 Object localObject2 = new BigInteger(1, new byte[] { arrayOfByte[7], arrayOfByte[6], arrayOfByte[5], arrayOfByte[4], arrayOfByte[3], arrayOfByte[2], arrayOfByte[1], arrayOfByte[0] });
-/*  413:     */                 
-/*  414: 427 */                 this.lastBlocks.put(localAccount, localBlock);
-/*  415: 428 */                 this.hits.put(localAccount, localObject2);
-/*  416:     */                 
-/*  417: 430 */                 JSONObject localJSONObject = new JSONObject();
-/*  418: 431 */                 localJSONObject.put("response", "setBlockGenerationDeadline");
-/*  419: 432 */                 localJSONObject.put("deadline", Long.valueOf(((BigInteger)localObject2).divide(BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(l))).longValue() - (Convert.getEpochTime() - localBlock.getTimestamp())));
-/*  420:     */                 
-/*  421: 434 */                 localUser.send(localJSONObject);
-/*  422:     */               }
-/*  423:     */             }
-/*  424:     */             else
-/*  425:     */             {
-/*  426: 438 */               int i = Convert.getEpochTime() - localBlock.getTimestamp();
-/*  427: 439 */               if (i > 0)
-/*  428:     */               {
-/*  429: 441 */                 BigInteger localBigInteger = BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(localAccount.getEffectiveBalance())).multiply(BigInteger.valueOf(i));
-/*  430: 442 */                 if (((BigInteger)this.hits.get(localAccount)).compareTo(localBigInteger) < 0) {
-/*  431: 444 */                   Blockchain.generateBlock(localUser.getSecretPhrase());
-/*  432:     */                 }
-/*  433:     */               }
-/*  434:     */             }
-/*  435:     */           }
-/*  436:     */         }
-/*  437:     */         catch (Exception localException)
-/*  438:     */         {
-/*  439:     */           Iterator localIterator;
-/*  440:     */           Object localObject1;
-/*  441:     */           Account localAccount;
-/*  442: 453 */           Logger.logDebugMessage("Error in block generation thread", localException);
-/*  443:     */         }
-/*  444:     */       }
-/*  445:     */       catch (Throwable localThrowable)
-/*  446:     */       {
-/*  447: 456 */         Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + localThrowable.toString());
-/*  448: 457 */         localThrowable.printStackTrace();
-/*  449: 458 */         System.exit(1);
-/*  450:     */       }
-/*  451:     */     }
-/*  452:     */   };
-/*  453: 465 */   static final Runnable rebroadcastTransactionsThread = new Runnable()
-/*  454:     */   {
-/*  455:     */     public void run()
-/*  456:     */     {
-/*  457:     */       try
-/*  458:     */       {
-/*  459:     */         try
-/*  460:     */         {
-/*  461: 472 */           JSONArray localJSONArray = new JSONArray();
-/*  462: 474 */           for (Object localObject = Blockchain.nonBroadcastedTransactions.values().iterator(); ((Iterator)localObject).hasNext();)
-/*  463:     */           {
-/*  464: 474 */             Transaction localTransaction = (Transaction)((Iterator)localObject).next();
-/*  465: 476 */             if ((Blockchain.unconfirmedTransactions.get(localTransaction.getId()) == null) && (!Transaction.hasTransaction(localTransaction.getId()))) {
-/*  466: 478 */               localJSONArray.add(localTransaction.getJSONObject());
-/*  467:     */             } else {
-/*  468: 482 */               Blockchain.nonBroadcastedTransactions.remove(localTransaction.getId());
-/*  469:     */             }
-/*  470:     */           }
-/*  471: 488 */           if (localJSONArray.size() > 0)
-/*  472:     */           {
-/*  473: 490 */             localObject = new JSONObject();
-/*  474: 491 */             ((JSONObject)localObject).put("requestType", "processTransactions");
-/*  475: 492 */             ((JSONObject)localObject).put("transactions", localJSONArray);
-/*  476:     */             
-/*  477: 494 */             Peer.sendToSomePeers((JSONObject)localObject);
-/*  478:     */           }
-/*  479:     */         }
-/*  480:     */         catch (Exception localException)
-/*  481:     */         {
-/*  482: 499 */           Logger.logDebugMessage("Error in transaction re-broadcasting thread", localException);
-/*  483:     */         }
-/*  484:     */       }
-/*  485:     */       catch (Throwable localThrowable)
-/*  486:     */       {
-/*  487: 502 */         Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + localThrowable.toString());
-/*  488: 503 */         localThrowable.printStackTrace();
-/*  489: 504 */         System.exit(1);
-/*  490:     */       }
-/*  491:     */     }
-/*  492:     */   };
-/*  493:     */   
-/*  494:     */   public static DbIterator<Block> getAllBlocks()
-/*  495:     */   {
-/*  496: 512 */     Connection localConnection = null;
-/*  497:     */     try
-/*  498:     */     {
-/*  499: 514 */       localConnection = Db.getConnection();
-/*  500: 515 */       PreparedStatement localPreparedStatement = localConnection.prepareStatement("SELECT * FROM block ORDER BY db_id ASC");
-/*  501: 516 */       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
-/*  502:     */       {
-/*  503:     */         public Block get(Connection paramAnonymousConnection, ResultSet paramAnonymousResultSet)
-/*  504:     */           throws NxtException.ValidationException
-/*  505:     */         {
-/*  506: 519 */           return Block.getBlock(paramAnonymousConnection, paramAnonymousResultSet);
-/*  507:     */         }
-/*  508:     */       });
-/*  509:     */     }
-/*  510:     */     catch (SQLException localSQLException)
-/*  511:     */     {
-/*  512: 523 */       DbUtils.close(new AutoCloseable[] { localConnection });
-/*  513: 524 */       throw new RuntimeException(localSQLException.toString(), localSQLException);
-/*  514:     */     }
-/*  515:     */   }
-/*  516:     */   
-/*  517:     */   public static DbIterator<Block> getAllBlocks(Account paramAccount, int paramInt)
-/*  518:     */   {
-/*  519: 529 */     Connection localConnection = null;
-/*  520:     */     try
-/*  521:     */     {
-/*  522: 531 */       localConnection = Db.getConnection();
-/*  523: 532 */       PreparedStatement localPreparedStatement = localConnection.prepareStatement("SELECT * FROM block WHERE timestamp >= ? AND generator_public_key = ? ORDER BY db_id ASC");
-/*  524: 533 */       localPreparedStatement.setInt(1, paramInt);
-/*  525: 534 */       localPreparedStatement.setBytes(2, paramAccount.getPublicKey());
-/*  526: 535 */       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
-/*  527:     */       {
-/*  528:     */         public Block get(Connection paramAnonymousConnection, ResultSet paramAnonymousResultSet)
-/*  529:     */           throws NxtException.ValidationException
-/*  530:     */         {
-/*  531: 538 */           return Block.getBlock(paramAnonymousConnection, paramAnonymousResultSet);
-/*  532:     */         }
-/*  533:     */       });
-/*  534:     */     }
-/*  535:     */     catch (SQLException localSQLException)
+/*  397: 403 */               localAccount = Account.getAccount(((User)localObject1).getPublicKey());
+/*  398: 404 */               if ((localAccount != null) && (localAccount.getEffectiveBalance() > 0)) {
+/*  399: 405 */                 localHashMap.put(localAccount, localObject1);
+/*  400:     */               }
+/*  401:     */             }
+/*  402:     */           }
+/*  403: 410 */           for (localIterator = localHashMap.entrySet().iterator(); localIterator.hasNext();)
+/*  404:     */           {
+/*  405: 410 */             localObject1 = (Map.Entry)localIterator.next();
+/*  406:     */             
+/*  407: 412 */             localAccount = (Account)((Map.Entry)localObject1).getKey();
+/*  408: 413 */             User localUser = (User)((Map.Entry)localObject1).getValue();
+/*  409: 414 */             Block localBlock = (Block)Blockchain.lastBlock.get();
+/*  410: 415 */             if (this.lastBlocks.get(localAccount) != localBlock)
+/*  411:     */             {
+/*  412: 417 */               long l = localAccount.getEffectiveBalance();
+/*  413: 418 */               if (l > 0L)
+/*  414:     */               {
+/*  415: 421 */                 MessageDigest localMessageDigest = Crypto.sha256();
+/*  416:     */                 byte[] arrayOfByte;
+/*  417: 423 */                 if (localBlock.getHeight() < 30000)
+/*  418:     */                 {
+/*  419: 425 */                   localObject2 = Crypto.sign(localBlock.getGenerationSignature(), localUser.getSecretPhrase());
+/*  420: 426 */                   arrayOfByte = localMessageDigest.digest((byte[])localObject2);
+/*  421:     */                 }
+/*  422:     */                 else
+/*  423:     */                 {
+/*  424: 430 */                   localMessageDigest.update(localBlock.getGenerationSignature());
+/*  425: 431 */                   arrayOfByte = localMessageDigest.digest(localUser.getPublicKey());
+/*  426:     */                 }
+/*  427: 434 */                 Object localObject2 = new BigInteger(1, new byte[] { arrayOfByte[7], arrayOfByte[6], arrayOfByte[5], arrayOfByte[4], arrayOfByte[3], arrayOfByte[2], arrayOfByte[1], arrayOfByte[0] });
+/*  428:     */                 
+/*  429: 436 */                 this.lastBlocks.put(localAccount, localBlock);
+/*  430: 437 */                 this.hits.put(localAccount, localObject2);
+/*  431:     */                 
+/*  432: 439 */                 JSONObject localJSONObject = new JSONObject();
+/*  433: 440 */                 localJSONObject.put("response", "setBlockGenerationDeadline");
+/*  434: 441 */                 localJSONObject.put("deadline", Long.valueOf(((BigInteger)localObject2).divide(BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(l))).longValue() - (Convert.getEpochTime() - localBlock.getTimestamp())));
+/*  435:     */                 
+/*  436: 443 */                 localUser.send(localJSONObject);
+/*  437:     */               }
+/*  438:     */             }
+/*  439:     */             else
+/*  440:     */             {
+/*  441: 447 */               int i = Convert.getEpochTime() - localBlock.getTimestamp();
+/*  442: 448 */               if (i > 0)
+/*  443:     */               {
+/*  444: 450 */                 BigInteger localBigInteger = BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(localAccount.getEffectiveBalance())).multiply(BigInteger.valueOf(i));
+/*  445: 451 */                 if (((BigInteger)this.hits.get(localAccount)).compareTo(localBigInteger) < 0) {
+/*  446: 453 */                   Blockchain.generateBlock(localUser.getSecretPhrase());
+/*  447:     */                 }
+/*  448:     */               }
+/*  449:     */             }
+/*  450:     */           }
+/*  451:     */         }
+/*  452:     */         catch (Exception localException)
+/*  453:     */         {
+/*  454:     */           Iterator localIterator;
+/*  455:     */           Object localObject1;
+/*  456:     */           Account localAccount;
+/*  457: 462 */           Logger.logDebugMessage("Error in block generation thread", localException);
+/*  458:     */         }
+/*  459:     */       }
+/*  460:     */       catch (Throwable localThrowable)
+/*  461:     */       {
+/*  462: 465 */         Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + localThrowable.toString());
+/*  463: 466 */         localThrowable.printStackTrace();
+/*  464: 467 */         System.exit(1);
+/*  465:     */       }
+/*  466:     */     }
+/*  467:     */   };
+/*  468: 474 */   static final Runnable rebroadcastTransactionsThread = new Runnable()
+/*  469:     */   {
+/*  470:     */     public void run()
+/*  471:     */     {
+/*  472:     */       try
+/*  473:     */       {
+/*  474:     */         try
+/*  475:     */         {
+/*  476: 481 */           JSONArray localJSONArray = new JSONArray();
+/*  477: 483 */           for (Object localObject = Blockchain.nonBroadcastedTransactions.values().iterator(); ((Iterator)localObject).hasNext();)
+/*  478:     */           {
+/*  479: 483 */             Transaction localTransaction = (Transaction)((Iterator)localObject).next();
+/*  480: 485 */             if ((Blockchain.unconfirmedTransactions.get(localTransaction.getId()) == null) && (!Transaction.hasTransaction(localTransaction.getId()))) {
+/*  481: 487 */               localJSONArray.add(localTransaction.getJSONObject());
+/*  482:     */             } else {
+/*  483: 491 */               Blockchain.nonBroadcastedTransactions.remove(localTransaction.getId());
+/*  484:     */             }
+/*  485:     */           }
+/*  486: 497 */           if (localJSONArray.size() > 0)
+/*  487:     */           {
+/*  488: 499 */             localObject = new JSONObject();
+/*  489: 500 */             ((JSONObject)localObject).put("requestType", "processTransactions");
+/*  490: 501 */             ((JSONObject)localObject).put("transactions", localJSONArray);
+/*  491:     */             
+/*  492: 503 */             Peer.sendToSomePeers((JSONObject)localObject);
+/*  493:     */           }
+/*  494:     */         }
+/*  495:     */         catch (Exception localException)
+/*  496:     */         {
+/*  497: 508 */           Logger.logDebugMessage("Error in transaction re-broadcasting thread", localException);
+/*  498:     */         }
+/*  499:     */       }
+/*  500:     */       catch (Throwable localThrowable)
+/*  501:     */       {
+/*  502: 511 */         Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + localThrowable.toString());
+/*  503: 512 */         localThrowable.printStackTrace();
+/*  504: 513 */         System.exit(1);
+/*  505:     */       }
+/*  506:     */     }
+/*  507:     */   };
+/*  508:     */   
+/*  509:     */   public static DbIterator<Block> getAllBlocks()
+/*  510:     */   {
+/*  511: 521 */     Connection localConnection = null;
+/*  512:     */     try
+/*  513:     */     {
+/*  514: 523 */       localConnection = Db.getConnection();
+/*  515: 524 */       PreparedStatement localPreparedStatement = localConnection.prepareStatement("SELECT * FROM block ORDER BY db_id ASC");
+/*  516: 525 */       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
+/*  517:     */       {
+/*  518:     */         public Block get(Connection paramAnonymousConnection, ResultSet paramAnonymousResultSet)
+/*  519:     */           throws NxtException.ValidationException
+/*  520:     */         {
+/*  521: 528 */           return Block.getBlock(paramAnonymousConnection, paramAnonymousResultSet);
+/*  522:     */         }
+/*  523:     */       });
+/*  524:     */     }
+/*  525:     */     catch (SQLException localSQLException)
+/*  526:     */     {
+/*  527: 532 */       DbUtils.close(new AutoCloseable[] { localConnection });
+/*  528: 533 */       throw new RuntimeException(localSQLException.toString(), localSQLException);
+/*  529:     */     }
+/*  530:     */   }
+/*  531:     */   
+/*  532:     */   public static DbIterator<Block> getAllBlocks(Account paramAccount, int paramInt)
+/*  533:     */   {
+/*  534: 538 */     Connection localConnection = null;
+/*  535:     */     try
 /*  536:     */     {
-/*  537: 542 */       DbUtils.close(new AutoCloseable[] { localConnection });
-/*  538: 543 */       throw new RuntimeException(localSQLException.toString(), localSQLException);
-/*  539:     */     }
-/*  540:     */   }
-/*  541:     */   
-/*  542:     */   /* Error */
-/*  543:     */   public static int getBlockCount()
-/*  544:     */   {
-/*  545:     */     // Byte code:
-/*  546:     */     //   0: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
-/*  547:     */     //   3: astore_0
-/*  548:     */     //   4: aconst_null
-/*  549:     */     //   5: astore_1
-/*  550:     */     //   6: aload_0
-/*  551:     */     //   7: ldc 29
-/*  552:     */     //   9: invokeinterface 12 2 0
-/*  553:     */     //   14: astore_2
-/*  554:     */     //   15: aconst_null
-/*  555:     */     //   16: astore_3
-/*  556:     */     //   17: aload_2
-/*  557:     */     //   18: invokeinterface 30 1 0
-/*  558:     */     //   23: astore 4
-/*  559:     */     //   25: aload 4
-/*  560:     */     //   27: invokeinterface 31 1 0
-/*  561:     */     //   32: pop
-/*  562:     */     //   33: aload 4
-/*  563:     */     //   35: iconst_1
-/*  564:     */     //   36: invokeinterface 32 2 0
-/*  565:     */     //   41: istore 5
-/*  566:     */     //   43: aload_2
-/*  567:     */     //   44: ifnull +33 -> 77
-/*  568:     */     //   47: aload_3
-/*  569:     */     //   48: ifnull +23 -> 71
-/*  570:     */     //   51: aload_2
-/*  571:     */     //   52: invokeinterface 33 1 0
-/*  572:     */     //   57: goto +20 -> 77
-/*  573:     */     //   60: astore 6
-/*  574:     */     //   62: aload_3
-/*  575:     */     //   63: aload 6
-/*  576:     */     //   65: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  577:     */     //   68: goto +9 -> 77
-/*  578:     */     //   71: aload_2
-/*  579:     */     //   72: invokeinterface 33 1 0
-/*  580:     */     //   77: aload_0
-/*  581:     */     //   78: ifnull +33 -> 111
-/*  582:     */     //   81: aload_1
-/*  583:     */     //   82: ifnull +23 -> 105
-/*  584:     */     //   85: aload_0
-/*  585:     */     //   86: invokeinterface 36 1 0
-/*  586:     */     //   91: goto +20 -> 111
-/*  587:     */     //   94: astore 6
-/*  588:     */     //   96: aload_1
-/*  589:     */     //   97: aload 6
-/*  590:     */     //   99: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  591:     */     //   102: goto +9 -> 111
-/*  592:     */     //   105: aload_0
-/*  593:     */     //   106: invokeinterface 36 1 0
-/*  594:     */     //   111: iload 5
-/*  595:     */     //   113: ireturn
-/*  596:     */     //   114: astore 4
-/*  597:     */     //   116: aload 4
-/*  598:     */     //   118: astore_3
-/*  599:     */     //   119: aload 4
-/*  600:     */     //   121: athrow
-/*  601:     */     //   122: astore 7
-/*  602:     */     //   124: aload_2
-/*  603:     */     //   125: ifnull +33 -> 158
-/*  604:     */     //   128: aload_3
-/*  605:     */     //   129: ifnull +23 -> 152
-/*  606:     */     //   132: aload_2
-/*  607:     */     //   133: invokeinterface 33 1 0
-/*  608:     */     //   138: goto +20 -> 158
-/*  609:     */     //   141: astore 8
-/*  610:     */     //   143: aload_3
-/*  611:     */     //   144: aload 8
-/*  612:     */     //   146: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  613:     */     //   149: goto +9 -> 158
-/*  614:     */     //   152: aload_2
-/*  615:     */     //   153: invokeinterface 33 1 0
-/*  616:     */     //   158: aload 7
-/*  617:     */     //   160: athrow
-/*  618:     */     //   161: astore_2
-/*  619:     */     //   162: aload_2
-/*  620:     */     //   163: astore_1
-/*  621:     */     //   164: aload_2
-/*  622:     */     //   165: athrow
-/*  623:     */     //   166: astore 9
-/*  624:     */     //   168: aload_0
-/*  625:     */     //   169: ifnull +33 -> 202
-/*  626:     */     //   172: aload_1
-/*  627:     */     //   173: ifnull +23 -> 196
-/*  628:     */     //   176: aload_0
-/*  629:     */     //   177: invokeinterface 36 1 0
-/*  630:     */     //   182: goto +20 -> 202
-/*  631:     */     //   185: astore 10
-/*  632:     */     //   187: aload_1
-/*  633:     */     //   188: aload 10
-/*  634:     */     //   190: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  635:     */     //   193: goto +9 -> 202
-/*  636:     */     //   196: aload_0
-/*  637:     */     //   197: invokeinterface 36 1 0
-/*  638:     */     //   202: aload 9
-/*  639:     */     //   204: athrow
-/*  640:     */     //   205: astore_0
-/*  641:     */     //   206: new 20	java/lang/RuntimeException
-/*  642:     */     //   209: dup
-/*  643:     */     //   210: aload_0
-/*  644:     */     //   211: invokevirtual 21	java/sql/SQLException:toString	()Ljava/lang/String;
-/*  645:     */     //   214: aload_0
-/*  646:     */     //   215: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
-/*  647:     */     //   218: athrow
-/*  648:     */     // Line number table:
-/*  649:     */     //   Java source line #548	-> byte code offset #0
-/*  650:     */     //   Java source line #549	-> byte code offset #17
-/*  651:     */     //   Java source line #550	-> byte code offset #25
-/*  652:     */     //   Java source line #551	-> byte code offset #33
-/*  653:     */     //   Java source line #552	-> byte code offset #43
-/*  654:     */     //   Java source line #548	-> byte code offset #114
-/*  655:     */     //   Java source line #552	-> byte code offset #122
-/*  656:     */     //   Java source line #548	-> byte code offset #161
-/*  657:     */     //   Java source line #552	-> byte code offset #166
-/*  658:     */     //   Java source line #553	-> byte code offset #206
-/*  659:     */     // Local variable table:
-/*  660:     */     //   start	length	slot	name	signature
-/*  661:     */     //   3	194	0	localConnection	Connection
-/*  662:     */     //   205	10	0	localSQLException	SQLException
-/*  663:     */     //   5	183	1	localObject1	Object
-/*  664:     */     //   14	139	2	localPreparedStatement	PreparedStatement
-/*  665:     */     //   161	4	2	localThrowable1	Throwable
-/*  666:     */     //   16	128	3	localObject2	Object
-/*  667:     */     //   23	11	4	localResultSet	ResultSet
-/*  668:     */     //   114	6	4	localThrowable2	Throwable
-/*  669:     */     //   60	4	6	localThrowable3	Throwable
-/*  670:     */     //   94	4	6	localThrowable4	Throwable
-/*  671:     */     //   122	37	7	localObject3	Object
-/*  672:     */     //   141	4	8	localThrowable5	Throwable
-/*  673:     */     //   166	37	9	localObject4	Object
-/*  674:     */     //   185	4	10	localThrowable6	Throwable
-/*  675:     */     // Exception table:
-/*  676:     */     //   from	to	target	type
-/*  677:     */     //   51	57	60	java/lang/Throwable
-/*  678:     */     //   85	91	94	java/lang/Throwable
-/*  679:     */     //   17	43	114	java/lang/Throwable
-/*  680:     */     //   17	43	122	finally
-/*  681:     */     //   114	124	122	finally
-/*  682:     */     //   132	138	141	java/lang/Throwable
-/*  683:     */     //   6	77	161	java/lang/Throwable
-/*  684:     */     //   114	161	161	java/lang/Throwable
-/*  685:     */     //   6	77	166	finally
-/*  686:     */     //   114	168	166	finally
-/*  687:     */     //   176	182	185	java/lang/Throwable
-/*  688:     */     //   0	111	205	java/sql/SQLException
-/*  689:     */     //   114	205	205	java/sql/SQLException
-/*  690:     */   }
-/*  691:     */   
-/*  692:     */   public static DbIterator<Transaction> getAllTransactions()
-/*  693:     */   {
-/*  694: 558 */     Connection localConnection = null;
-/*  695:     */     try
-/*  696:     */     {
-/*  697: 560 */       localConnection = Db.getConnection();
-/*  698: 561 */       PreparedStatement localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction ORDER BY db_id ASC");
-/*  699: 562 */       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
-/*  700:     */       {
-/*  701:     */         public Transaction get(Connection paramAnonymousConnection, ResultSet paramAnonymousResultSet)
-/*  702:     */           throws NxtException.ValidationException
-/*  703:     */         {
-/*  704: 565 */           return Transaction.getTransaction(paramAnonymousConnection, paramAnonymousResultSet);
-/*  705:     */         }
-/*  706:     */       });
-/*  707:     */     }
-/*  708:     */     catch (SQLException localSQLException)
-/*  709:     */     {
-/*  710: 569 */       DbUtils.close(new AutoCloseable[] { localConnection });
-/*  711: 570 */       throw new RuntimeException(localSQLException.toString(), localSQLException);
-/*  712:     */     }
-/*  713:     */   }
-/*  714:     */   
-/*  715:     */   public static DbIterator<Transaction> getAllTransactions(Account paramAccount, byte paramByte1, byte paramByte2, int paramInt)
-/*  716:     */   {
-/*  717: 575 */     Connection localConnection = null;
-/*  718:     */     try
-/*  719:     */     {
-/*  720: 577 */       localConnection = Db.getConnection();
-/*  721:     */       PreparedStatement localPreparedStatement;
-/*  722: 579 */       if (paramByte1 >= 0)
-/*  723:     */       {
-/*  724: 580 */         if (paramByte2 >= 0)
-/*  725:     */         {
-/*  726: 581 */           localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_account_id = ?) AND type = ? AND subtype = ? ORDER BY timestamp ASC");
-/*  727: 582 */           localPreparedStatement.setInt(1, paramInt);
-/*  728: 583 */           localPreparedStatement.setLong(2, paramAccount.getId().longValue());
-/*  729: 584 */           localPreparedStatement.setLong(3, paramAccount.getId().longValue());
-/*  730: 585 */           localPreparedStatement.setByte(4, paramByte1);
-/*  731: 586 */           localPreparedStatement.setByte(5, paramByte2);
-/*  732:     */         }
-/*  733:     */         else
-/*  734:     */         {
-/*  735: 588 */           localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_account_id = ?) AND type = ? ORDER BY timestamp ASC");
-/*  736: 589 */           localPreparedStatement.setInt(1, paramInt);
-/*  737: 590 */           localPreparedStatement.setLong(2, paramAccount.getId().longValue());
-/*  738: 591 */           localPreparedStatement.setLong(3, paramAccount.getId().longValue());
-/*  739: 592 */           localPreparedStatement.setByte(4, paramByte1);
-/*  740:     */         }
-/*  741:     */       }
-/*  742:     */       else
-/*  743:     */       {
-/*  744: 595 */         localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_account_id = ?) ORDER BY timestamp ASC");
-/*  745: 596 */         localPreparedStatement.setInt(1, paramInt);
-/*  746: 597 */         localPreparedStatement.setLong(2, paramAccount.getId().longValue());
-/*  747: 598 */         localPreparedStatement.setLong(3, paramAccount.getId().longValue());
-/*  748:     */       }
-/*  749: 600 */       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
-/*  750:     */       {
-/*  751:     */         public Transaction get(Connection paramAnonymousConnection, ResultSet paramAnonymousResultSet)
-/*  752:     */           throws NxtException.ValidationException
-/*  753:     */         {
-/*  754: 603 */           return Transaction.getTransaction(paramAnonymousConnection, paramAnonymousResultSet);
+/*  537: 540 */       localConnection = Db.getConnection();
+/*  538: 541 */       PreparedStatement localPreparedStatement = localConnection.prepareStatement("SELECT * FROM block WHERE timestamp >= ? AND generator_public_key = ? ORDER BY db_id ASC");
+/*  539: 542 */       localPreparedStatement.setInt(1, paramInt);
+/*  540: 543 */       localPreparedStatement.setBytes(2, paramAccount.getPublicKey());
+/*  541: 544 */       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
+/*  542:     */       {
+/*  543:     */         public Block get(Connection paramAnonymousConnection, ResultSet paramAnonymousResultSet)
+/*  544:     */           throws NxtException.ValidationException
+/*  545:     */         {
+/*  546: 547 */           return Block.getBlock(paramAnonymousConnection, paramAnonymousResultSet);
+/*  547:     */         }
+/*  548:     */       });
+/*  549:     */     }
+/*  550:     */     catch (SQLException localSQLException)
+/*  551:     */     {
+/*  552: 551 */       DbUtils.close(new AutoCloseable[] { localConnection });
+/*  553: 552 */       throw new RuntimeException(localSQLException.toString(), localSQLException);
+/*  554:     */     }
+/*  555:     */   }
+/*  556:     */   
+/*  557:     */   /* Error */
+/*  558:     */   public static int getBlockCount()
+/*  559:     */   {
+/*  560:     */     // Byte code:
+/*  561:     */     //   0: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
+/*  562:     */     //   3: astore_0
+/*  563:     */     //   4: aconst_null
+/*  564:     */     //   5: astore_1
+/*  565:     */     //   6: aload_0
+/*  566:     */     //   7: ldc 29
+/*  567:     */     //   9: invokeinterface 12 2 0
+/*  568:     */     //   14: astore_2
+/*  569:     */     //   15: aconst_null
+/*  570:     */     //   16: astore_3
+/*  571:     */     //   17: aload_2
+/*  572:     */     //   18: invokeinterface 30 1 0
+/*  573:     */     //   23: astore 4
+/*  574:     */     //   25: aload 4
+/*  575:     */     //   27: invokeinterface 31 1 0
+/*  576:     */     //   32: pop
+/*  577:     */     //   33: aload 4
+/*  578:     */     //   35: iconst_1
+/*  579:     */     //   36: invokeinterface 32 2 0
+/*  580:     */     //   41: istore 5
+/*  581:     */     //   43: aload_2
+/*  582:     */     //   44: ifnull +33 -> 77
+/*  583:     */     //   47: aload_3
+/*  584:     */     //   48: ifnull +23 -> 71
+/*  585:     */     //   51: aload_2
+/*  586:     */     //   52: invokeinterface 33 1 0
+/*  587:     */     //   57: goto +20 -> 77
+/*  588:     */     //   60: astore 6
+/*  589:     */     //   62: aload_3
+/*  590:     */     //   63: aload 6
+/*  591:     */     //   65: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  592:     */     //   68: goto +9 -> 77
+/*  593:     */     //   71: aload_2
+/*  594:     */     //   72: invokeinterface 33 1 0
+/*  595:     */     //   77: aload_0
+/*  596:     */     //   78: ifnull +33 -> 111
+/*  597:     */     //   81: aload_1
+/*  598:     */     //   82: ifnull +23 -> 105
+/*  599:     */     //   85: aload_0
+/*  600:     */     //   86: invokeinterface 36 1 0
+/*  601:     */     //   91: goto +20 -> 111
+/*  602:     */     //   94: astore 6
+/*  603:     */     //   96: aload_1
+/*  604:     */     //   97: aload 6
+/*  605:     */     //   99: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  606:     */     //   102: goto +9 -> 111
+/*  607:     */     //   105: aload_0
+/*  608:     */     //   106: invokeinterface 36 1 0
+/*  609:     */     //   111: iload 5
+/*  610:     */     //   113: ireturn
+/*  611:     */     //   114: astore 4
+/*  612:     */     //   116: aload 4
+/*  613:     */     //   118: astore_3
+/*  614:     */     //   119: aload 4
+/*  615:     */     //   121: athrow
+/*  616:     */     //   122: astore 7
+/*  617:     */     //   124: aload_2
+/*  618:     */     //   125: ifnull +33 -> 158
+/*  619:     */     //   128: aload_3
+/*  620:     */     //   129: ifnull +23 -> 152
+/*  621:     */     //   132: aload_2
+/*  622:     */     //   133: invokeinterface 33 1 0
+/*  623:     */     //   138: goto +20 -> 158
+/*  624:     */     //   141: astore 8
+/*  625:     */     //   143: aload_3
+/*  626:     */     //   144: aload 8
+/*  627:     */     //   146: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  628:     */     //   149: goto +9 -> 158
+/*  629:     */     //   152: aload_2
+/*  630:     */     //   153: invokeinterface 33 1 0
+/*  631:     */     //   158: aload 7
+/*  632:     */     //   160: athrow
+/*  633:     */     //   161: astore_2
+/*  634:     */     //   162: aload_2
+/*  635:     */     //   163: astore_1
+/*  636:     */     //   164: aload_2
+/*  637:     */     //   165: athrow
+/*  638:     */     //   166: astore 9
+/*  639:     */     //   168: aload_0
+/*  640:     */     //   169: ifnull +33 -> 202
+/*  641:     */     //   172: aload_1
+/*  642:     */     //   173: ifnull +23 -> 196
+/*  643:     */     //   176: aload_0
+/*  644:     */     //   177: invokeinterface 36 1 0
+/*  645:     */     //   182: goto +20 -> 202
+/*  646:     */     //   185: astore 10
+/*  647:     */     //   187: aload_1
+/*  648:     */     //   188: aload 10
+/*  649:     */     //   190: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  650:     */     //   193: goto +9 -> 202
+/*  651:     */     //   196: aload_0
+/*  652:     */     //   197: invokeinterface 36 1 0
+/*  653:     */     //   202: aload 9
+/*  654:     */     //   204: athrow
+/*  655:     */     //   205: astore_0
+/*  656:     */     //   206: new 20	java/lang/RuntimeException
+/*  657:     */     //   209: dup
+/*  658:     */     //   210: aload_0
+/*  659:     */     //   211: invokevirtual 21	java/sql/SQLException:toString	()Ljava/lang/String;
+/*  660:     */     //   214: aload_0
+/*  661:     */     //   215: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
+/*  662:     */     //   218: athrow
+/*  663:     */     // Line number table:
+/*  664:     */     //   Java source line #557	-> byte code offset #0
+/*  665:     */     //   Java source line #558	-> byte code offset #17
+/*  666:     */     //   Java source line #559	-> byte code offset #25
+/*  667:     */     //   Java source line #560	-> byte code offset #33
+/*  668:     */     //   Java source line #561	-> byte code offset #43
+/*  669:     */     //   Java source line #557	-> byte code offset #114
+/*  670:     */     //   Java source line #561	-> byte code offset #122
+/*  671:     */     //   Java source line #557	-> byte code offset #161
+/*  672:     */     //   Java source line #561	-> byte code offset #166
+/*  673:     */     //   Java source line #562	-> byte code offset #206
+/*  674:     */     // Local variable table:
+/*  675:     */     //   start	length	slot	name	signature
+/*  676:     */     //   3	194	0	localConnection	Connection
+/*  677:     */     //   205	10	0	localSQLException	SQLException
+/*  678:     */     //   5	183	1	localObject1	Object
+/*  679:     */     //   14	139	2	localPreparedStatement	PreparedStatement
+/*  680:     */     //   161	4	2	localThrowable1	Throwable
+/*  681:     */     //   16	128	3	localObject2	Object
+/*  682:     */     //   23	11	4	localResultSet	ResultSet
+/*  683:     */     //   114	6	4	localThrowable2	Throwable
+/*  684:     */     //   60	4	6	localThrowable3	Throwable
+/*  685:     */     //   94	4	6	localThrowable4	Throwable
+/*  686:     */     //   122	37	7	localObject3	Object
+/*  687:     */     //   141	4	8	localThrowable5	Throwable
+/*  688:     */     //   166	37	9	localObject4	Object
+/*  689:     */     //   185	4	10	localThrowable6	Throwable
+/*  690:     */     // Exception table:
+/*  691:     */     //   from	to	target	type
+/*  692:     */     //   51	57	60	java/lang/Throwable
+/*  693:     */     //   85	91	94	java/lang/Throwable
+/*  694:     */     //   17	43	114	java/lang/Throwable
+/*  695:     */     //   17	43	122	finally
+/*  696:     */     //   114	124	122	finally
+/*  697:     */     //   132	138	141	java/lang/Throwable
+/*  698:     */     //   6	77	161	java/lang/Throwable
+/*  699:     */     //   114	161	161	java/lang/Throwable
+/*  700:     */     //   6	77	166	finally
+/*  701:     */     //   114	168	166	finally
+/*  702:     */     //   176	182	185	java/lang/Throwable
+/*  703:     */     //   0	111	205	java/sql/SQLException
+/*  704:     */     //   114	205	205	java/sql/SQLException
+/*  705:     */   }
+/*  706:     */   
+/*  707:     */   public static DbIterator<Transaction> getAllTransactions()
+/*  708:     */   {
+/*  709: 567 */     Connection localConnection = null;
+/*  710:     */     try
+/*  711:     */     {
+/*  712: 569 */       localConnection = Db.getConnection();
+/*  713: 570 */       PreparedStatement localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction ORDER BY db_id ASC");
+/*  714: 571 */       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
+/*  715:     */       {
+/*  716:     */         public Transaction get(Connection paramAnonymousConnection, ResultSet paramAnonymousResultSet)
+/*  717:     */           throws NxtException.ValidationException
+/*  718:     */         {
+/*  719: 574 */           return Transaction.getTransaction(paramAnonymousConnection, paramAnonymousResultSet);
+/*  720:     */         }
+/*  721:     */       });
+/*  722:     */     }
+/*  723:     */     catch (SQLException localSQLException)
+/*  724:     */     {
+/*  725: 578 */       DbUtils.close(new AutoCloseable[] { localConnection });
+/*  726: 579 */       throw new RuntimeException(localSQLException.toString(), localSQLException);
+/*  727:     */     }
+/*  728:     */   }
+/*  729:     */   
+/*  730:     */   public static DbIterator<Transaction> getAllTransactions(Account paramAccount, byte paramByte1, byte paramByte2, int paramInt)
+/*  731:     */   {
+/*  732: 584 */     Connection localConnection = null;
+/*  733:     */     try
+/*  734:     */     {
+/*  735: 586 */       localConnection = Db.getConnection();
+/*  736:     */       PreparedStatement localPreparedStatement;
+/*  737: 588 */       if (paramByte1 >= 0)
+/*  738:     */       {
+/*  739: 589 */         if (paramByte2 >= 0)
+/*  740:     */         {
+/*  741: 590 */           localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_account_id = ?) AND type = ? AND subtype = ? ORDER BY timestamp ASC");
+/*  742: 591 */           localPreparedStatement.setInt(1, paramInt);
+/*  743: 592 */           localPreparedStatement.setLong(2, paramAccount.getId().longValue());
+/*  744: 593 */           localPreparedStatement.setLong(3, paramAccount.getId().longValue());
+/*  745: 594 */           localPreparedStatement.setByte(4, paramByte1);
+/*  746: 595 */           localPreparedStatement.setByte(5, paramByte2);
+/*  747:     */         }
+/*  748:     */         else
+/*  749:     */         {
+/*  750: 597 */           localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_account_id = ?) AND type = ? ORDER BY timestamp ASC");
+/*  751: 598 */           localPreparedStatement.setInt(1, paramInt);
+/*  752: 599 */           localPreparedStatement.setLong(2, paramAccount.getId().longValue());
+/*  753: 600 */           localPreparedStatement.setLong(3, paramAccount.getId().longValue());
+/*  754: 601 */           localPreparedStatement.setByte(4, paramByte1);
 /*  755:     */         }
-/*  756:     */       });
-/*  757:     */     }
-/*  758:     */     catch (SQLException localSQLException)
-/*  759:     */     {
-/*  760: 607 */       DbUtils.close(new AutoCloseable[] { localConnection });
-/*  761: 608 */       throw new RuntimeException(localSQLException.toString(), localSQLException);
-/*  762:     */     }
-/*  763:     */   }
-/*  764:     */   
-/*  765:     */   /* Error */
-/*  766:     */   public static int getTransactionCount()
-/*  767:     */   {
-/*  768:     */     // Byte code:
-/*  769:     */     //   0: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
-/*  770:     */     //   3: astore_0
-/*  771:     */     //   4: aconst_null
-/*  772:     */     //   5: astore_1
-/*  773:     */     //   6: aload_0
-/*  774:     */     //   7: ldc 49
-/*  775:     */     //   9: invokeinterface 12 2 0
-/*  776:     */     //   14: astore_2
-/*  777:     */     //   15: aconst_null
-/*  778:     */     //   16: astore_3
-/*  779:     */     //   17: aload_2
-/*  780:     */     //   18: invokeinterface 30 1 0
-/*  781:     */     //   23: astore 4
-/*  782:     */     //   25: aload 4
-/*  783:     */     //   27: invokeinterface 31 1 0
-/*  784:     */     //   32: pop
-/*  785:     */     //   33: aload 4
-/*  786:     */     //   35: iconst_1
-/*  787:     */     //   36: invokeinterface 32 2 0
-/*  788:     */     //   41: istore 5
-/*  789:     */     //   43: aload_2
-/*  790:     */     //   44: ifnull +33 -> 77
-/*  791:     */     //   47: aload_3
-/*  792:     */     //   48: ifnull +23 -> 71
-/*  793:     */     //   51: aload_2
-/*  794:     */     //   52: invokeinterface 33 1 0
-/*  795:     */     //   57: goto +20 -> 77
-/*  796:     */     //   60: astore 6
-/*  797:     */     //   62: aload_3
-/*  798:     */     //   63: aload 6
-/*  799:     */     //   65: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  800:     */     //   68: goto +9 -> 77
-/*  801:     */     //   71: aload_2
-/*  802:     */     //   72: invokeinterface 33 1 0
-/*  803:     */     //   77: aload_0
-/*  804:     */     //   78: ifnull +33 -> 111
-/*  805:     */     //   81: aload_1
-/*  806:     */     //   82: ifnull +23 -> 105
-/*  807:     */     //   85: aload_0
-/*  808:     */     //   86: invokeinterface 36 1 0
-/*  809:     */     //   91: goto +20 -> 111
-/*  810:     */     //   94: astore 6
-/*  811:     */     //   96: aload_1
-/*  812:     */     //   97: aload 6
-/*  813:     */     //   99: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  814:     */     //   102: goto +9 -> 111
-/*  815:     */     //   105: aload_0
-/*  816:     */     //   106: invokeinterface 36 1 0
-/*  817:     */     //   111: iload 5
-/*  818:     */     //   113: ireturn
-/*  819:     */     //   114: astore 4
-/*  820:     */     //   116: aload 4
-/*  821:     */     //   118: astore_3
-/*  822:     */     //   119: aload 4
-/*  823:     */     //   121: athrow
-/*  824:     */     //   122: astore 7
-/*  825:     */     //   124: aload_2
-/*  826:     */     //   125: ifnull +33 -> 158
-/*  827:     */     //   128: aload_3
-/*  828:     */     //   129: ifnull +23 -> 152
-/*  829:     */     //   132: aload_2
-/*  830:     */     //   133: invokeinterface 33 1 0
-/*  831:     */     //   138: goto +20 -> 158
-/*  832:     */     //   141: astore 8
-/*  833:     */     //   143: aload_3
-/*  834:     */     //   144: aload 8
-/*  835:     */     //   146: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  836:     */     //   149: goto +9 -> 158
-/*  837:     */     //   152: aload_2
-/*  838:     */     //   153: invokeinterface 33 1 0
-/*  839:     */     //   158: aload 7
-/*  840:     */     //   160: athrow
-/*  841:     */     //   161: astore_2
-/*  842:     */     //   162: aload_2
-/*  843:     */     //   163: astore_1
-/*  844:     */     //   164: aload_2
-/*  845:     */     //   165: athrow
-/*  846:     */     //   166: astore 9
-/*  847:     */     //   168: aload_0
-/*  848:     */     //   169: ifnull +33 -> 202
-/*  849:     */     //   172: aload_1
-/*  850:     */     //   173: ifnull +23 -> 196
-/*  851:     */     //   176: aload_0
-/*  852:     */     //   177: invokeinterface 36 1 0
-/*  853:     */     //   182: goto +20 -> 202
-/*  854:     */     //   185: astore 10
-/*  855:     */     //   187: aload_1
-/*  856:     */     //   188: aload 10
-/*  857:     */     //   190: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  858:     */     //   193: goto +9 -> 202
-/*  859:     */     //   196: aload_0
-/*  860:     */     //   197: invokeinterface 36 1 0
-/*  861:     */     //   202: aload 9
-/*  862:     */     //   204: athrow
-/*  863:     */     //   205: astore_0
-/*  864:     */     //   206: new 20	java/lang/RuntimeException
-/*  865:     */     //   209: dup
-/*  866:     */     //   210: aload_0
-/*  867:     */     //   211: invokevirtual 21	java/sql/SQLException:toString	()Ljava/lang/String;
-/*  868:     */     //   214: aload_0
-/*  869:     */     //   215: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
-/*  870:     */     //   218: athrow
-/*  871:     */     // Line number table:
-/*  872:     */     //   Java source line #613	-> byte code offset #0
-/*  873:     */     //   Java source line #614	-> byte code offset #17
-/*  874:     */     //   Java source line #615	-> byte code offset #25
-/*  875:     */     //   Java source line #616	-> byte code offset #33
-/*  876:     */     //   Java source line #617	-> byte code offset #43
-/*  877:     */     //   Java source line #613	-> byte code offset #114
-/*  878:     */     //   Java source line #617	-> byte code offset #122
-/*  879:     */     //   Java source line #613	-> byte code offset #161
-/*  880:     */     //   Java source line #617	-> byte code offset #166
-/*  881:     */     //   Java source line #618	-> byte code offset #206
-/*  882:     */     // Local variable table:
-/*  883:     */     //   start	length	slot	name	signature
-/*  884:     */     //   3	194	0	localConnection	Connection
-/*  885:     */     //   205	10	0	localSQLException	SQLException
-/*  886:     */     //   5	183	1	localObject1	Object
-/*  887:     */     //   14	139	2	localPreparedStatement	PreparedStatement
-/*  888:     */     //   161	4	2	localThrowable1	Throwable
-/*  889:     */     //   16	128	3	localObject2	Object
-/*  890:     */     //   23	11	4	localResultSet	ResultSet
-/*  891:     */     //   114	6	4	localThrowable2	Throwable
-/*  892:     */     //   60	4	6	localThrowable3	Throwable
-/*  893:     */     //   94	4	6	localThrowable4	Throwable
-/*  894:     */     //   122	37	7	localObject3	Object
-/*  895:     */     //   141	4	8	localThrowable5	Throwable
-/*  896:     */     //   166	37	9	localObject4	Object
-/*  897:     */     //   185	4	10	localThrowable6	Throwable
-/*  898:     */     // Exception table:
-/*  899:     */     //   from	to	target	type
-/*  900:     */     //   51	57	60	java/lang/Throwable
-/*  901:     */     //   85	91	94	java/lang/Throwable
-/*  902:     */     //   17	43	114	java/lang/Throwable
-/*  903:     */     //   17	43	122	finally
-/*  904:     */     //   114	124	122	finally
-/*  905:     */     //   132	138	141	java/lang/Throwable
-/*  906:     */     //   6	77	161	java/lang/Throwable
-/*  907:     */     //   114	161	161	java/lang/Throwable
-/*  908:     */     //   6	77	166	finally
-/*  909:     */     //   114	168	166	finally
-/*  910:     */     //   176	182	185	java/lang/Throwable
-/*  911:     */     //   0	111	205	java/sql/SQLException
-/*  912:     */     //   114	205	205	java/sql/SQLException
-/*  913:     */   }
-/*  914:     */   
-/*  915:     */   /* Error */
-/*  916:     */   public static java.util.List<Long> getBlockIdsAfter(Long paramLong, int paramInt)
-/*  917:     */   {
-/*  918:     */     // Byte code:
-/*  919:     */     //   0: iload_1
-/*  920:     */     //   1: sipush 1440
-/*  921:     */     //   4: if_icmple +13 -> 17
-/*  922:     */     //   7: new 50	java/lang/IllegalArgumentException
-/*  923:     */     //   10: dup
-/*  924:     */     //   11: ldc 51
-/*  925:     */     //   13: invokespecial 52	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
-/*  926:     */     //   16: athrow
-/*  927:     */     //   17: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
-/*  928:     */     //   20: astore_2
-/*  929:     */     //   21: aconst_null
-/*  930:     */     //   22: astore_3
-/*  931:     */     //   23: aload_2
-/*  932:     */     //   24: ldc 53
-/*  933:     */     //   26: invokeinterface 12 2 0
-/*  934:     */     //   31: astore 4
-/*  935:     */     //   33: aconst_null
-/*  936:     */     //   34: astore 5
-/*  937:     */     //   36: aload_2
-/*  938:     */     //   37: ldc 54
-/*  939:     */     //   39: invokeinterface 12 2 0
-/*  940:     */     //   44: astore 6
-/*  941:     */     //   46: aconst_null
-/*  942:     */     //   47: astore 7
-/*  943:     */     //   49: aload 4
-/*  944:     */     //   51: iconst_1
-/*  945:     */     //   52: aload_0
-/*  946:     */     //   53: invokevirtual 42	java/lang/Long:longValue	()J
-/*  947:     */     //   56: invokeinterface 43 4 0
-/*  948:     */     //   61: aload 4
-/*  949:     */     //   63: invokeinterface 30 1 0
-/*  950:     */     //   68: astore 8
-/*  951:     */     //   70: aload 8
-/*  952:     */     //   72: invokeinterface 31 1 0
-/*  953:     */     //   77: ifne +130 -> 207
-/*  954:     */     //   80: aload 8
-/*  955:     */     //   82: invokeinterface 55 1 0
-/*  956:     */     //   87: invokestatic 56	java/util/Collections:emptyList	()Ljava/util/List;
-/*  957:     */     //   90: astore 9
-/*  958:     */     //   92: aload 6
-/*  959:     */     //   94: ifnull +37 -> 131
-/*  960:     */     //   97: aload 7
-/*  961:     */     //   99: ifnull +25 -> 124
-/*  962:     */     //   102: aload 6
-/*  963:     */     //   104: invokeinterface 33 1 0
-/*  964:     */     //   109: goto +22 -> 131
-/*  965:     */     //   112: astore 10
-/*  966:     */     //   114: aload 7
-/*  967:     */     //   116: aload 10
-/*  968:     */     //   118: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  969:     */     //   121: goto +10 -> 131
-/*  970:     */     //   124: aload 6
-/*  971:     */     //   126: invokeinterface 33 1 0
-/*  972:     */     //   131: aload 4
-/*  973:     */     //   133: ifnull +37 -> 170
-/*  974:     */     //   136: aload 5
-/*  975:     */     //   138: ifnull +25 -> 163
-/*  976:     */     //   141: aload 4
-/*  977:     */     //   143: invokeinterface 33 1 0
-/*  978:     */     //   148: goto +22 -> 170
-/*  979:     */     //   151: astore 10
-/*  980:     */     //   153: aload 5
-/*  981:     */     //   155: aload 10
-/*  982:     */     //   157: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  983:     */     //   160: goto +10 -> 170
-/*  984:     */     //   163: aload 4
-/*  985:     */     //   165: invokeinterface 33 1 0
-/*  986:     */     //   170: aload_2
-/*  987:     */     //   171: ifnull +33 -> 204
-/*  988:     */     //   174: aload_3
-/*  989:     */     //   175: ifnull +23 -> 198
-/*  990:     */     //   178: aload_2
-/*  991:     */     //   179: invokeinterface 36 1 0
-/*  992:     */     //   184: goto +20 -> 204
-/*  993:     */     //   187: astore 10
-/*  994:     */     //   189: aload_3
-/*  995:     */     //   190: aload 10
-/*  996:     */     //   192: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/*  997:     */     //   195: goto +9 -> 204
-/*  998:     */     //   198: aload_2
-/*  999:     */     //   199: invokeinterface 36 1 0
-/* 1000:     */     //   204: aload 9
-/* 1001:     */     //   206: areturn
-/* 1002:     */     //   207: new 57	java/util/ArrayList
-/* 1003:     */     //   210: dup
-/* 1004:     */     //   211: invokespecial 58	java/util/ArrayList:<init>	()V
-/* 1005:     */     //   214: astore 9
-/* 1006:     */     //   216: aload 8
-/* 1007:     */     //   218: ldc 59
-/* 1008:     */     //   220: invokeinterface 60 2 0
-/* 1009:     */     //   225: istore 10
-/* 1010:     */     //   227: aload 6
-/* 1011:     */     //   229: iconst_1
-/* 1012:     */     //   230: iload 10
-/* 1013:     */     //   232: invokeinterface 24 3 0
-/* 1014:     */     //   237: aload 6
-/* 1015:     */     //   239: iconst_2
-/* 1016:     */     //   240: iload_1
-/* 1017:     */     //   241: invokeinterface 24 3 0
-/* 1018:     */     //   246: aload 6
-/* 1019:     */     //   248: invokeinterface 30 1 0
-/* 1020:     */     //   253: astore 8
-/* 1021:     */     //   255: aload 8
-/* 1022:     */     //   257: invokeinterface 31 1 0
-/* 1023:     */     //   262: ifeq +26 -> 288
-/* 1024:     */     //   265: aload 9
-/* 1025:     */     //   267: aload 8
-/* 1026:     */     //   269: ldc 61
-/* 1027:     */     //   271: invokeinterface 62 2 0
-/* 1028:     */     //   276: invokestatic 63	java/lang/Long:valueOf	(J)Ljava/lang/Long;
-/* 1029:     */     //   279: invokeinterface 64 2 0
-/* 1030:     */     //   284: pop
-/* 1031:     */     //   285: goto -30 -> 255
-/* 1032:     */     //   288: aload 8
-/* 1033:     */     //   290: invokeinterface 55 1 0
-/* 1034:     */     //   295: aload 9
-/* 1035:     */     //   297: astore 11
-/* 1036:     */     //   299: aload 6
-/* 1037:     */     //   301: ifnull +37 -> 338
-/* 1038:     */     //   304: aload 7
-/* 1039:     */     //   306: ifnull +25 -> 331
-/* 1040:     */     //   309: aload 6
-/* 1041:     */     //   311: invokeinterface 33 1 0
-/* 1042:     */     //   316: goto +22 -> 338
-/* 1043:     */     //   319: astore 12
-/* 1044:     */     //   321: aload 7
-/* 1045:     */     //   323: aload 12
-/* 1046:     */     //   325: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1047:     */     //   328: goto +10 -> 338
-/* 1048:     */     //   331: aload 6
-/* 1049:     */     //   333: invokeinterface 33 1 0
-/* 1050:     */     //   338: aload 4
-/* 1051:     */     //   340: ifnull +37 -> 377
-/* 1052:     */     //   343: aload 5
-/* 1053:     */     //   345: ifnull +25 -> 370
-/* 1054:     */     //   348: aload 4
-/* 1055:     */     //   350: invokeinterface 33 1 0
-/* 1056:     */     //   355: goto +22 -> 377
-/* 1057:     */     //   358: astore 12
-/* 1058:     */     //   360: aload 5
-/* 1059:     */     //   362: aload 12
-/* 1060:     */     //   364: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1061:     */     //   367: goto +10 -> 377
-/* 1062:     */     //   370: aload 4
-/* 1063:     */     //   372: invokeinterface 33 1 0
-/* 1064:     */     //   377: aload_2
-/* 1065:     */     //   378: ifnull +33 -> 411
-/* 1066:     */     //   381: aload_3
-/* 1067:     */     //   382: ifnull +23 -> 405
-/* 1068:     */     //   385: aload_2
-/* 1069:     */     //   386: invokeinterface 36 1 0
-/* 1070:     */     //   391: goto +20 -> 411
-/* 1071:     */     //   394: astore 12
-/* 1072:     */     //   396: aload_3
-/* 1073:     */     //   397: aload 12
-/* 1074:     */     //   399: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1075:     */     //   402: goto +9 -> 411
-/* 1076:     */     //   405: aload_2
-/* 1077:     */     //   406: invokeinterface 36 1 0
-/* 1078:     */     //   411: aload 11
-/* 1079:     */     //   413: areturn
-/* 1080:     */     //   414: astore 8
-/* 1081:     */     //   416: aload 8
-/* 1082:     */     //   418: astore 7
-/* 1083:     */     //   420: aload 8
-/* 1084:     */     //   422: athrow
-/* 1085:     */     //   423: astore 13
-/* 1086:     */     //   425: aload 6
-/* 1087:     */     //   427: ifnull +37 -> 464
-/* 1088:     */     //   430: aload 7
-/* 1089:     */     //   432: ifnull +25 -> 457
-/* 1090:     */     //   435: aload 6
-/* 1091:     */     //   437: invokeinterface 33 1 0
-/* 1092:     */     //   442: goto +22 -> 464
-/* 1093:     */     //   445: astore 14
-/* 1094:     */     //   447: aload 7
-/* 1095:     */     //   449: aload 14
-/* 1096:     */     //   451: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1097:     */     //   454: goto +10 -> 464
-/* 1098:     */     //   457: aload 6
-/* 1099:     */     //   459: invokeinterface 33 1 0
-/* 1100:     */     //   464: aload 13
-/* 1101:     */     //   466: athrow
-/* 1102:     */     //   467: astore 6
-/* 1103:     */     //   469: aload 6
-/* 1104:     */     //   471: astore 5
-/* 1105:     */     //   473: aload 6
-/* 1106:     */     //   475: athrow
-/* 1107:     */     //   476: astore 15
-/* 1108:     */     //   478: aload 4
-/* 1109:     */     //   480: ifnull +37 -> 517
-/* 1110:     */     //   483: aload 5
-/* 1111:     */     //   485: ifnull +25 -> 510
-/* 1112:     */     //   488: aload 4
-/* 1113:     */     //   490: invokeinterface 33 1 0
-/* 1114:     */     //   495: goto +22 -> 517
-/* 1115:     */     //   498: astore 16
-/* 1116:     */     //   500: aload 5
-/* 1117:     */     //   502: aload 16
-/* 1118:     */     //   504: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1119:     */     //   507: goto +10 -> 517
-/* 1120:     */     //   510: aload 4
-/* 1121:     */     //   512: invokeinterface 33 1 0
-/* 1122:     */     //   517: aload 15
-/* 1123:     */     //   519: athrow
-/* 1124:     */     //   520: astore 4
-/* 1125:     */     //   522: aload 4
-/* 1126:     */     //   524: astore_3
-/* 1127:     */     //   525: aload 4
-/* 1128:     */     //   527: athrow
-/* 1129:     */     //   528: astore 17
-/* 1130:     */     //   530: aload_2
-/* 1131:     */     //   531: ifnull +33 -> 564
-/* 1132:     */     //   534: aload_3
-/* 1133:     */     //   535: ifnull +23 -> 558
-/* 1134:     */     //   538: aload_2
-/* 1135:     */     //   539: invokeinterface 36 1 0
-/* 1136:     */     //   544: goto +20 -> 564
-/* 1137:     */     //   547: astore 18
-/* 1138:     */     //   549: aload_3
-/* 1139:     */     //   550: aload 18
-/* 1140:     */     //   552: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1141:     */     //   555: goto +9 -> 564
-/* 1142:     */     //   558: aload_2
-/* 1143:     */     //   559: invokeinterface 36 1 0
-/* 1144:     */     //   564: aload 17
-/* 1145:     */     //   566: athrow
-/* 1146:     */     //   567: astore_2
-/* 1147:     */     //   568: new 20	java/lang/RuntimeException
-/* 1148:     */     //   571: dup
-/* 1149:     */     //   572: aload_2
-/* 1150:     */     //   573: invokevirtual 21	java/sql/SQLException:toString	()Ljava/lang/String;
-/* 1151:     */     //   576: aload_2
-/* 1152:     */     //   577: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
-/* 1153:     */     //   580: athrow
-/* 1154:     */     // Line number table:
-/* 1155:     */     //   Java source line #623	-> byte code offset #0
-/* 1156:     */     //   Java source line #624	-> byte code offset #7
-/* 1157:     */     //   Java source line #626	-> byte code offset #17
-/* 1158:     */     //   Java source line #627	-> byte code offset #23
-/* 1159:     */     //   Java source line #626	-> byte code offset #33
-/* 1160:     */     //   Java source line #628	-> byte code offset #36
-/* 1161:     */     //   Java source line #626	-> byte code offset #46
-/* 1162:     */     //   Java source line #629	-> byte code offset #49
-/* 1163:     */     //   Java source line #630	-> byte code offset #61
-/* 1164:     */     //   Java source line #631	-> byte code offset #70
-/* 1165:     */     //   Java source line #632	-> byte code offset #80
-/* 1166:     */     //   Java source line #633	-> byte code offset #87
-/* 1167:     */     //   Java source line #645	-> byte code offset #92
-/* 1168:     */     //   Java source line #635	-> byte code offset #207
-/* 1169:     */     //   Java source line #636	-> byte code offset #216
-/* 1170:     */     //   Java source line #637	-> byte code offset #227
-/* 1171:     */     //   Java source line #638	-> byte code offset #237
-/* 1172:     */     //   Java source line #639	-> byte code offset #246
-/* 1173:     */     //   Java source line #640	-> byte code offset #255
-/* 1174:     */     //   Java source line #641	-> byte code offset #265
-/* 1175:     */     //   Java source line #643	-> byte code offset #288
-/* 1176:     */     //   Java source line #644	-> byte code offset #295
-/* 1177:     */     //   Java source line #645	-> byte code offset #299
-/* 1178:     */     //   Java source line #626	-> byte code offset #414
-/* 1179:     */     //   Java source line #645	-> byte code offset #423
-/* 1180:     */     //   Java source line #626	-> byte code offset #467
-/* 1181:     */     //   Java source line #645	-> byte code offset #476
-/* 1182:     */     //   Java source line #626	-> byte code offset #520
-/* 1183:     */     //   Java source line #645	-> byte code offset #528
-/* 1184:     */     //   Java source line #646	-> byte code offset #568
-/* 1185:     */     // Local variable table:
-/* 1186:     */     //   start	length	slot	name	signature
-/* 1187:     */     //   0	581	0	paramLong	Long
-/* 1188:     */     //   0	581	1	paramInt	int
-/* 1189:     */     //   20	539	2	localConnection	Connection
-/* 1190:     */     //   567	10	2	localSQLException	SQLException
-/* 1191:     */     //   22	528	3	localObject1	Object
-/* 1192:     */     //   31	480	4	localPreparedStatement1	PreparedStatement
-/* 1193:     */     //   520	6	4	localThrowable1	Throwable
-/* 1194:     */     //   34	467	5	localObject2	Object
-/* 1195:     */     //   44	414	6	localPreparedStatement2	PreparedStatement
-/* 1196:     */     //   467	7	6	localThrowable2	Throwable
-/* 1197:     */     //   47	401	7	localObject3	Object
-/* 1198:     */     //   68	221	8	localResultSet	ResultSet
-/* 1199:     */     //   414	7	8	localThrowable3	Throwable
-/* 1200:     */     //   90	206	9	localObject4	Object
-/* 1201:     */     //   112	5	10	localThrowable4	Throwable
-/* 1202:     */     //   151	5	10	localThrowable5	Throwable
-/* 1203:     */     //   187	4	10	localThrowable6	Throwable
-/* 1204:     */     //   225	6	10	i	int
-/* 1205:     */     //   297	115	11	localObject5	Object
-/* 1206:     */     //   319	5	12	localThrowable7	Throwable
-/* 1207:     */     //   358	5	12	localThrowable8	Throwable
-/* 1208:     */     //   394	4	12	localThrowable9	Throwable
-/* 1209:     */     //   423	42	13	localObject6	Object
-/* 1210:     */     //   445	5	14	localThrowable10	Throwable
-/* 1211:     */     //   476	42	15	localObject7	Object
-/* 1212:     */     //   498	5	16	localThrowable11	Throwable
-/* 1213:     */     //   528	37	17	localObject8	Object
-/* 1214:     */     //   547	4	18	localThrowable12	Throwable
-/* 1215:     */     // Exception table:
-/* 1216:     */     //   from	to	target	type
-/* 1217:     */     //   102	109	112	java/lang/Throwable
-/* 1218:     */     //   141	148	151	java/lang/Throwable
-/* 1219:     */     //   178	184	187	java/lang/Throwable
-/* 1220:     */     //   309	316	319	java/lang/Throwable
-/* 1221:     */     //   348	355	358	java/lang/Throwable
-/* 1222:     */     //   385	391	394	java/lang/Throwable
-/* 1223:     */     //   49	92	414	java/lang/Throwable
-/* 1224:     */     //   207	299	414	java/lang/Throwable
-/* 1225:     */     //   49	92	423	finally
-/* 1226:     */     //   207	299	423	finally
-/* 1227:     */     //   414	425	423	finally
-/* 1228:     */     //   435	442	445	java/lang/Throwable
-/* 1229:     */     //   36	131	467	java/lang/Throwable
-/* 1230:     */     //   207	338	467	java/lang/Throwable
-/* 1231:     */     //   414	467	467	java/lang/Throwable
-/* 1232:     */     //   36	131	476	finally
-/* 1233:     */     //   207	338	476	finally
-/* 1234:     */     //   414	478	476	finally
-/* 1235:     */     //   488	495	498	java/lang/Throwable
-/* 1236:     */     //   23	170	520	java/lang/Throwable
-/* 1237:     */     //   207	377	520	java/lang/Throwable
-/* 1238:     */     //   414	520	520	java/lang/Throwable
-/* 1239:     */     //   23	170	528	finally
-/* 1240:     */     //   207	377	528	finally
-/* 1241:     */     //   414	530	528	finally
-/* 1242:     */     //   538	544	547	java/lang/Throwable
-/* 1243:     */     //   17	204	567	java/sql/SQLException
-/* 1244:     */     //   207	411	567	java/sql/SQLException
-/* 1245:     */     //   414	567	567	java/sql/SQLException
-/* 1246:     */   }
-/* 1247:     */   
-/* 1248:     */   /* Error */
-/* 1249:     */   public static java.util.List<Block> getBlocksAfter(Long paramLong, int paramInt)
-/* 1250:     */   {
-/* 1251:     */     // Byte code:
-/* 1252:     */     //   0: iload_1
-/* 1253:     */     //   1: sipush 1440
-/* 1254:     */     //   4: if_icmple +13 -> 17
-/* 1255:     */     //   7: new 50	java/lang/IllegalArgumentException
-/* 1256:     */     //   10: dup
-/* 1257:     */     //   11: ldc 51
-/* 1258:     */     //   13: invokespecial 52	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
-/* 1259:     */     //   16: athrow
-/* 1260:     */     //   17: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
-/* 1261:     */     //   20: astore_2
-/* 1262:     */     //   21: aconst_null
-/* 1263:     */     //   22: astore_3
-/* 1264:     */     //   23: aload_2
-/* 1265:     */     //   24: ldc 53
-/* 1266:     */     //   26: invokeinterface 12 2 0
-/* 1267:     */     //   31: astore 4
-/* 1268:     */     //   33: aconst_null
-/* 1269:     */     //   34: astore 5
-/* 1270:     */     //   36: aload_2
-/* 1271:     */     //   37: ldc 65
-/* 1272:     */     //   39: invokeinterface 12 2 0
-/* 1273:     */     //   44: astore 6
-/* 1274:     */     //   46: aconst_null
-/* 1275:     */     //   47: astore 7
-/* 1276:     */     //   49: aload 4
-/* 1277:     */     //   51: iconst_1
-/* 1278:     */     //   52: aload_0
-/* 1279:     */     //   53: invokevirtual 42	java/lang/Long:longValue	()J
-/* 1280:     */     //   56: invokeinterface 43 4 0
-/* 1281:     */     //   61: aload 4
-/* 1282:     */     //   63: invokeinterface 30 1 0
-/* 1283:     */     //   68: astore 8
-/* 1284:     */     //   70: aload 8
-/* 1285:     */     //   72: invokeinterface 31 1 0
-/* 1286:     */     //   77: ifne +130 -> 207
-/* 1287:     */     //   80: aload 8
-/* 1288:     */     //   82: invokeinterface 55 1 0
-/* 1289:     */     //   87: invokestatic 56	java/util/Collections:emptyList	()Ljava/util/List;
-/* 1290:     */     //   90: astore 9
-/* 1291:     */     //   92: aload 6
-/* 1292:     */     //   94: ifnull +37 -> 131
-/* 1293:     */     //   97: aload 7
-/* 1294:     */     //   99: ifnull +25 -> 124
-/* 1295:     */     //   102: aload 6
-/* 1296:     */     //   104: invokeinterface 33 1 0
-/* 1297:     */     //   109: goto +22 -> 131
-/* 1298:     */     //   112: astore 10
-/* 1299:     */     //   114: aload 7
-/* 1300:     */     //   116: aload 10
-/* 1301:     */     //   118: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1302:     */     //   121: goto +10 -> 131
-/* 1303:     */     //   124: aload 6
-/* 1304:     */     //   126: invokeinterface 33 1 0
-/* 1305:     */     //   131: aload 4
-/* 1306:     */     //   133: ifnull +37 -> 170
-/* 1307:     */     //   136: aload 5
-/* 1308:     */     //   138: ifnull +25 -> 163
-/* 1309:     */     //   141: aload 4
-/* 1310:     */     //   143: invokeinterface 33 1 0
-/* 1311:     */     //   148: goto +22 -> 170
-/* 1312:     */     //   151: astore 10
-/* 1313:     */     //   153: aload 5
-/* 1314:     */     //   155: aload 10
-/* 1315:     */     //   157: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1316:     */     //   160: goto +10 -> 170
-/* 1317:     */     //   163: aload 4
-/* 1318:     */     //   165: invokeinterface 33 1 0
-/* 1319:     */     //   170: aload_2
-/* 1320:     */     //   171: ifnull +33 -> 204
-/* 1321:     */     //   174: aload_3
-/* 1322:     */     //   175: ifnull +23 -> 198
-/* 1323:     */     //   178: aload_2
-/* 1324:     */     //   179: invokeinterface 36 1 0
-/* 1325:     */     //   184: goto +20 -> 204
-/* 1326:     */     //   187: astore 10
-/* 1327:     */     //   189: aload_3
-/* 1328:     */     //   190: aload 10
-/* 1329:     */     //   192: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1330:     */     //   195: goto +9 -> 204
-/* 1331:     */     //   198: aload_2
-/* 1332:     */     //   199: invokeinterface 36 1 0
-/* 1333:     */     //   204: aload 9
-/* 1334:     */     //   206: areturn
-/* 1335:     */     //   207: new 57	java/util/ArrayList
-/* 1336:     */     //   210: dup
-/* 1337:     */     //   211: invokespecial 58	java/util/ArrayList:<init>	()V
-/* 1338:     */     //   214: astore 9
-/* 1339:     */     //   216: aload 8
-/* 1340:     */     //   218: ldc 59
-/* 1341:     */     //   220: invokeinterface 60 2 0
-/* 1342:     */     //   225: istore 10
-/* 1343:     */     //   227: aload 6
-/* 1344:     */     //   229: iconst_1
-/* 1345:     */     //   230: iload 10
-/* 1346:     */     //   232: invokeinterface 24 3 0
-/* 1347:     */     //   237: aload 6
-/* 1348:     */     //   239: iconst_2
-/* 1349:     */     //   240: iload_1
-/* 1350:     */     //   241: invokeinterface 24 3 0
-/* 1351:     */     //   246: aload 6
-/* 1352:     */     //   248: invokeinterface 30 1 0
-/* 1353:     */     //   253: astore 8
-/* 1354:     */     //   255: aload 8
-/* 1355:     */     //   257: invokeinterface 31 1 0
-/* 1356:     */     //   262: ifeq +20 -> 282
-/* 1357:     */     //   265: aload 9
-/* 1358:     */     //   267: aload_2
-/* 1359:     */     //   268: aload 8
-/* 1360:     */     //   270: invokestatic 66	nxt/Block:getBlock	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Block;
-/* 1361:     */     //   273: invokeinterface 64 2 0
-/* 1362:     */     //   278: pop
-/* 1363:     */     //   279: goto -24 -> 255
-/* 1364:     */     //   282: aload 8
-/* 1365:     */     //   284: invokeinterface 55 1 0
-/* 1366:     */     //   289: aload 9
-/* 1367:     */     //   291: astore 11
-/* 1368:     */     //   293: aload 6
-/* 1369:     */     //   295: ifnull +37 -> 332
-/* 1370:     */     //   298: aload 7
-/* 1371:     */     //   300: ifnull +25 -> 325
-/* 1372:     */     //   303: aload 6
-/* 1373:     */     //   305: invokeinterface 33 1 0
-/* 1374:     */     //   310: goto +22 -> 332
-/* 1375:     */     //   313: astore 12
-/* 1376:     */     //   315: aload 7
-/* 1377:     */     //   317: aload 12
-/* 1378:     */     //   319: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1379:     */     //   322: goto +10 -> 332
-/* 1380:     */     //   325: aload 6
-/* 1381:     */     //   327: invokeinterface 33 1 0
-/* 1382:     */     //   332: aload 4
-/* 1383:     */     //   334: ifnull +37 -> 371
-/* 1384:     */     //   337: aload 5
-/* 1385:     */     //   339: ifnull +25 -> 364
-/* 1386:     */     //   342: aload 4
-/* 1387:     */     //   344: invokeinterface 33 1 0
-/* 1388:     */     //   349: goto +22 -> 371
-/* 1389:     */     //   352: astore 12
-/* 1390:     */     //   354: aload 5
-/* 1391:     */     //   356: aload 12
-/* 1392:     */     //   358: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1393:     */     //   361: goto +10 -> 371
-/* 1394:     */     //   364: aload 4
-/* 1395:     */     //   366: invokeinterface 33 1 0
-/* 1396:     */     //   371: aload_2
-/* 1397:     */     //   372: ifnull +33 -> 405
-/* 1398:     */     //   375: aload_3
-/* 1399:     */     //   376: ifnull +23 -> 399
-/* 1400:     */     //   379: aload_2
-/* 1401:     */     //   380: invokeinterface 36 1 0
-/* 1402:     */     //   385: goto +20 -> 405
-/* 1403:     */     //   388: astore 12
-/* 1404:     */     //   390: aload_3
-/* 1405:     */     //   391: aload 12
-/* 1406:     */     //   393: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1407:     */     //   396: goto +9 -> 405
-/* 1408:     */     //   399: aload_2
-/* 1409:     */     //   400: invokeinterface 36 1 0
-/* 1410:     */     //   405: aload 11
-/* 1411:     */     //   407: areturn
-/* 1412:     */     //   408: astore 8
-/* 1413:     */     //   410: aload 8
-/* 1414:     */     //   412: astore 7
-/* 1415:     */     //   414: aload 8
-/* 1416:     */     //   416: athrow
-/* 1417:     */     //   417: astore 13
-/* 1418:     */     //   419: aload 6
-/* 1419:     */     //   421: ifnull +37 -> 458
-/* 1420:     */     //   424: aload 7
-/* 1421:     */     //   426: ifnull +25 -> 451
-/* 1422:     */     //   429: aload 6
-/* 1423:     */     //   431: invokeinterface 33 1 0
-/* 1424:     */     //   436: goto +22 -> 458
-/* 1425:     */     //   439: astore 14
-/* 1426:     */     //   441: aload 7
-/* 1427:     */     //   443: aload 14
-/* 1428:     */     //   445: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1429:     */     //   448: goto +10 -> 458
-/* 1430:     */     //   451: aload 6
-/* 1431:     */     //   453: invokeinterface 33 1 0
-/* 1432:     */     //   458: aload 13
-/* 1433:     */     //   460: athrow
-/* 1434:     */     //   461: astore 6
-/* 1435:     */     //   463: aload 6
-/* 1436:     */     //   465: astore 5
-/* 1437:     */     //   467: aload 6
-/* 1438:     */     //   469: athrow
-/* 1439:     */     //   470: astore 15
-/* 1440:     */     //   472: aload 4
-/* 1441:     */     //   474: ifnull +37 -> 511
-/* 1442:     */     //   477: aload 5
-/* 1443:     */     //   479: ifnull +25 -> 504
-/* 1444:     */     //   482: aload 4
-/* 1445:     */     //   484: invokeinterface 33 1 0
-/* 1446:     */     //   489: goto +22 -> 511
-/* 1447:     */     //   492: astore 16
-/* 1448:     */     //   494: aload 5
-/* 1449:     */     //   496: aload 16
-/* 1450:     */     //   498: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1451:     */     //   501: goto +10 -> 511
-/* 1452:     */     //   504: aload 4
-/* 1453:     */     //   506: invokeinterface 33 1 0
-/* 1454:     */     //   511: aload 15
-/* 1455:     */     //   513: athrow
-/* 1456:     */     //   514: astore 4
-/* 1457:     */     //   516: aload 4
-/* 1458:     */     //   518: astore_3
-/* 1459:     */     //   519: aload 4
-/* 1460:     */     //   521: athrow
-/* 1461:     */     //   522: astore 17
-/* 1462:     */     //   524: aload_2
-/* 1463:     */     //   525: ifnull +33 -> 558
-/* 1464:     */     //   528: aload_3
-/* 1465:     */     //   529: ifnull +23 -> 552
-/* 1466:     */     //   532: aload_2
-/* 1467:     */     //   533: invokeinterface 36 1 0
-/* 1468:     */     //   538: goto +20 -> 558
-/* 1469:     */     //   541: astore 18
-/* 1470:     */     //   543: aload_3
-/* 1471:     */     //   544: aload 18
-/* 1472:     */     //   546: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1473:     */     //   549: goto +9 -> 558
-/* 1474:     */     //   552: aload_2
-/* 1475:     */     //   553: invokeinterface 36 1 0
-/* 1476:     */     //   558: aload 17
-/* 1477:     */     //   560: athrow
-/* 1478:     */     //   561: astore_2
-/* 1479:     */     //   562: new 20	java/lang/RuntimeException
-/* 1480:     */     //   565: dup
-/* 1481:     */     //   566: aload_2
-/* 1482:     */     //   567: invokevirtual 68	java/lang/Exception:toString	()Ljava/lang/String;
-/* 1483:     */     //   570: aload_2
-/* 1484:     */     //   571: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
-/* 1485:     */     //   574: athrow
-/* 1486:     */     // Line number table:
-/* 1487:     */     //   Java source line #651	-> byte code offset #0
-/* 1488:     */     //   Java source line #652	-> byte code offset #7
-/* 1489:     */     //   Java source line #654	-> byte code offset #17
-/* 1490:     */     //   Java source line #655	-> byte code offset #23
-/* 1491:     */     //   Java source line #654	-> byte code offset #33
-/* 1492:     */     //   Java source line #656	-> byte code offset #36
-/* 1493:     */     //   Java source line #654	-> byte code offset #46
-/* 1494:     */     //   Java source line #657	-> byte code offset #49
-/* 1495:     */     //   Java source line #658	-> byte code offset #61
-/* 1496:     */     //   Java source line #659	-> byte code offset #70
-/* 1497:     */     //   Java source line #660	-> byte code offset #80
-/* 1498:     */     //   Java source line #661	-> byte code offset #87
-/* 1499:     */     //   Java source line #673	-> byte code offset #92
-/* 1500:     */     //   Java source line #663	-> byte code offset #207
-/* 1501:     */     //   Java source line #664	-> byte code offset #216
-/* 1502:     */     //   Java source line #665	-> byte code offset #227
-/* 1503:     */     //   Java source line #666	-> byte code offset #237
-/* 1504:     */     //   Java source line #667	-> byte code offset #246
-/* 1505:     */     //   Java source line #668	-> byte code offset #255
-/* 1506:     */     //   Java source line #669	-> byte code offset #265
-/* 1507:     */     //   Java source line #671	-> byte code offset #282
-/* 1508:     */     //   Java source line #672	-> byte code offset #289
-/* 1509:     */     //   Java source line #673	-> byte code offset #293
-/* 1510:     */     //   Java source line #654	-> byte code offset #408
-/* 1511:     */     //   Java source line #673	-> byte code offset #417
-/* 1512:     */     //   Java source line #654	-> byte code offset #461
-/* 1513:     */     //   Java source line #673	-> byte code offset #470
-/* 1514:     */     //   Java source line #654	-> byte code offset #514
-/* 1515:     */     //   Java source line #673	-> byte code offset #522
-/* 1516:     */     //   Java source line #674	-> byte code offset #562
-/* 1517:     */     // Local variable table:
-/* 1518:     */     //   start	length	slot	name	signature
-/* 1519:     */     //   0	575	0	paramLong	Long
-/* 1520:     */     //   0	575	1	paramInt	int
-/* 1521:     */     //   20	533	2	localConnection	Connection
-/* 1522:     */     //   561	10	2	localValidationException	NxtException.ValidationException
-/* 1523:     */     //   22	522	3	localObject1	Object
-/* 1524:     */     //   31	474	4	localPreparedStatement1	PreparedStatement
-/* 1525:     */     //   514	6	4	localThrowable1	Throwable
-/* 1526:     */     //   34	461	5	localObject2	Object
-/* 1527:     */     //   44	408	6	localPreparedStatement2	PreparedStatement
-/* 1528:     */     //   461	7	6	localThrowable2	Throwable
-/* 1529:     */     //   47	395	7	localObject3	Object
-/* 1530:     */     //   68	215	8	localResultSet	ResultSet
-/* 1531:     */     //   408	7	8	localThrowable3	Throwable
-/* 1532:     */     //   90	200	9	localObject4	Object
-/* 1533:     */     //   112	5	10	localThrowable4	Throwable
-/* 1534:     */     //   151	5	10	localThrowable5	Throwable
-/* 1535:     */     //   187	4	10	localThrowable6	Throwable
-/* 1536:     */     //   225	6	10	i	int
-/* 1537:     */     //   291	115	11	localObject5	Object
-/* 1538:     */     //   313	5	12	localThrowable7	Throwable
-/* 1539:     */     //   352	5	12	localThrowable8	Throwable
-/* 1540:     */     //   388	4	12	localThrowable9	Throwable
-/* 1541:     */     //   417	42	13	localObject6	Object
-/* 1542:     */     //   439	5	14	localThrowable10	Throwable
-/* 1543:     */     //   470	42	15	localObject7	Object
-/* 1544:     */     //   492	5	16	localThrowable11	Throwable
-/* 1545:     */     //   522	37	17	localObject8	Object
-/* 1546:     */     //   541	4	18	localThrowable12	Throwable
-/* 1547:     */     // Exception table:
-/* 1548:     */     //   from	to	target	type
-/* 1549:     */     //   102	109	112	java/lang/Throwable
-/* 1550:     */     //   141	148	151	java/lang/Throwable
-/* 1551:     */     //   178	184	187	java/lang/Throwable
-/* 1552:     */     //   303	310	313	java/lang/Throwable
-/* 1553:     */     //   342	349	352	java/lang/Throwable
-/* 1554:     */     //   379	385	388	java/lang/Throwable
-/* 1555:     */     //   49	92	408	java/lang/Throwable
-/* 1556:     */     //   207	293	408	java/lang/Throwable
-/* 1557:     */     //   49	92	417	finally
-/* 1558:     */     //   207	293	417	finally
-/* 1559:     */     //   408	419	417	finally
-/* 1560:     */     //   429	436	439	java/lang/Throwable
-/* 1561:     */     //   36	131	461	java/lang/Throwable
-/* 1562:     */     //   207	332	461	java/lang/Throwable
-/* 1563:     */     //   408	461	461	java/lang/Throwable
-/* 1564:     */     //   36	131	470	finally
-/* 1565:     */     //   207	332	470	finally
-/* 1566:     */     //   408	472	470	finally
-/* 1567:     */     //   482	489	492	java/lang/Throwable
-/* 1568:     */     //   23	170	514	java/lang/Throwable
-/* 1569:     */     //   207	371	514	java/lang/Throwable
-/* 1570:     */     //   408	514	514	java/lang/Throwable
-/* 1571:     */     //   23	170	522	finally
-/* 1572:     */     //   207	371	522	finally
-/* 1573:     */     //   408	524	522	finally
-/* 1574:     */     //   532	538	541	java/lang/Throwable
-/* 1575:     */     //   17	204	561	nxt/NxtException$ValidationException
-/* 1576:     */     //   17	204	561	java/sql/SQLException
-/* 1577:     */     //   207	405	561	nxt/NxtException$ValidationException
-/* 1578:     */     //   207	405	561	java/sql/SQLException
-/* 1579:     */     //   408	561	561	nxt/NxtException$ValidationException
-/* 1580:     */     //   408	561	561	java/sql/SQLException
-/* 1581:     */   }
-/* 1582:     */   
-/* 1583:     */   public static long getBlockIdAtHeight(int paramInt)
-/* 1584:     */   {
-/* 1585: 679 */     Block localBlock = (Block)lastBlock.get();
-/* 1586: 680 */     if (paramInt > localBlock.getHeight()) {
-/* 1587: 681 */       throw new IllegalArgumentException("Invalid height " + paramInt + ", current blockchain is at " + localBlock.getHeight());
-/* 1588:     */     }
-/* 1589: 683 */     if (paramInt == localBlock.getHeight()) {
-/* 1590: 684 */       return localBlock.getId().longValue();
-/* 1591:     */     }
-/* 1592: 686 */     return Block.findBlockIdAtHeight(paramInt);
-/* 1593:     */   }
-/* 1594:     */   
-/* 1595:     */   /* Error */
-/* 1596:     */   public static java.util.List<Block> getBlocksFromHeight(int paramInt)
-/* 1597:     */   {
-/* 1598:     */     // Byte code:
-/* 1599:     */     //   0: iload_0
-/* 1600:     */     //   1: iflt +23 -> 24
-/* 1601:     */     //   4: getstatic 6	nxt/Blockchain:lastBlock	Ljava/util/concurrent/atomic/AtomicReference;
-/* 1602:     */     //   7: invokevirtual 69	java/util/concurrent/atomic/AtomicReference:get	()Ljava/lang/Object;
-/* 1603:     */     //   10: checkcast 70	nxt/Block
-/* 1604:     */     //   13: invokevirtual 71	nxt/Block:getHeight	()I
-/* 1605:     */     //   16: iload_0
-/* 1606:     */     //   17: isub
-/* 1607:     */     //   18: sipush 1440
-/* 1608:     */     //   21: if_icmple +13 -> 34
-/* 1609:     */     //   24: new 50	java/lang/IllegalArgumentException
-/* 1610:     */     //   27: dup
-/* 1611:     */     //   28: ldc 81
-/* 1612:     */     //   30: invokespecial 52	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
-/* 1613:     */     //   33: athrow
-/* 1614:     */     //   34: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
-/* 1615:     */     //   37: astore_1
-/* 1616:     */     //   38: aconst_null
-/* 1617:     */     //   39: astore_2
-/* 1618:     */     //   40: aload_1
-/* 1619:     */     //   41: ldc 82
-/* 1620:     */     //   43: invokeinterface 12 2 0
-/* 1621:     */     //   48: astore_3
-/* 1622:     */     //   49: aconst_null
-/* 1623:     */     //   50: astore 4
-/* 1624:     */     //   52: aload_3
-/* 1625:     */     //   53: iconst_1
-/* 1626:     */     //   54: iload_0
-/* 1627:     */     //   55: invokeinterface 24 3 0
-/* 1628:     */     //   60: aload_3
-/* 1629:     */     //   61: invokeinterface 30 1 0
-/* 1630:     */     //   66: astore 5
-/* 1631:     */     //   68: new 57	java/util/ArrayList
-/* 1632:     */     //   71: dup
-/* 1633:     */     //   72: invokespecial 58	java/util/ArrayList:<init>	()V
-/* 1634:     */     //   75: astore 6
-/* 1635:     */     //   77: aload 5
-/* 1636:     */     //   79: invokeinterface 31 1 0
-/* 1637:     */     //   84: ifeq +20 -> 104
-/* 1638:     */     //   87: aload 6
-/* 1639:     */     //   89: aload_1
-/* 1640:     */     //   90: aload 5
-/* 1641:     */     //   92: invokestatic 66	nxt/Block:getBlock	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Block;
-/* 1642:     */     //   95: invokeinterface 64 2 0
-/* 1643:     */     //   100: pop
-/* 1644:     */     //   101: goto -24 -> 77
-/* 1645:     */     //   104: aload 6
-/* 1646:     */     //   106: astore 7
-/* 1647:     */     //   108: aload_3
-/* 1648:     */     //   109: ifnull +35 -> 144
-/* 1649:     */     //   112: aload 4
-/* 1650:     */     //   114: ifnull +24 -> 138
-/* 1651:     */     //   117: aload_3
-/* 1652:     */     //   118: invokeinterface 33 1 0
-/* 1653:     */     //   123: goto +21 -> 144
-/* 1654:     */     //   126: astore 8
-/* 1655:     */     //   128: aload 4
-/* 1656:     */     //   130: aload 8
-/* 1657:     */     //   132: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1658:     */     //   135: goto +9 -> 144
-/* 1659:     */     //   138: aload_3
-/* 1660:     */     //   139: invokeinterface 33 1 0
-/* 1661:     */     //   144: aload_1
-/* 1662:     */     //   145: ifnull +33 -> 178
-/* 1663:     */     //   148: aload_2
-/* 1664:     */     //   149: ifnull +23 -> 172
-/* 1665:     */     //   152: aload_1
-/* 1666:     */     //   153: invokeinterface 36 1 0
-/* 1667:     */     //   158: goto +20 -> 178
-/* 1668:     */     //   161: astore 8
-/* 1669:     */     //   163: aload_2
-/* 1670:     */     //   164: aload 8
-/* 1671:     */     //   166: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1672:     */     //   169: goto +9 -> 178
-/* 1673:     */     //   172: aload_1
-/* 1674:     */     //   173: invokeinterface 36 1 0
-/* 1675:     */     //   178: aload 7
-/* 1676:     */     //   180: areturn
-/* 1677:     */     //   181: astore 5
-/* 1678:     */     //   183: aload 5
-/* 1679:     */     //   185: astore 4
-/* 1680:     */     //   187: aload 5
-/* 1681:     */     //   189: athrow
-/* 1682:     */     //   190: astore 9
-/* 1683:     */     //   192: aload_3
-/* 1684:     */     //   193: ifnull +35 -> 228
-/* 1685:     */     //   196: aload 4
-/* 1686:     */     //   198: ifnull +24 -> 222
-/* 1687:     */     //   201: aload_3
-/* 1688:     */     //   202: invokeinterface 33 1 0
-/* 1689:     */     //   207: goto +21 -> 228
-/* 1690:     */     //   210: astore 10
-/* 1691:     */     //   212: aload 4
-/* 1692:     */     //   214: aload 10
-/* 1693:     */     //   216: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1694:     */     //   219: goto +9 -> 228
-/* 1695:     */     //   222: aload_3
-/* 1696:     */     //   223: invokeinterface 33 1 0
-/* 1697:     */     //   228: aload 9
-/* 1698:     */     //   230: athrow
-/* 1699:     */     //   231: astore_3
-/* 1700:     */     //   232: aload_3
-/* 1701:     */     //   233: astore_2
-/* 1702:     */     //   234: aload_3
-/* 1703:     */     //   235: athrow
-/* 1704:     */     //   236: astore 11
-/* 1705:     */     //   238: aload_1
-/* 1706:     */     //   239: ifnull +33 -> 272
-/* 1707:     */     //   242: aload_2
-/* 1708:     */     //   243: ifnull +23 -> 266
-/* 1709:     */     //   246: aload_1
-/* 1710:     */     //   247: invokeinterface 36 1 0
-/* 1711:     */     //   252: goto +20 -> 272
-/* 1712:     */     //   255: astore 12
-/* 1713:     */     //   257: aload_2
-/* 1714:     */     //   258: aload 12
-/* 1715:     */     //   260: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
-/* 1716:     */     //   263: goto +9 -> 272
-/* 1717:     */     //   266: aload_1
-/* 1718:     */     //   267: invokeinterface 36 1 0
-/* 1719:     */     //   272: aload 11
-/* 1720:     */     //   274: athrow
-/* 1721:     */     //   275: astore_1
-/* 1722:     */     //   276: new 20	java/lang/RuntimeException
-/* 1723:     */     //   279: dup
-/* 1724:     */     //   280: aload_1
-/* 1725:     */     //   281: invokevirtual 68	java/lang/Exception:toString	()Ljava/lang/String;
-/* 1726:     */     //   284: aload_1
-/* 1727:     */     //   285: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
-/* 1728:     */     //   288: athrow
-/* 1729:     */     // Line number table:
-/* 1730:     */     //   Java source line #690	-> byte code offset #0
-/* 1731:     */     //   Java source line #691	-> byte code offset #24
-/* 1732:     */     //   Java source line #693	-> byte code offset #34
-/* 1733:     */     //   Java source line #694	-> byte code offset #40
-/* 1734:     */     //   Java source line #693	-> byte code offset #49
-/* 1735:     */     //   Java source line #695	-> byte code offset #52
-/* 1736:     */     //   Java source line #696	-> byte code offset #60
-/* 1737:     */     //   Java source line #697	-> byte code offset #68
-/* 1738:     */     //   Java source line #698	-> byte code offset #77
-/* 1739:     */     //   Java source line #699	-> byte code offset #87
-/* 1740:     */     //   Java source line #701	-> byte code offset #104
-/* 1741:     */     //   Java source line #702	-> byte code offset #108
-/* 1742:     */     //   Java source line #693	-> byte code offset #181
-/* 1743:     */     //   Java source line #702	-> byte code offset #190
-/* 1744:     */     //   Java source line #693	-> byte code offset #231
-/* 1745:     */     //   Java source line #702	-> byte code offset #236
-/* 1746:     */     //   Java source line #703	-> byte code offset #276
-/* 1747:     */     // Local variable table:
-/* 1748:     */     //   start	length	slot	name	signature
-/* 1749:     */     //   0	289	0	paramInt	int
-/* 1750:     */     //   37	230	1	localConnection	Connection
-/* 1751:     */     //   275	10	1	localSQLException	SQLException
-/* 1752:     */     //   39	219	2	localObject1	Object
-/* 1753:     */     //   48	175	3	localPreparedStatement	PreparedStatement
-/* 1754:     */     //   231	4	3	localThrowable1	Throwable
-/* 1755:     */     //   50	163	4	localObject2	Object
-/* 1756:     */     //   66	25	5	localResultSet	ResultSet
-/* 1757:     */     //   181	7	5	localThrowable2	Throwable
-/* 1758:     */     //   75	30	6	localArrayList1	java.util.ArrayList
-/* 1759:     */     //   126	5	8	localThrowable3	Throwable
-/* 1760:     */     //   161	4	8	localThrowable4	Throwable
-/* 1761:     */     //   190	39	9	localObject3	Object
-/* 1762:     */     //   210	5	10	localThrowable5	Throwable
-/* 1763:     */     //   236	37	11	localObject4	Object
-/* 1764:     */     //   255	4	12	localThrowable6	Throwable
-/* 1765:     */     // Exception table:
-/* 1766:     */     //   from	to	target	type
-/* 1767:     */     //   117	123	126	java/lang/Throwable
-/* 1768:     */     //   152	158	161	java/lang/Throwable
-/* 1769:     */     //   52	108	181	java/lang/Throwable
-/* 1770:     */     //   52	108	190	finally
-/* 1771:     */     //   181	192	190	finally
-/* 1772:     */     //   201	207	210	java/lang/Throwable
-/* 1773:     */     //   40	144	231	java/lang/Throwable
-/* 1774:     */     //   181	231	231	java/lang/Throwable
-/* 1775:     */     //   40	144	236	finally
-/* 1776:     */     //   181	238	236	finally
-/* 1777:     */     //   246	252	255	java/lang/Throwable
-/* 1778:     */     //   34	178	275	java/sql/SQLException
-/* 1779:     */     //   34	178	275	nxt/NxtException$ValidationException
-/* 1780:     */     //   181	275	275	java/sql/SQLException
-/* 1781:     */     //   181	275	275	nxt/NxtException$ValidationException
-/* 1782:     */   }
-/* 1783:     */   
-/* 1784:     */   public static Collection<Transaction> getAllUnconfirmedTransactions()
-/* 1785:     */   {
-/* 1786: 708 */     return allUnconfirmedTransactions;
-/* 1787:     */   }
-/* 1788:     */   
-/* 1789:     */   public static Block getLastBlock()
-/* 1790:     */   {
-/* 1791: 712 */     return (Block)lastBlock.get();
-/* 1792:     */   }
-/* 1793:     */   
-/* 1794:     */   public static Block getBlock(Long paramLong)
-/* 1795:     */   {
-/* 1796: 716 */     return Block.findBlock(paramLong);
+/*  756:     */       }
+/*  757:     */       else
+/*  758:     */       {
+/*  759: 604 */         localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_account_id = ?) ORDER BY timestamp ASC");
+/*  760: 605 */         localPreparedStatement.setInt(1, paramInt);
+/*  761: 606 */         localPreparedStatement.setLong(2, paramAccount.getId().longValue());
+/*  762: 607 */         localPreparedStatement.setLong(3, paramAccount.getId().longValue());
+/*  763:     */       }
+/*  764: 609 */       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
+/*  765:     */       {
+/*  766:     */         public Transaction get(Connection paramAnonymousConnection, ResultSet paramAnonymousResultSet)
+/*  767:     */           throws NxtException.ValidationException
+/*  768:     */         {
+/*  769: 612 */           return Transaction.getTransaction(paramAnonymousConnection, paramAnonymousResultSet);
+/*  770:     */         }
+/*  771:     */       });
+/*  772:     */     }
+/*  773:     */     catch (SQLException localSQLException)
+/*  774:     */     {
+/*  775: 616 */       DbUtils.close(new AutoCloseable[] { localConnection });
+/*  776: 617 */       throw new RuntimeException(localSQLException.toString(), localSQLException);
+/*  777:     */     }
+/*  778:     */   }
+/*  779:     */   
+/*  780:     */   /* Error */
+/*  781:     */   public static int getTransactionCount()
+/*  782:     */   {
+/*  783:     */     // Byte code:
+/*  784:     */     //   0: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
+/*  785:     */     //   3: astore_0
+/*  786:     */     //   4: aconst_null
+/*  787:     */     //   5: astore_1
+/*  788:     */     //   6: aload_0
+/*  789:     */     //   7: ldc 49
+/*  790:     */     //   9: invokeinterface 12 2 0
+/*  791:     */     //   14: astore_2
+/*  792:     */     //   15: aconst_null
+/*  793:     */     //   16: astore_3
+/*  794:     */     //   17: aload_2
+/*  795:     */     //   18: invokeinterface 30 1 0
+/*  796:     */     //   23: astore 4
+/*  797:     */     //   25: aload 4
+/*  798:     */     //   27: invokeinterface 31 1 0
+/*  799:     */     //   32: pop
+/*  800:     */     //   33: aload 4
+/*  801:     */     //   35: iconst_1
+/*  802:     */     //   36: invokeinterface 32 2 0
+/*  803:     */     //   41: istore 5
+/*  804:     */     //   43: aload_2
+/*  805:     */     //   44: ifnull +33 -> 77
+/*  806:     */     //   47: aload_3
+/*  807:     */     //   48: ifnull +23 -> 71
+/*  808:     */     //   51: aload_2
+/*  809:     */     //   52: invokeinterface 33 1 0
+/*  810:     */     //   57: goto +20 -> 77
+/*  811:     */     //   60: astore 6
+/*  812:     */     //   62: aload_3
+/*  813:     */     //   63: aload 6
+/*  814:     */     //   65: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  815:     */     //   68: goto +9 -> 77
+/*  816:     */     //   71: aload_2
+/*  817:     */     //   72: invokeinterface 33 1 0
+/*  818:     */     //   77: aload_0
+/*  819:     */     //   78: ifnull +33 -> 111
+/*  820:     */     //   81: aload_1
+/*  821:     */     //   82: ifnull +23 -> 105
+/*  822:     */     //   85: aload_0
+/*  823:     */     //   86: invokeinterface 36 1 0
+/*  824:     */     //   91: goto +20 -> 111
+/*  825:     */     //   94: astore 6
+/*  826:     */     //   96: aload_1
+/*  827:     */     //   97: aload 6
+/*  828:     */     //   99: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  829:     */     //   102: goto +9 -> 111
+/*  830:     */     //   105: aload_0
+/*  831:     */     //   106: invokeinterface 36 1 0
+/*  832:     */     //   111: iload 5
+/*  833:     */     //   113: ireturn
+/*  834:     */     //   114: astore 4
+/*  835:     */     //   116: aload 4
+/*  836:     */     //   118: astore_3
+/*  837:     */     //   119: aload 4
+/*  838:     */     //   121: athrow
+/*  839:     */     //   122: astore 7
+/*  840:     */     //   124: aload_2
+/*  841:     */     //   125: ifnull +33 -> 158
+/*  842:     */     //   128: aload_3
+/*  843:     */     //   129: ifnull +23 -> 152
+/*  844:     */     //   132: aload_2
+/*  845:     */     //   133: invokeinterface 33 1 0
+/*  846:     */     //   138: goto +20 -> 158
+/*  847:     */     //   141: astore 8
+/*  848:     */     //   143: aload_3
+/*  849:     */     //   144: aload 8
+/*  850:     */     //   146: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  851:     */     //   149: goto +9 -> 158
+/*  852:     */     //   152: aload_2
+/*  853:     */     //   153: invokeinterface 33 1 0
+/*  854:     */     //   158: aload 7
+/*  855:     */     //   160: athrow
+/*  856:     */     //   161: astore_2
+/*  857:     */     //   162: aload_2
+/*  858:     */     //   163: astore_1
+/*  859:     */     //   164: aload_2
+/*  860:     */     //   165: athrow
+/*  861:     */     //   166: astore 9
+/*  862:     */     //   168: aload_0
+/*  863:     */     //   169: ifnull +33 -> 202
+/*  864:     */     //   172: aload_1
+/*  865:     */     //   173: ifnull +23 -> 196
+/*  866:     */     //   176: aload_0
+/*  867:     */     //   177: invokeinterface 36 1 0
+/*  868:     */     //   182: goto +20 -> 202
+/*  869:     */     //   185: astore 10
+/*  870:     */     //   187: aload_1
+/*  871:     */     //   188: aload 10
+/*  872:     */     //   190: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  873:     */     //   193: goto +9 -> 202
+/*  874:     */     //   196: aload_0
+/*  875:     */     //   197: invokeinterface 36 1 0
+/*  876:     */     //   202: aload 9
+/*  877:     */     //   204: athrow
+/*  878:     */     //   205: astore_0
+/*  879:     */     //   206: new 20	java/lang/RuntimeException
+/*  880:     */     //   209: dup
+/*  881:     */     //   210: aload_0
+/*  882:     */     //   211: invokevirtual 21	java/sql/SQLException:toString	()Ljava/lang/String;
+/*  883:     */     //   214: aload_0
+/*  884:     */     //   215: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
+/*  885:     */     //   218: athrow
+/*  886:     */     // Line number table:
+/*  887:     */     //   Java source line #622	-> byte code offset #0
+/*  888:     */     //   Java source line #623	-> byte code offset #17
+/*  889:     */     //   Java source line #624	-> byte code offset #25
+/*  890:     */     //   Java source line #625	-> byte code offset #33
+/*  891:     */     //   Java source line #626	-> byte code offset #43
+/*  892:     */     //   Java source line #622	-> byte code offset #114
+/*  893:     */     //   Java source line #626	-> byte code offset #122
+/*  894:     */     //   Java source line #622	-> byte code offset #161
+/*  895:     */     //   Java source line #626	-> byte code offset #166
+/*  896:     */     //   Java source line #627	-> byte code offset #206
+/*  897:     */     // Local variable table:
+/*  898:     */     //   start	length	slot	name	signature
+/*  899:     */     //   3	194	0	localConnection	Connection
+/*  900:     */     //   205	10	0	localSQLException	SQLException
+/*  901:     */     //   5	183	1	localObject1	Object
+/*  902:     */     //   14	139	2	localPreparedStatement	PreparedStatement
+/*  903:     */     //   161	4	2	localThrowable1	Throwable
+/*  904:     */     //   16	128	3	localObject2	Object
+/*  905:     */     //   23	11	4	localResultSet	ResultSet
+/*  906:     */     //   114	6	4	localThrowable2	Throwable
+/*  907:     */     //   60	4	6	localThrowable3	Throwable
+/*  908:     */     //   94	4	6	localThrowable4	Throwable
+/*  909:     */     //   122	37	7	localObject3	Object
+/*  910:     */     //   141	4	8	localThrowable5	Throwable
+/*  911:     */     //   166	37	9	localObject4	Object
+/*  912:     */     //   185	4	10	localThrowable6	Throwable
+/*  913:     */     // Exception table:
+/*  914:     */     //   from	to	target	type
+/*  915:     */     //   51	57	60	java/lang/Throwable
+/*  916:     */     //   85	91	94	java/lang/Throwable
+/*  917:     */     //   17	43	114	java/lang/Throwable
+/*  918:     */     //   17	43	122	finally
+/*  919:     */     //   114	124	122	finally
+/*  920:     */     //   132	138	141	java/lang/Throwable
+/*  921:     */     //   6	77	161	java/lang/Throwable
+/*  922:     */     //   114	161	161	java/lang/Throwable
+/*  923:     */     //   6	77	166	finally
+/*  924:     */     //   114	168	166	finally
+/*  925:     */     //   176	182	185	java/lang/Throwable
+/*  926:     */     //   0	111	205	java/sql/SQLException
+/*  927:     */     //   114	205	205	java/sql/SQLException
+/*  928:     */   }
+/*  929:     */   
+/*  930:     */   /* Error */
+/*  931:     */   public static java.util.List<Long> getBlockIdsAfter(Long paramLong, int paramInt)
+/*  932:     */   {
+/*  933:     */     // Byte code:
+/*  934:     */     //   0: iload_1
+/*  935:     */     //   1: sipush 1440
+/*  936:     */     //   4: if_icmple +13 -> 17
+/*  937:     */     //   7: new 50	java/lang/IllegalArgumentException
+/*  938:     */     //   10: dup
+/*  939:     */     //   11: ldc 51
+/*  940:     */     //   13: invokespecial 52	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
+/*  941:     */     //   16: athrow
+/*  942:     */     //   17: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
+/*  943:     */     //   20: astore_2
+/*  944:     */     //   21: aconst_null
+/*  945:     */     //   22: astore_3
+/*  946:     */     //   23: aload_2
+/*  947:     */     //   24: ldc 53
+/*  948:     */     //   26: invokeinterface 12 2 0
+/*  949:     */     //   31: astore 4
+/*  950:     */     //   33: aconst_null
+/*  951:     */     //   34: astore 5
+/*  952:     */     //   36: aload_2
+/*  953:     */     //   37: ldc 54
+/*  954:     */     //   39: invokeinterface 12 2 0
+/*  955:     */     //   44: astore 6
+/*  956:     */     //   46: aconst_null
+/*  957:     */     //   47: astore 7
+/*  958:     */     //   49: aload 4
+/*  959:     */     //   51: iconst_1
+/*  960:     */     //   52: aload_0
+/*  961:     */     //   53: invokevirtual 42	java/lang/Long:longValue	()J
+/*  962:     */     //   56: invokeinterface 43 4 0
+/*  963:     */     //   61: aload 4
+/*  964:     */     //   63: invokeinterface 30 1 0
+/*  965:     */     //   68: astore 8
+/*  966:     */     //   70: aload 8
+/*  967:     */     //   72: invokeinterface 31 1 0
+/*  968:     */     //   77: ifne +130 -> 207
+/*  969:     */     //   80: aload 8
+/*  970:     */     //   82: invokeinterface 55 1 0
+/*  971:     */     //   87: invokestatic 56	java/util/Collections:emptyList	()Ljava/util/List;
+/*  972:     */     //   90: astore 9
+/*  973:     */     //   92: aload 6
+/*  974:     */     //   94: ifnull +37 -> 131
+/*  975:     */     //   97: aload 7
+/*  976:     */     //   99: ifnull +25 -> 124
+/*  977:     */     //   102: aload 6
+/*  978:     */     //   104: invokeinterface 33 1 0
+/*  979:     */     //   109: goto +22 -> 131
+/*  980:     */     //   112: astore 10
+/*  981:     */     //   114: aload 7
+/*  982:     */     //   116: aload 10
+/*  983:     */     //   118: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  984:     */     //   121: goto +10 -> 131
+/*  985:     */     //   124: aload 6
+/*  986:     */     //   126: invokeinterface 33 1 0
+/*  987:     */     //   131: aload 4
+/*  988:     */     //   133: ifnull +37 -> 170
+/*  989:     */     //   136: aload 5
+/*  990:     */     //   138: ifnull +25 -> 163
+/*  991:     */     //   141: aload 4
+/*  992:     */     //   143: invokeinterface 33 1 0
+/*  993:     */     //   148: goto +22 -> 170
+/*  994:     */     //   151: astore 10
+/*  995:     */     //   153: aload 5
+/*  996:     */     //   155: aload 10
+/*  997:     */     //   157: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/*  998:     */     //   160: goto +10 -> 170
+/*  999:     */     //   163: aload 4
+/* 1000:     */     //   165: invokeinterface 33 1 0
+/* 1001:     */     //   170: aload_2
+/* 1002:     */     //   171: ifnull +33 -> 204
+/* 1003:     */     //   174: aload_3
+/* 1004:     */     //   175: ifnull +23 -> 198
+/* 1005:     */     //   178: aload_2
+/* 1006:     */     //   179: invokeinterface 36 1 0
+/* 1007:     */     //   184: goto +20 -> 204
+/* 1008:     */     //   187: astore 10
+/* 1009:     */     //   189: aload_3
+/* 1010:     */     //   190: aload 10
+/* 1011:     */     //   192: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1012:     */     //   195: goto +9 -> 204
+/* 1013:     */     //   198: aload_2
+/* 1014:     */     //   199: invokeinterface 36 1 0
+/* 1015:     */     //   204: aload 9
+/* 1016:     */     //   206: areturn
+/* 1017:     */     //   207: new 57	java/util/ArrayList
+/* 1018:     */     //   210: dup
+/* 1019:     */     //   211: invokespecial 58	java/util/ArrayList:<init>	()V
+/* 1020:     */     //   214: astore 9
+/* 1021:     */     //   216: aload 8
+/* 1022:     */     //   218: ldc 59
+/* 1023:     */     //   220: invokeinterface 60 2 0
+/* 1024:     */     //   225: istore 10
+/* 1025:     */     //   227: aload 6
+/* 1026:     */     //   229: iconst_1
+/* 1027:     */     //   230: iload 10
+/* 1028:     */     //   232: invokeinterface 24 3 0
+/* 1029:     */     //   237: aload 6
+/* 1030:     */     //   239: iconst_2
+/* 1031:     */     //   240: iload_1
+/* 1032:     */     //   241: invokeinterface 24 3 0
+/* 1033:     */     //   246: aload 6
+/* 1034:     */     //   248: invokeinterface 30 1 0
+/* 1035:     */     //   253: astore 8
+/* 1036:     */     //   255: aload 8
+/* 1037:     */     //   257: invokeinterface 31 1 0
+/* 1038:     */     //   262: ifeq +26 -> 288
+/* 1039:     */     //   265: aload 9
+/* 1040:     */     //   267: aload 8
+/* 1041:     */     //   269: ldc 61
+/* 1042:     */     //   271: invokeinterface 62 2 0
+/* 1043:     */     //   276: invokestatic 63	java/lang/Long:valueOf	(J)Ljava/lang/Long;
+/* 1044:     */     //   279: invokeinterface 64 2 0
+/* 1045:     */     //   284: pop
+/* 1046:     */     //   285: goto -30 -> 255
+/* 1047:     */     //   288: aload 8
+/* 1048:     */     //   290: invokeinterface 55 1 0
+/* 1049:     */     //   295: aload 9
+/* 1050:     */     //   297: astore 11
+/* 1051:     */     //   299: aload 6
+/* 1052:     */     //   301: ifnull +37 -> 338
+/* 1053:     */     //   304: aload 7
+/* 1054:     */     //   306: ifnull +25 -> 331
+/* 1055:     */     //   309: aload 6
+/* 1056:     */     //   311: invokeinterface 33 1 0
+/* 1057:     */     //   316: goto +22 -> 338
+/* 1058:     */     //   319: astore 12
+/* 1059:     */     //   321: aload 7
+/* 1060:     */     //   323: aload 12
+/* 1061:     */     //   325: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1062:     */     //   328: goto +10 -> 338
+/* 1063:     */     //   331: aload 6
+/* 1064:     */     //   333: invokeinterface 33 1 0
+/* 1065:     */     //   338: aload 4
+/* 1066:     */     //   340: ifnull +37 -> 377
+/* 1067:     */     //   343: aload 5
+/* 1068:     */     //   345: ifnull +25 -> 370
+/* 1069:     */     //   348: aload 4
+/* 1070:     */     //   350: invokeinterface 33 1 0
+/* 1071:     */     //   355: goto +22 -> 377
+/* 1072:     */     //   358: astore 12
+/* 1073:     */     //   360: aload 5
+/* 1074:     */     //   362: aload 12
+/* 1075:     */     //   364: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1076:     */     //   367: goto +10 -> 377
+/* 1077:     */     //   370: aload 4
+/* 1078:     */     //   372: invokeinterface 33 1 0
+/* 1079:     */     //   377: aload_2
+/* 1080:     */     //   378: ifnull +33 -> 411
+/* 1081:     */     //   381: aload_3
+/* 1082:     */     //   382: ifnull +23 -> 405
+/* 1083:     */     //   385: aload_2
+/* 1084:     */     //   386: invokeinterface 36 1 0
+/* 1085:     */     //   391: goto +20 -> 411
+/* 1086:     */     //   394: astore 12
+/* 1087:     */     //   396: aload_3
+/* 1088:     */     //   397: aload 12
+/* 1089:     */     //   399: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1090:     */     //   402: goto +9 -> 411
+/* 1091:     */     //   405: aload_2
+/* 1092:     */     //   406: invokeinterface 36 1 0
+/* 1093:     */     //   411: aload 11
+/* 1094:     */     //   413: areturn
+/* 1095:     */     //   414: astore 8
+/* 1096:     */     //   416: aload 8
+/* 1097:     */     //   418: astore 7
+/* 1098:     */     //   420: aload 8
+/* 1099:     */     //   422: athrow
+/* 1100:     */     //   423: astore 13
+/* 1101:     */     //   425: aload 6
+/* 1102:     */     //   427: ifnull +37 -> 464
+/* 1103:     */     //   430: aload 7
+/* 1104:     */     //   432: ifnull +25 -> 457
+/* 1105:     */     //   435: aload 6
+/* 1106:     */     //   437: invokeinterface 33 1 0
+/* 1107:     */     //   442: goto +22 -> 464
+/* 1108:     */     //   445: astore 14
+/* 1109:     */     //   447: aload 7
+/* 1110:     */     //   449: aload 14
+/* 1111:     */     //   451: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1112:     */     //   454: goto +10 -> 464
+/* 1113:     */     //   457: aload 6
+/* 1114:     */     //   459: invokeinterface 33 1 0
+/* 1115:     */     //   464: aload 13
+/* 1116:     */     //   466: athrow
+/* 1117:     */     //   467: astore 6
+/* 1118:     */     //   469: aload 6
+/* 1119:     */     //   471: astore 5
+/* 1120:     */     //   473: aload 6
+/* 1121:     */     //   475: athrow
+/* 1122:     */     //   476: astore 15
+/* 1123:     */     //   478: aload 4
+/* 1124:     */     //   480: ifnull +37 -> 517
+/* 1125:     */     //   483: aload 5
+/* 1126:     */     //   485: ifnull +25 -> 510
+/* 1127:     */     //   488: aload 4
+/* 1128:     */     //   490: invokeinterface 33 1 0
+/* 1129:     */     //   495: goto +22 -> 517
+/* 1130:     */     //   498: astore 16
+/* 1131:     */     //   500: aload 5
+/* 1132:     */     //   502: aload 16
+/* 1133:     */     //   504: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1134:     */     //   507: goto +10 -> 517
+/* 1135:     */     //   510: aload 4
+/* 1136:     */     //   512: invokeinterface 33 1 0
+/* 1137:     */     //   517: aload 15
+/* 1138:     */     //   519: athrow
+/* 1139:     */     //   520: astore 4
+/* 1140:     */     //   522: aload 4
+/* 1141:     */     //   524: astore_3
+/* 1142:     */     //   525: aload 4
+/* 1143:     */     //   527: athrow
+/* 1144:     */     //   528: astore 17
+/* 1145:     */     //   530: aload_2
+/* 1146:     */     //   531: ifnull +33 -> 564
+/* 1147:     */     //   534: aload_3
+/* 1148:     */     //   535: ifnull +23 -> 558
+/* 1149:     */     //   538: aload_2
+/* 1150:     */     //   539: invokeinterface 36 1 0
+/* 1151:     */     //   544: goto +20 -> 564
+/* 1152:     */     //   547: astore 18
+/* 1153:     */     //   549: aload_3
+/* 1154:     */     //   550: aload 18
+/* 1155:     */     //   552: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1156:     */     //   555: goto +9 -> 564
+/* 1157:     */     //   558: aload_2
+/* 1158:     */     //   559: invokeinterface 36 1 0
+/* 1159:     */     //   564: aload 17
+/* 1160:     */     //   566: athrow
+/* 1161:     */     //   567: astore_2
+/* 1162:     */     //   568: new 20	java/lang/RuntimeException
+/* 1163:     */     //   571: dup
+/* 1164:     */     //   572: aload_2
+/* 1165:     */     //   573: invokevirtual 21	java/sql/SQLException:toString	()Ljava/lang/String;
+/* 1166:     */     //   576: aload_2
+/* 1167:     */     //   577: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
+/* 1168:     */     //   580: athrow
+/* 1169:     */     // Line number table:
+/* 1170:     */     //   Java source line #632	-> byte code offset #0
+/* 1171:     */     //   Java source line #633	-> byte code offset #7
+/* 1172:     */     //   Java source line #635	-> byte code offset #17
+/* 1173:     */     //   Java source line #636	-> byte code offset #23
+/* 1174:     */     //   Java source line #635	-> byte code offset #33
+/* 1175:     */     //   Java source line #637	-> byte code offset #36
+/* 1176:     */     //   Java source line #635	-> byte code offset #46
+/* 1177:     */     //   Java source line #638	-> byte code offset #49
+/* 1178:     */     //   Java source line #639	-> byte code offset #61
+/* 1179:     */     //   Java source line #640	-> byte code offset #70
+/* 1180:     */     //   Java source line #641	-> byte code offset #80
+/* 1181:     */     //   Java source line #642	-> byte code offset #87
+/* 1182:     */     //   Java source line #654	-> byte code offset #92
+/* 1183:     */     //   Java source line #644	-> byte code offset #207
+/* 1184:     */     //   Java source line #645	-> byte code offset #216
+/* 1185:     */     //   Java source line #646	-> byte code offset #227
+/* 1186:     */     //   Java source line #647	-> byte code offset #237
+/* 1187:     */     //   Java source line #648	-> byte code offset #246
+/* 1188:     */     //   Java source line #649	-> byte code offset #255
+/* 1189:     */     //   Java source line #650	-> byte code offset #265
+/* 1190:     */     //   Java source line #652	-> byte code offset #288
+/* 1191:     */     //   Java source line #653	-> byte code offset #295
+/* 1192:     */     //   Java source line #654	-> byte code offset #299
+/* 1193:     */     //   Java source line #635	-> byte code offset #414
+/* 1194:     */     //   Java source line #654	-> byte code offset #423
+/* 1195:     */     //   Java source line #635	-> byte code offset #467
+/* 1196:     */     //   Java source line #654	-> byte code offset #476
+/* 1197:     */     //   Java source line #635	-> byte code offset #520
+/* 1198:     */     //   Java source line #654	-> byte code offset #528
+/* 1199:     */     //   Java source line #655	-> byte code offset #568
+/* 1200:     */     // Local variable table:
+/* 1201:     */     //   start	length	slot	name	signature
+/* 1202:     */     //   0	581	0	paramLong	Long
+/* 1203:     */     //   0	581	1	paramInt	int
+/* 1204:     */     //   20	539	2	localConnection	Connection
+/* 1205:     */     //   567	10	2	localSQLException	SQLException
+/* 1206:     */     //   22	528	3	localObject1	Object
+/* 1207:     */     //   31	480	4	localPreparedStatement1	PreparedStatement
+/* 1208:     */     //   520	6	4	localThrowable1	Throwable
+/* 1209:     */     //   34	467	5	localObject2	Object
+/* 1210:     */     //   44	414	6	localPreparedStatement2	PreparedStatement
+/* 1211:     */     //   467	7	6	localThrowable2	Throwable
+/* 1212:     */     //   47	401	7	localObject3	Object
+/* 1213:     */     //   68	221	8	localResultSet	ResultSet
+/* 1214:     */     //   414	7	8	localThrowable3	Throwable
+/* 1215:     */     //   90	206	9	localObject4	Object
+/* 1216:     */     //   112	5	10	localThrowable4	Throwable
+/* 1217:     */     //   151	5	10	localThrowable5	Throwable
+/* 1218:     */     //   187	4	10	localThrowable6	Throwable
+/* 1219:     */     //   225	6	10	i	int
+/* 1220:     */     //   297	115	11	localObject5	Object
+/* 1221:     */     //   319	5	12	localThrowable7	Throwable
+/* 1222:     */     //   358	5	12	localThrowable8	Throwable
+/* 1223:     */     //   394	4	12	localThrowable9	Throwable
+/* 1224:     */     //   423	42	13	localObject6	Object
+/* 1225:     */     //   445	5	14	localThrowable10	Throwable
+/* 1226:     */     //   476	42	15	localObject7	Object
+/* 1227:     */     //   498	5	16	localThrowable11	Throwable
+/* 1228:     */     //   528	37	17	localObject8	Object
+/* 1229:     */     //   547	4	18	localThrowable12	Throwable
+/* 1230:     */     // Exception table:
+/* 1231:     */     //   from	to	target	type
+/* 1232:     */     //   102	109	112	java/lang/Throwable
+/* 1233:     */     //   141	148	151	java/lang/Throwable
+/* 1234:     */     //   178	184	187	java/lang/Throwable
+/* 1235:     */     //   309	316	319	java/lang/Throwable
+/* 1236:     */     //   348	355	358	java/lang/Throwable
+/* 1237:     */     //   385	391	394	java/lang/Throwable
+/* 1238:     */     //   49	92	414	java/lang/Throwable
+/* 1239:     */     //   207	299	414	java/lang/Throwable
+/* 1240:     */     //   49	92	423	finally
+/* 1241:     */     //   207	299	423	finally
+/* 1242:     */     //   414	425	423	finally
+/* 1243:     */     //   435	442	445	java/lang/Throwable
+/* 1244:     */     //   36	131	467	java/lang/Throwable
+/* 1245:     */     //   207	338	467	java/lang/Throwable
+/* 1246:     */     //   414	467	467	java/lang/Throwable
+/* 1247:     */     //   36	131	476	finally
+/* 1248:     */     //   207	338	476	finally
+/* 1249:     */     //   414	478	476	finally
+/* 1250:     */     //   488	495	498	java/lang/Throwable
+/* 1251:     */     //   23	170	520	java/lang/Throwable
+/* 1252:     */     //   207	377	520	java/lang/Throwable
+/* 1253:     */     //   414	520	520	java/lang/Throwable
+/* 1254:     */     //   23	170	528	finally
+/* 1255:     */     //   207	377	528	finally
+/* 1256:     */     //   414	530	528	finally
+/* 1257:     */     //   538	544	547	java/lang/Throwable
+/* 1258:     */     //   17	204	567	java/sql/SQLException
+/* 1259:     */     //   207	411	567	java/sql/SQLException
+/* 1260:     */     //   414	567	567	java/sql/SQLException
+/* 1261:     */   }
+/* 1262:     */   
+/* 1263:     */   /* Error */
+/* 1264:     */   public static java.util.List<Block> getBlocksAfter(Long paramLong, int paramInt)
+/* 1265:     */   {
+/* 1266:     */     // Byte code:
+/* 1267:     */     //   0: iload_1
+/* 1268:     */     //   1: sipush 1440
+/* 1269:     */     //   4: if_icmple +13 -> 17
+/* 1270:     */     //   7: new 50	java/lang/IllegalArgumentException
+/* 1271:     */     //   10: dup
+/* 1272:     */     //   11: ldc 51
+/* 1273:     */     //   13: invokespecial 52	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
+/* 1274:     */     //   16: athrow
+/* 1275:     */     //   17: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
+/* 1276:     */     //   20: astore_2
+/* 1277:     */     //   21: aconst_null
+/* 1278:     */     //   22: astore_3
+/* 1279:     */     //   23: aload_2
+/* 1280:     */     //   24: ldc 53
+/* 1281:     */     //   26: invokeinterface 12 2 0
+/* 1282:     */     //   31: astore 4
+/* 1283:     */     //   33: aconst_null
+/* 1284:     */     //   34: astore 5
+/* 1285:     */     //   36: aload_2
+/* 1286:     */     //   37: ldc 65
+/* 1287:     */     //   39: invokeinterface 12 2 0
+/* 1288:     */     //   44: astore 6
+/* 1289:     */     //   46: aconst_null
+/* 1290:     */     //   47: astore 7
+/* 1291:     */     //   49: aload 4
+/* 1292:     */     //   51: iconst_1
+/* 1293:     */     //   52: aload_0
+/* 1294:     */     //   53: invokevirtual 42	java/lang/Long:longValue	()J
+/* 1295:     */     //   56: invokeinterface 43 4 0
+/* 1296:     */     //   61: aload 4
+/* 1297:     */     //   63: invokeinterface 30 1 0
+/* 1298:     */     //   68: astore 8
+/* 1299:     */     //   70: aload 8
+/* 1300:     */     //   72: invokeinterface 31 1 0
+/* 1301:     */     //   77: ifne +130 -> 207
+/* 1302:     */     //   80: aload 8
+/* 1303:     */     //   82: invokeinterface 55 1 0
+/* 1304:     */     //   87: invokestatic 56	java/util/Collections:emptyList	()Ljava/util/List;
+/* 1305:     */     //   90: astore 9
+/* 1306:     */     //   92: aload 6
+/* 1307:     */     //   94: ifnull +37 -> 131
+/* 1308:     */     //   97: aload 7
+/* 1309:     */     //   99: ifnull +25 -> 124
+/* 1310:     */     //   102: aload 6
+/* 1311:     */     //   104: invokeinterface 33 1 0
+/* 1312:     */     //   109: goto +22 -> 131
+/* 1313:     */     //   112: astore 10
+/* 1314:     */     //   114: aload 7
+/* 1315:     */     //   116: aload 10
+/* 1316:     */     //   118: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1317:     */     //   121: goto +10 -> 131
+/* 1318:     */     //   124: aload 6
+/* 1319:     */     //   126: invokeinterface 33 1 0
+/* 1320:     */     //   131: aload 4
+/* 1321:     */     //   133: ifnull +37 -> 170
+/* 1322:     */     //   136: aload 5
+/* 1323:     */     //   138: ifnull +25 -> 163
+/* 1324:     */     //   141: aload 4
+/* 1325:     */     //   143: invokeinterface 33 1 0
+/* 1326:     */     //   148: goto +22 -> 170
+/* 1327:     */     //   151: astore 10
+/* 1328:     */     //   153: aload 5
+/* 1329:     */     //   155: aload 10
+/* 1330:     */     //   157: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1331:     */     //   160: goto +10 -> 170
+/* 1332:     */     //   163: aload 4
+/* 1333:     */     //   165: invokeinterface 33 1 0
+/* 1334:     */     //   170: aload_2
+/* 1335:     */     //   171: ifnull +33 -> 204
+/* 1336:     */     //   174: aload_3
+/* 1337:     */     //   175: ifnull +23 -> 198
+/* 1338:     */     //   178: aload_2
+/* 1339:     */     //   179: invokeinterface 36 1 0
+/* 1340:     */     //   184: goto +20 -> 204
+/* 1341:     */     //   187: astore 10
+/* 1342:     */     //   189: aload_3
+/* 1343:     */     //   190: aload 10
+/* 1344:     */     //   192: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1345:     */     //   195: goto +9 -> 204
+/* 1346:     */     //   198: aload_2
+/* 1347:     */     //   199: invokeinterface 36 1 0
+/* 1348:     */     //   204: aload 9
+/* 1349:     */     //   206: areturn
+/* 1350:     */     //   207: new 57	java/util/ArrayList
+/* 1351:     */     //   210: dup
+/* 1352:     */     //   211: invokespecial 58	java/util/ArrayList:<init>	()V
+/* 1353:     */     //   214: astore 9
+/* 1354:     */     //   216: aload 8
+/* 1355:     */     //   218: ldc 59
+/* 1356:     */     //   220: invokeinterface 60 2 0
+/* 1357:     */     //   225: istore 10
+/* 1358:     */     //   227: aload 6
+/* 1359:     */     //   229: iconst_1
+/* 1360:     */     //   230: iload 10
+/* 1361:     */     //   232: invokeinterface 24 3 0
+/* 1362:     */     //   237: aload 6
+/* 1363:     */     //   239: iconst_2
+/* 1364:     */     //   240: iload_1
+/* 1365:     */     //   241: invokeinterface 24 3 0
+/* 1366:     */     //   246: aload 6
+/* 1367:     */     //   248: invokeinterface 30 1 0
+/* 1368:     */     //   253: astore 8
+/* 1369:     */     //   255: aload 8
+/* 1370:     */     //   257: invokeinterface 31 1 0
+/* 1371:     */     //   262: ifeq +20 -> 282
+/* 1372:     */     //   265: aload 9
+/* 1373:     */     //   267: aload_2
+/* 1374:     */     //   268: aload 8
+/* 1375:     */     //   270: invokestatic 66	nxt/Block:getBlock	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Block;
+/* 1376:     */     //   273: invokeinterface 64 2 0
+/* 1377:     */     //   278: pop
+/* 1378:     */     //   279: goto -24 -> 255
+/* 1379:     */     //   282: aload 8
+/* 1380:     */     //   284: invokeinterface 55 1 0
+/* 1381:     */     //   289: aload 9
+/* 1382:     */     //   291: astore 11
+/* 1383:     */     //   293: aload 6
+/* 1384:     */     //   295: ifnull +37 -> 332
+/* 1385:     */     //   298: aload 7
+/* 1386:     */     //   300: ifnull +25 -> 325
+/* 1387:     */     //   303: aload 6
+/* 1388:     */     //   305: invokeinterface 33 1 0
+/* 1389:     */     //   310: goto +22 -> 332
+/* 1390:     */     //   313: astore 12
+/* 1391:     */     //   315: aload 7
+/* 1392:     */     //   317: aload 12
+/* 1393:     */     //   319: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1394:     */     //   322: goto +10 -> 332
+/* 1395:     */     //   325: aload 6
+/* 1396:     */     //   327: invokeinterface 33 1 0
+/* 1397:     */     //   332: aload 4
+/* 1398:     */     //   334: ifnull +37 -> 371
+/* 1399:     */     //   337: aload 5
+/* 1400:     */     //   339: ifnull +25 -> 364
+/* 1401:     */     //   342: aload 4
+/* 1402:     */     //   344: invokeinterface 33 1 0
+/* 1403:     */     //   349: goto +22 -> 371
+/* 1404:     */     //   352: astore 12
+/* 1405:     */     //   354: aload 5
+/* 1406:     */     //   356: aload 12
+/* 1407:     */     //   358: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1408:     */     //   361: goto +10 -> 371
+/* 1409:     */     //   364: aload 4
+/* 1410:     */     //   366: invokeinterface 33 1 0
+/* 1411:     */     //   371: aload_2
+/* 1412:     */     //   372: ifnull +33 -> 405
+/* 1413:     */     //   375: aload_3
+/* 1414:     */     //   376: ifnull +23 -> 399
+/* 1415:     */     //   379: aload_2
+/* 1416:     */     //   380: invokeinterface 36 1 0
+/* 1417:     */     //   385: goto +20 -> 405
+/* 1418:     */     //   388: astore 12
+/* 1419:     */     //   390: aload_3
+/* 1420:     */     //   391: aload 12
+/* 1421:     */     //   393: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1422:     */     //   396: goto +9 -> 405
+/* 1423:     */     //   399: aload_2
+/* 1424:     */     //   400: invokeinterface 36 1 0
+/* 1425:     */     //   405: aload 11
+/* 1426:     */     //   407: areturn
+/* 1427:     */     //   408: astore 8
+/* 1428:     */     //   410: aload 8
+/* 1429:     */     //   412: astore 7
+/* 1430:     */     //   414: aload 8
+/* 1431:     */     //   416: athrow
+/* 1432:     */     //   417: astore 13
+/* 1433:     */     //   419: aload 6
+/* 1434:     */     //   421: ifnull +37 -> 458
+/* 1435:     */     //   424: aload 7
+/* 1436:     */     //   426: ifnull +25 -> 451
+/* 1437:     */     //   429: aload 6
+/* 1438:     */     //   431: invokeinterface 33 1 0
+/* 1439:     */     //   436: goto +22 -> 458
+/* 1440:     */     //   439: astore 14
+/* 1441:     */     //   441: aload 7
+/* 1442:     */     //   443: aload 14
+/* 1443:     */     //   445: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1444:     */     //   448: goto +10 -> 458
+/* 1445:     */     //   451: aload 6
+/* 1446:     */     //   453: invokeinterface 33 1 0
+/* 1447:     */     //   458: aload 13
+/* 1448:     */     //   460: athrow
+/* 1449:     */     //   461: astore 6
+/* 1450:     */     //   463: aload 6
+/* 1451:     */     //   465: astore 5
+/* 1452:     */     //   467: aload 6
+/* 1453:     */     //   469: athrow
+/* 1454:     */     //   470: astore 15
+/* 1455:     */     //   472: aload 4
+/* 1456:     */     //   474: ifnull +37 -> 511
+/* 1457:     */     //   477: aload 5
+/* 1458:     */     //   479: ifnull +25 -> 504
+/* 1459:     */     //   482: aload 4
+/* 1460:     */     //   484: invokeinterface 33 1 0
+/* 1461:     */     //   489: goto +22 -> 511
+/* 1462:     */     //   492: astore 16
+/* 1463:     */     //   494: aload 5
+/* 1464:     */     //   496: aload 16
+/* 1465:     */     //   498: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1466:     */     //   501: goto +10 -> 511
+/* 1467:     */     //   504: aload 4
+/* 1468:     */     //   506: invokeinterface 33 1 0
+/* 1469:     */     //   511: aload 15
+/* 1470:     */     //   513: athrow
+/* 1471:     */     //   514: astore 4
+/* 1472:     */     //   516: aload 4
+/* 1473:     */     //   518: astore_3
+/* 1474:     */     //   519: aload 4
+/* 1475:     */     //   521: athrow
+/* 1476:     */     //   522: astore 17
+/* 1477:     */     //   524: aload_2
+/* 1478:     */     //   525: ifnull +33 -> 558
+/* 1479:     */     //   528: aload_3
+/* 1480:     */     //   529: ifnull +23 -> 552
+/* 1481:     */     //   532: aload_2
+/* 1482:     */     //   533: invokeinterface 36 1 0
+/* 1483:     */     //   538: goto +20 -> 558
+/* 1484:     */     //   541: astore 18
+/* 1485:     */     //   543: aload_3
+/* 1486:     */     //   544: aload 18
+/* 1487:     */     //   546: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1488:     */     //   549: goto +9 -> 558
+/* 1489:     */     //   552: aload_2
+/* 1490:     */     //   553: invokeinterface 36 1 0
+/* 1491:     */     //   558: aload 17
+/* 1492:     */     //   560: athrow
+/* 1493:     */     //   561: astore_2
+/* 1494:     */     //   562: new 20	java/lang/RuntimeException
+/* 1495:     */     //   565: dup
+/* 1496:     */     //   566: aload_2
+/* 1497:     */     //   567: invokevirtual 68	java/lang/Exception:toString	()Ljava/lang/String;
+/* 1498:     */     //   570: aload_2
+/* 1499:     */     //   571: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
+/* 1500:     */     //   574: athrow
+/* 1501:     */     // Line number table:
+/* 1502:     */     //   Java source line #660	-> byte code offset #0
+/* 1503:     */     //   Java source line #661	-> byte code offset #7
+/* 1504:     */     //   Java source line #663	-> byte code offset #17
+/* 1505:     */     //   Java source line #664	-> byte code offset #23
+/* 1506:     */     //   Java source line #663	-> byte code offset #33
+/* 1507:     */     //   Java source line #665	-> byte code offset #36
+/* 1508:     */     //   Java source line #663	-> byte code offset #46
+/* 1509:     */     //   Java source line #666	-> byte code offset #49
+/* 1510:     */     //   Java source line #667	-> byte code offset #61
+/* 1511:     */     //   Java source line #668	-> byte code offset #70
+/* 1512:     */     //   Java source line #669	-> byte code offset #80
+/* 1513:     */     //   Java source line #670	-> byte code offset #87
+/* 1514:     */     //   Java source line #682	-> byte code offset #92
+/* 1515:     */     //   Java source line #672	-> byte code offset #207
+/* 1516:     */     //   Java source line #673	-> byte code offset #216
+/* 1517:     */     //   Java source line #674	-> byte code offset #227
+/* 1518:     */     //   Java source line #675	-> byte code offset #237
+/* 1519:     */     //   Java source line #676	-> byte code offset #246
+/* 1520:     */     //   Java source line #677	-> byte code offset #255
+/* 1521:     */     //   Java source line #678	-> byte code offset #265
+/* 1522:     */     //   Java source line #680	-> byte code offset #282
+/* 1523:     */     //   Java source line #681	-> byte code offset #289
+/* 1524:     */     //   Java source line #682	-> byte code offset #293
+/* 1525:     */     //   Java source line #663	-> byte code offset #408
+/* 1526:     */     //   Java source line #682	-> byte code offset #417
+/* 1527:     */     //   Java source line #663	-> byte code offset #461
+/* 1528:     */     //   Java source line #682	-> byte code offset #470
+/* 1529:     */     //   Java source line #663	-> byte code offset #514
+/* 1530:     */     //   Java source line #682	-> byte code offset #522
+/* 1531:     */     //   Java source line #683	-> byte code offset #562
+/* 1532:     */     // Local variable table:
+/* 1533:     */     //   start	length	slot	name	signature
+/* 1534:     */     //   0	575	0	paramLong	Long
+/* 1535:     */     //   0	575	1	paramInt	int
+/* 1536:     */     //   20	533	2	localConnection	Connection
+/* 1537:     */     //   561	10	2	localValidationException	NxtException.ValidationException
+/* 1538:     */     //   22	522	3	localObject1	Object
+/* 1539:     */     //   31	474	4	localPreparedStatement1	PreparedStatement
+/* 1540:     */     //   514	6	4	localThrowable1	Throwable
+/* 1541:     */     //   34	461	5	localObject2	Object
+/* 1542:     */     //   44	408	6	localPreparedStatement2	PreparedStatement
+/* 1543:     */     //   461	7	6	localThrowable2	Throwable
+/* 1544:     */     //   47	395	7	localObject3	Object
+/* 1545:     */     //   68	215	8	localResultSet	ResultSet
+/* 1546:     */     //   408	7	8	localThrowable3	Throwable
+/* 1547:     */     //   90	200	9	localObject4	Object
+/* 1548:     */     //   112	5	10	localThrowable4	Throwable
+/* 1549:     */     //   151	5	10	localThrowable5	Throwable
+/* 1550:     */     //   187	4	10	localThrowable6	Throwable
+/* 1551:     */     //   225	6	10	i	int
+/* 1552:     */     //   291	115	11	localObject5	Object
+/* 1553:     */     //   313	5	12	localThrowable7	Throwable
+/* 1554:     */     //   352	5	12	localThrowable8	Throwable
+/* 1555:     */     //   388	4	12	localThrowable9	Throwable
+/* 1556:     */     //   417	42	13	localObject6	Object
+/* 1557:     */     //   439	5	14	localThrowable10	Throwable
+/* 1558:     */     //   470	42	15	localObject7	Object
+/* 1559:     */     //   492	5	16	localThrowable11	Throwable
+/* 1560:     */     //   522	37	17	localObject8	Object
+/* 1561:     */     //   541	4	18	localThrowable12	Throwable
+/* 1562:     */     // Exception table:
+/* 1563:     */     //   from	to	target	type
+/* 1564:     */     //   102	109	112	java/lang/Throwable
+/* 1565:     */     //   141	148	151	java/lang/Throwable
+/* 1566:     */     //   178	184	187	java/lang/Throwable
+/* 1567:     */     //   303	310	313	java/lang/Throwable
+/* 1568:     */     //   342	349	352	java/lang/Throwable
+/* 1569:     */     //   379	385	388	java/lang/Throwable
+/* 1570:     */     //   49	92	408	java/lang/Throwable
+/* 1571:     */     //   207	293	408	java/lang/Throwable
+/* 1572:     */     //   49	92	417	finally
+/* 1573:     */     //   207	293	417	finally
+/* 1574:     */     //   408	419	417	finally
+/* 1575:     */     //   429	436	439	java/lang/Throwable
+/* 1576:     */     //   36	131	461	java/lang/Throwable
+/* 1577:     */     //   207	332	461	java/lang/Throwable
+/* 1578:     */     //   408	461	461	java/lang/Throwable
+/* 1579:     */     //   36	131	470	finally
+/* 1580:     */     //   207	332	470	finally
+/* 1581:     */     //   408	472	470	finally
+/* 1582:     */     //   482	489	492	java/lang/Throwable
+/* 1583:     */     //   23	170	514	java/lang/Throwable
+/* 1584:     */     //   207	371	514	java/lang/Throwable
+/* 1585:     */     //   408	514	514	java/lang/Throwable
+/* 1586:     */     //   23	170	522	finally
+/* 1587:     */     //   207	371	522	finally
+/* 1588:     */     //   408	524	522	finally
+/* 1589:     */     //   532	538	541	java/lang/Throwable
+/* 1590:     */     //   17	204	561	nxt/NxtException$ValidationException
+/* 1591:     */     //   17	204	561	java/sql/SQLException
+/* 1592:     */     //   207	405	561	nxt/NxtException$ValidationException
+/* 1593:     */     //   207	405	561	java/sql/SQLException
+/* 1594:     */     //   408	561	561	nxt/NxtException$ValidationException
+/* 1595:     */     //   408	561	561	java/sql/SQLException
+/* 1596:     */   }
+/* 1597:     */   
+/* 1598:     */   public static long getBlockIdAtHeight(int paramInt)
+/* 1599:     */   {
+/* 1600: 688 */     Block localBlock = (Block)lastBlock.get();
+/* 1601: 689 */     if (paramInt > localBlock.getHeight()) {
+/* 1602: 690 */       throw new IllegalArgumentException("Invalid height " + paramInt + ", current blockchain is at " + localBlock.getHeight());
+/* 1603:     */     }
+/* 1604: 692 */     if (paramInt == localBlock.getHeight()) {
+/* 1605: 693 */       return localBlock.getId().longValue();
+/* 1606:     */     }
+/* 1607: 695 */     return Block.findBlockIdAtHeight(paramInt);
+/* 1608:     */   }
+/* 1609:     */   
+/* 1610:     */   /* Error */
+/* 1611:     */   public static java.util.List<Block> getBlocksFromHeight(int paramInt)
+/* 1612:     */   {
+/* 1613:     */     // Byte code:
+/* 1614:     */     //   0: iload_0
+/* 1615:     */     //   1: iflt +23 -> 24
+/* 1616:     */     //   4: getstatic 6	nxt/Blockchain:lastBlock	Ljava/util/concurrent/atomic/AtomicReference;
+/* 1617:     */     //   7: invokevirtual 69	java/util/concurrent/atomic/AtomicReference:get	()Ljava/lang/Object;
+/* 1618:     */     //   10: checkcast 70	nxt/Block
+/* 1619:     */     //   13: invokevirtual 71	nxt/Block:getHeight	()I
+/* 1620:     */     //   16: iload_0
+/* 1621:     */     //   17: isub
+/* 1622:     */     //   18: sipush 1440
+/* 1623:     */     //   21: if_icmple +13 -> 34
+/* 1624:     */     //   24: new 50	java/lang/IllegalArgumentException
+/* 1625:     */     //   27: dup
+/* 1626:     */     //   28: ldc 81
+/* 1627:     */     //   30: invokespecial 52	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
+/* 1628:     */     //   33: athrow
+/* 1629:     */     //   34: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
+/* 1630:     */     //   37: astore_1
+/* 1631:     */     //   38: aconst_null
+/* 1632:     */     //   39: astore_2
+/* 1633:     */     //   40: aload_1
+/* 1634:     */     //   41: ldc 82
+/* 1635:     */     //   43: invokeinterface 12 2 0
+/* 1636:     */     //   48: astore_3
+/* 1637:     */     //   49: aconst_null
+/* 1638:     */     //   50: astore 4
+/* 1639:     */     //   52: aload_3
+/* 1640:     */     //   53: iconst_1
+/* 1641:     */     //   54: iload_0
+/* 1642:     */     //   55: invokeinterface 24 3 0
+/* 1643:     */     //   60: aload_3
+/* 1644:     */     //   61: invokeinterface 30 1 0
+/* 1645:     */     //   66: astore 5
+/* 1646:     */     //   68: new 57	java/util/ArrayList
+/* 1647:     */     //   71: dup
+/* 1648:     */     //   72: invokespecial 58	java/util/ArrayList:<init>	()V
+/* 1649:     */     //   75: astore 6
+/* 1650:     */     //   77: aload 5
+/* 1651:     */     //   79: invokeinterface 31 1 0
+/* 1652:     */     //   84: ifeq +20 -> 104
+/* 1653:     */     //   87: aload 6
+/* 1654:     */     //   89: aload_1
+/* 1655:     */     //   90: aload 5
+/* 1656:     */     //   92: invokestatic 66	nxt/Block:getBlock	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Block;
+/* 1657:     */     //   95: invokeinterface 64 2 0
+/* 1658:     */     //   100: pop
+/* 1659:     */     //   101: goto -24 -> 77
+/* 1660:     */     //   104: aload 6
+/* 1661:     */     //   106: astore 7
+/* 1662:     */     //   108: aload_3
+/* 1663:     */     //   109: ifnull +35 -> 144
+/* 1664:     */     //   112: aload 4
+/* 1665:     */     //   114: ifnull +24 -> 138
+/* 1666:     */     //   117: aload_3
+/* 1667:     */     //   118: invokeinterface 33 1 0
+/* 1668:     */     //   123: goto +21 -> 144
+/* 1669:     */     //   126: astore 8
+/* 1670:     */     //   128: aload 4
+/* 1671:     */     //   130: aload 8
+/* 1672:     */     //   132: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1673:     */     //   135: goto +9 -> 144
+/* 1674:     */     //   138: aload_3
+/* 1675:     */     //   139: invokeinterface 33 1 0
+/* 1676:     */     //   144: aload_1
+/* 1677:     */     //   145: ifnull +33 -> 178
+/* 1678:     */     //   148: aload_2
+/* 1679:     */     //   149: ifnull +23 -> 172
+/* 1680:     */     //   152: aload_1
+/* 1681:     */     //   153: invokeinterface 36 1 0
+/* 1682:     */     //   158: goto +20 -> 178
+/* 1683:     */     //   161: astore 8
+/* 1684:     */     //   163: aload_2
+/* 1685:     */     //   164: aload 8
+/* 1686:     */     //   166: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1687:     */     //   169: goto +9 -> 178
+/* 1688:     */     //   172: aload_1
+/* 1689:     */     //   173: invokeinterface 36 1 0
+/* 1690:     */     //   178: aload 7
+/* 1691:     */     //   180: areturn
+/* 1692:     */     //   181: astore 5
+/* 1693:     */     //   183: aload 5
+/* 1694:     */     //   185: astore 4
+/* 1695:     */     //   187: aload 5
+/* 1696:     */     //   189: athrow
+/* 1697:     */     //   190: astore 9
+/* 1698:     */     //   192: aload_3
+/* 1699:     */     //   193: ifnull +35 -> 228
+/* 1700:     */     //   196: aload 4
+/* 1701:     */     //   198: ifnull +24 -> 222
+/* 1702:     */     //   201: aload_3
+/* 1703:     */     //   202: invokeinterface 33 1 0
+/* 1704:     */     //   207: goto +21 -> 228
+/* 1705:     */     //   210: astore 10
+/* 1706:     */     //   212: aload 4
+/* 1707:     */     //   214: aload 10
+/* 1708:     */     //   216: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1709:     */     //   219: goto +9 -> 228
+/* 1710:     */     //   222: aload_3
+/* 1711:     */     //   223: invokeinterface 33 1 0
+/* 1712:     */     //   228: aload 9
+/* 1713:     */     //   230: athrow
+/* 1714:     */     //   231: astore_3
+/* 1715:     */     //   232: aload_3
+/* 1716:     */     //   233: astore_2
+/* 1717:     */     //   234: aload_3
+/* 1718:     */     //   235: athrow
+/* 1719:     */     //   236: astore 11
+/* 1720:     */     //   238: aload_1
+/* 1721:     */     //   239: ifnull +33 -> 272
+/* 1722:     */     //   242: aload_2
+/* 1723:     */     //   243: ifnull +23 -> 266
+/* 1724:     */     //   246: aload_1
+/* 1725:     */     //   247: invokeinterface 36 1 0
+/* 1726:     */     //   252: goto +20 -> 272
+/* 1727:     */     //   255: astore 12
+/* 1728:     */     //   257: aload_2
+/* 1729:     */     //   258: aload 12
+/* 1730:     */     //   260: invokevirtual 35	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+/* 1731:     */     //   263: goto +9 -> 272
+/* 1732:     */     //   266: aload_1
+/* 1733:     */     //   267: invokeinterface 36 1 0
+/* 1734:     */     //   272: aload 11
+/* 1735:     */     //   274: athrow
+/* 1736:     */     //   275: astore_1
+/* 1737:     */     //   276: new 20	java/lang/RuntimeException
+/* 1738:     */     //   279: dup
+/* 1739:     */     //   280: aload_1
+/* 1740:     */     //   281: invokevirtual 68	java/lang/Exception:toString	()Ljava/lang/String;
+/* 1741:     */     //   284: aload_1
+/* 1742:     */     //   285: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
+/* 1743:     */     //   288: athrow
+/* 1744:     */     // Line number table:
+/* 1745:     */     //   Java source line #699	-> byte code offset #0
+/* 1746:     */     //   Java source line #700	-> byte code offset #24
+/* 1747:     */     //   Java source line #702	-> byte code offset #34
+/* 1748:     */     //   Java source line #703	-> byte code offset #40
+/* 1749:     */     //   Java source line #702	-> byte code offset #49
+/* 1750:     */     //   Java source line #704	-> byte code offset #52
+/* 1751:     */     //   Java source line #705	-> byte code offset #60
+/* 1752:     */     //   Java source line #706	-> byte code offset #68
+/* 1753:     */     //   Java source line #707	-> byte code offset #77
+/* 1754:     */     //   Java source line #708	-> byte code offset #87
+/* 1755:     */     //   Java source line #710	-> byte code offset #104
+/* 1756:     */     //   Java source line #711	-> byte code offset #108
+/* 1757:     */     //   Java source line #702	-> byte code offset #181
+/* 1758:     */     //   Java source line #711	-> byte code offset #190
+/* 1759:     */     //   Java source line #702	-> byte code offset #231
+/* 1760:     */     //   Java source line #711	-> byte code offset #236
+/* 1761:     */     //   Java source line #712	-> byte code offset #276
+/* 1762:     */     // Local variable table:
+/* 1763:     */     //   start	length	slot	name	signature
+/* 1764:     */     //   0	289	0	paramInt	int
+/* 1765:     */     //   37	230	1	localConnection	Connection
+/* 1766:     */     //   275	10	1	localSQLException	SQLException
+/* 1767:     */     //   39	219	2	localObject1	Object
+/* 1768:     */     //   48	175	3	localPreparedStatement	PreparedStatement
+/* 1769:     */     //   231	4	3	localThrowable1	Throwable
+/* 1770:     */     //   50	163	4	localObject2	Object
+/* 1771:     */     //   66	25	5	localResultSet	ResultSet
+/* 1772:     */     //   181	7	5	localThrowable2	Throwable
+/* 1773:     */     //   75	30	6	localArrayList1	java.util.ArrayList
+/* 1774:     */     //   126	5	8	localThrowable3	Throwable
+/* 1775:     */     //   161	4	8	localThrowable4	Throwable
+/* 1776:     */     //   190	39	9	localObject3	Object
+/* 1777:     */     //   210	5	10	localThrowable5	Throwable
+/* 1778:     */     //   236	37	11	localObject4	Object
+/* 1779:     */     //   255	4	12	localThrowable6	Throwable
+/* 1780:     */     // Exception table:
+/* 1781:     */     //   from	to	target	type
+/* 1782:     */     //   117	123	126	java/lang/Throwable
+/* 1783:     */     //   152	158	161	java/lang/Throwable
+/* 1784:     */     //   52	108	181	java/lang/Throwable
+/* 1785:     */     //   52	108	190	finally
+/* 1786:     */     //   181	192	190	finally
+/* 1787:     */     //   201	207	210	java/lang/Throwable
+/* 1788:     */     //   40	144	231	java/lang/Throwable
+/* 1789:     */     //   181	231	231	java/lang/Throwable
+/* 1790:     */     //   40	144	236	finally
+/* 1791:     */     //   181	238	236	finally
+/* 1792:     */     //   246	252	255	java/lang/Throwable
+/* 1793:     */     //   34	178	275	java/sql/SQLException
+/* 1794:     */     //   34	178	275	nxt/NxtException$ValidationException
+/* 1795:     */     //   181	275	275	java/sql/SQLException
+/* 1796:     */     //   181	275	275	nxt/NxtException$ValidationException
 /* 1797:     */   }
 /* 1798:     */   
-/* 1799:     */   public static Transaction getTransaction(Long paramLong)
+/* 1799:     */   public static Collection<Transaction> getAllUnconfirmedTransactions()
 /* 1800:     */   {
-/* 1801: 720 */     return Transaction.findTransaction(paramLong);
+/* 1801: 717 */     return allUnconfirmedTransactions;
 /* 1802:     */   }
 /* 1803:     */   
-/* 1804:     */   public static Transaction getUnconfirmedTransaction(Long paramLong)
+/* 1804:     */   public static Block getLastBlock()
 /* 1805:     */   {
-/* 1806: 724 */     return (Transaction)unconfirmedTransactions.get(paramLong);
+/* 1806: 721 */     return (Block)lastBlock.get();
 /* 1807:     */   }
 /* 1808:     */   
-/* 1809:     */   public static void broadcast(Transaction paramTransaction)
+/* 1809:     */   public static Block getBlock(Long paramLong)
 /* 1810:     */   {
-/* 1811: 729 */     JSONObject localJSONObject = new JSONObject();
-/* 1812: 730 */     localJSONObject.put("requestType", "processTransactions");
-/* 1813: 731 */     JSONArray localJSONArray = new JSONArray();
-/* 1814: 732 */     localJSONArray.add(paramTransaction.getJSONObject());
-/* 1815: 733 */     localJSONObject.put("transactions", localJSONArray);
-/* 1816:     */     
-/* 1817: 735 */     Peer.sendToSomePeers(localJSONObject);
-/* 1818:     */     
-/* 1819: 737 */     nonBroadcastedTransactions.put(paramTransaction.getId(), paramTransaction);
-/* 1820:     */   }
-/* 1821:     */   
-/* 1822:     */   public static Peer getLastBlockchainFeeder()
-/* 1823:     */   {
-/* 1824: 741 */     return lastBlockchainFeeder;
-/* 1825:     */   }
-/* 1826:     */   
-/* 1827:     */   public static void processTransactions(JSONObject paramJSONObject)
-/* 1828:     */     throws NxtException.ValidationException
-/* 1829:     */   {
-/* 1830: 745 */     JSONArray localJSONArray = (JSONArray)paramJSONObject.get("transactions");
-/* 1831: 746 */     processTransactions(localJSONArray, false);
-/* 1832:     */   }
-/* 1833:     */   
-/* 1834:     */   public static boolean pushBlock(JSONObject paramJSONObject)
-/* 1835:     */     throws NxtException.ValidationException
-/* 1836:     */   {
-/* 1837: 751 */     Block localBlock = Block.getBlock(paramJSONObject);
-/* 1838: 752 */     if (!((Block)lastBlock.get()).getId().equals(localBlock.getPreviousBlockId())) {
-/* 1839: 755 */       return false;
-/* 1840:     */     }
-/* 1841: 757 */     JSONArray localJSONArray = (JSONArray)paramJSONObject.get("transactions");
-/* 1842: 758 */     Transaction[] arrayOfTransaction = new Transaction[localJSONArray.size()];
-/* 1843: 759 */     for (int i = 0; i < arrayOfTransaction.length; i++) {
-/* 1844: 760 */       arrayOfTransaction[i] = Transaction.getTransaction((JSONObject)localJSONArray.get(i));
-/* 1845:     */     }
-/* 1846: 762 */     return pushBlock(localBlock, arrayOfTransaction);
+/* 1811: 725 */     return Block.findBlock(paramLong);
+/* 1812:     */   }
+/* 1813:     */   
+/* 1814:     */   public static Transaction getTransaction(Long paramLong)
+/* 1815:     */   {
+/* 1816: 729 */     return Transaction.findTransaction(paramLong);
+/* 1817:     */   }
+/* 1818:     */   
+/* 1819:     */   public static Transaction getUnconfirmedTransaction(Long paramLong)
+/* 1820:     */   {
+/* 1821: 733 */     return (Transaction)unconfirmedTransactions.get(paramLong);
+/* 1822:     */   }
+/* 1823:     */   
+/* 1824:     */   public static void broadcast(Transaction paramTransaction)
+/* 1825:     */   {
+/* 1826: 738 */     JSONObject localJSONObject = new JSONObject();
+/* 1827: 739 */     localJSONObject.put("requestType", "processTransactions");
+/* 1828: 740 */     JSONArray localJSONArray = new JSONArray();
+/* 1829: 741 */     localJSONArray.add(paramTransaction.getJSONObject());
+/* 1830: 742 */     localJSONObject.put("transactions", localJSONArray);
+/* 1831:     */     
+/* 1832: 744 */     Peer.sendToSomePeers(localJSONObject);
+/* 1833:     */     
+/* 1834: 746 */     nonBroadcastedTransactions.put(paramTransaction.getId(), paramTransaction);
+/* 1835:     */   }
+/* 1836:     */   
+/* 1837:     */   public static Peer getLastBlockchainFeeder()
+/* 1838:     */   {
+/* 1839: 750 */     return lastBlockchainFeeder;
+/* 1840:     */   }
+/* 1841:     */   
+/* 1842:     */   public static void processTransactions(JSONObject paramJSONObject)
+/* 1843:     */     throws NxtException.ValidationException
+/* 1844:     */   {
+/* 1845: 754 */     JSONArray localJSONArray = (JSONArray)paramJSONObject.get("transactions");
+/* 1846: 755 */     processTransactions(localJSONArray, false);
 /* 1847:     */   }
 /* 1848:     */   
-/* 1849:     */   static void addBlock(Block paramBlock)
-/* 1850:     */   {
-/* 1851:     */     try
-/* 1852:     */     {
-/* 1853: 767 */       Connection localConnection = Db.getConnection();Object localObject1 = null;
-/* 1854:     */       try
-/* 1855:     */       {
-/* 1856:     */         try
-/* 1857:     */         {
-/* 1858: 769 */           Block.saveBlock(localConnection, paramBlock);
-/* 1859: 770 */           lastBlock.set(paramBlock);
-/* 1860: 771 */           localConnection.commit();
-/* 1861:     */         }
-/* 1862:     */         catch (SQLException localSQLException2)
-/* 1863:     */         {
-/* 1864: 773 */           localConnection.rollback();
-/* 1865: 774 */           throw localSQLException2;
-/* 1866:     */         }
-/* 1867:     */       }
-/* 1868:     */       catch (Throwable localThrowable2)
-/* 1869:     */       {
-/* 1870: 767 */         localObject1 = localThrowable2;throw localThrowable2;
-/* 1871:     */       }
-/* 1872:     */       finally
-/* 1873:     */       {
-/* 1874: 776 */         if (localConnection != null) {
-/* 1875: 776 */           if (localObject1 != null) {
-/* 1876:     */             try
-/* 1877:     */             {
-/* 1878: 776 */               localConnection.close();
-/* 1879:     */             }
-/* 1880:     */             catch (Throwable localThrowable3)
-/* 1881:     */             {
-/* 1882: 776 */               localObject1.addSuppressed(localThrowable3);
-/* 1883:     */             }
-/* 1884:     */           } else {
-/* 1885: 776 */             localConnection.close();
-/* 1886:     */           }
-/* 1887:     */         }
-/* 1888:     */       }
-/* 1889:     */     }
-/* 1890:     */     catch (SQLException localSQLException1)
-/* 1891:     */     {
-/* 1892: 777 */       throw new RuntimeException(localSQLException1.toString(), localSQLException1);
-/* 1893:     */     }
-/* 1894:     */   }
-/* 1895:     */   
-/* 1896:     */   static void init()
-/* 1897:     */   {
-/* 1898: 783 */     if (!Block.hasBlock(Genesis.GENESIS_BLOCK_ID))
-/* 1899:     */     {
-/* 1900: 784 */       Logger.logMessage("Genesis block not in database, starting from scratch");
-/* 1901:     */       
-/* 1902: 786 */       TreeMap localTreeMap = new TreeMap();
-/* 1903:     */       try
-/* 1904:     */       {
-/* 1905: 790 */         for (int i = 0; i < Genesis.GENESIS_RECIPIENTS.length; i++)
-/* 1906:     */         {
-/* 1907: 791 */           localObject1 = Transaction.newTransaction(0, (short)0, Genesis.CREATOR_PUBLIC_KEY, Genesis.GENESIS_RECIPIENTS[i], Genesis.GENESIS_AMOUNTS[i], 0, null, Genesis.GENESIS_SIGNATURES[i]);
-/* 1908:     */           
-/* 1909: 793 */           ((Transaction)localObject1).setIndex(transactionCounter.incrementAndGet());
-/* 1910: 794 */           localTreeMap.put(((Transaction)localObject1).getId(), localObject1);
+/* 1849:     */   public static boolean pushBlock(JSONObject paramJSONObject)
+/* 1850:     */     throws NxtException
+/* 1851:     */   {
+/* 1852: 760 */     Block localBlock = Block.getBlock(paramJSONObject);
+/* 1853: 761 */     if (!((Block)lastBlock.get()).getId().equals(localBlock.getPreviousBlockId())) {
+/* 1854: 764 */       return false;
+/* 1855:     */     }
+/* 1856: 766 */     JSONArray localJSONArray = (JSONArray)paramJSONObject.get("transactions");
+/* 1857: 767 */     Transaction[] arrayOfTransaction = new Transaction[localJSONArray.size()];
+/* 1858: 768 */     for (int i = 0; i < arrayOfTransaction.length; i++) {
+/* 1859: 769 */       arrayOfTransaction[i] = Transaction.getTransaction((JSONObject)localJSONArray.get(i));
+/* 1860:     */     }
+/* 1861:     */     try
+/* 1862:     */     {
+/* 1863: 772 */       pushBlock(localBlock, arrayOfTransaction);
+/* 1864: 773 */       return true;
+/* 1865:     */     }
+/* 1866:     */     catch (BlockNotAcceptedException localBlockNotAcceptedException)
+/* 1867:     */     {
+/* 1868: 775 */       Logger.logDebugMessage("Block " + localBlock.getStringId() + " not accepted: " + localBlockNotAcceptedException.getMessage());
+/* 1869: 776 */       throw localBlockNotAcceptedException;
+/* 1870:     */     }
+/* 1871:     */   }
+/* 1872:     */   
+/* 1873:     */   static void addBlock(Block paramBlock)
+/* 1874:     */   {
+/* 1875:     */     try
+/* 1876:     */     {
+/* 1877: 781 */       Connection localConnection = Db.getConnection();Object localObject1 = null;
+/* 1878:     */       try
+/* 1879:     */       {
+/* 1880:     */         try
+/* 1881:     */         {
+/* 1882: 783 */           Block.saveBlock(localConnection, paramBlock);
+/* 1883: 784 */           lastBlock.set(paramBlock);
+/* 1884: 785 */           localConnection.commit();
+/* 1885:     */         }
+/* 1886:     */         catch (SQLException localSQLException2)
+/* 1887:     */         {
+/* 1888: 787 */           localConnection.rollback();
+/* 1889: 788 */           throw localSQLException2;
+/* 1890:     */         }
+/* 1891:     */       }
+/* 1892:     */       catch (Throwable localThrowable2)
+/* 1893:     */       {
+/* 1894: 781 */         localObject1 = localThrowable2;throw localThrowable2;
+/* 1895:     */       }
+/* 1896:     */       finally
+/* 1897:     */       {
+/* 1898: 790 */         if (localConnection != null) {
+/* 1899: 790 */           if (localObject1 != null) {
+/* 1900:     */             try
+/* 1901:     */             {
+/* 1902: 790 */               localConnection.close();
+/* 1903:     */             }
+/* 1904:     */             catch (Throwable localThrowable3)
+/* 1905:     */             {
+/* 1906: 790 */               localObject1.addSuppressed(localThrowable3);
+/* 1907:     */             }
+/* 1908:     */           } else {
+/* 1909: 790 */             localConnection.close();
+/* 1910:     */           }
 /* 1911:     */         }
-/* 1912: 797 */         Block localBlock = new Block(-1, 0, null, localTreeMap.size(), 1000000000, 0, localTreeMap.size() * 128, null, Genesis.CREATOR_PUBLIC_KEY, new byte[64], Genesis.GENESIS_BLOCK_SIGNATURE);
-/* 1913:     */         
-/* 1914: 799 */         localBlock.setIndex(blockCounter.incrementAndGet());
-/* 1915:     */         
-/* 1916: 801 */         Object localObject1 = (Transaction[])localTreeMap.values().toArray(new Transaction[localTreeMap.size()]);
-/* 1917: 802 */         MessageDigest localMessageDigest = Crypto.sha256();
-/* 1918: 803 */         for (int j = 0; j < localObject1.length; j++)
-/* 1919:     */         {
-/* 1920: 804 */           Object localObject2 = localObject1[j];
-/* 1921: 805 */           localBlock.transactionIds[j] = localObject2.getId();
-/* 1922: 806 */           localBlock.blockTransactions[j] = localObject2;
-/* 1923: 807 */           localMessageDigest.update(localObject2.getBytes());
-/* 1924:     */         }
-/* 1925: 810 */         localBlock.setPayloadHash(localMessageDigest.digest());
-/* 1926: 812 */         for (Transaction localTransaction : localBlock.blockTransactions) {
-/* 1927: 813 */           localTransaction.setBlock(localBlock);
-/* 1928:     */         }
-/* 1929: 816 */         addBlock(localBlock);
-/* 1930:     */       }
-/* 1931:     */       catch (NxtException.ValidationException localValidationException)
-/* 1932:     */       {
-/* 1933: 819 */         Logger.logMessage(localValidationException.getMessage());
-/* 1934: 820 */         System.exit(1);
-/* 1935:     */       }
-/* 1936:     */     }
-/* 1937: 824 */     Logger.logMessage("Scanning blockchain...");
-/* 1938: 825 */     scan();
-/* 1939: 826 */     Logger.logMessage("...Done");
-/* 1940:     */   }
-/* 1941:     */   
-/* 1942:     */   private static void processUnconfirmedTransactions(JSONObject paramJSONObject)
-/* 1943:     */     throws NxtException.ValidationException
-/* 1944:     */   {
-/* 1945: 830 */     JSONArray localJSONArray = (JSONArray)paramJSONObject.get("unconfirmedTransactions");
-/* 1946: 831 */     processTransactions(localJSONArray, true);
-/* 1947:     */   }
-/* 1948:     */   
-/* 1949:     */   private static void processTransactions(JSONArray paramJSONArray, boolean paramBoolean)
-/* 1950:     */     throws NxtException.ValidationException
-/* 1951:     */   {
-/* 1952: 836 */     JSONArray localJSONArray = new JSONArray();
-/* 1953: 838 */     for (Object localObject1 = paramJSONArray.iterator(); ((Iterator)localObject1).hasNext();)
-/* 1954:     */     {
-/* 1955: 838 */       Object localObject2 = ((Iterator)localObject1).next();
-/* 1956:     */       try
-/* 1957:     */       {
-/* 1958: 842 */         Transaction localTransaction = Transaction.getTransaction((JSONObject)localObject2);
-/* 1959:     */         
-/* 1960: 844 */         int i = Convert.getEpochTime();
-/* 1961: 845 */         if ((localTransaction.getTimestamp() > i + 15) || (localTransaction.getExpiration() < i) || (localTransaction.getDeadline() <= 1440))
-/* 1962:     */         {
-/* 1963:     */           boolean bool;
-/* 1964: 852 */           synchronized (Blockchain.class)
-/* 1965:     */           {
-/* 1966: 854 */             localObject3 = localTransaction.getId();
-/* 1967: 855 */             if (((!Transaction.hasTransaction((Long)localObject3)) && (!unconfirmedTransactions.containsKey(localObject3)) && (!doubleSpendingTransactions.containsKey(localObject3)) && (!localTransaction.verify())) || 
-/* 1968:     */             
-/* 1969:     */ 
-/* 1970:     */ 
-/* 1971:     */ 
-/* 1972: 860 */               (transactionHashes.containsKey(localTransaction.getHash()))) {
-/* 1973:     */               continue;
-/* 1974:     */             }
-/* 1975: 864 */             bool = localTransaction.isDoubleSpending();
-/* 1976:     */             
-/* 1977: 866 */             localTransaction.setIndex(transactionCounter.incrementAndGet());
-/* 1978: 868 */             if (bool)
-/* 1979:     */             {
-/* 1980: 870 */               doubleSpendingTransactions.put(localObject3, localTransaction);
-/* 1981:     */             }
-/* 1982:     */             else
-/* 1983:     */             {
-/* 1984: 874 */               unconfirmedTransactions.put(localObject3, localTransaction);
-/* 1985: 876 */               if (!paramBoolean) {
-/* 1986: 878 */                 localJSONArray.add(localObject2);
-/* 1987:     */               }
-/* 1988:     */             }
-/* 1989:     */           }
-/* 1990: 886 */           ??? = new JSONObject();
-/* 1991: 887 */           ((JSONObject)???).put("response", "processNewData");
-/* 1992:     */           
-/* 1993: 889 */           Object localObject3 = new JSONArray();
-/* 1994: 890 */           JSONObject localJSONObject = new JSONObject();
-/* 1995: 891 */           localJSONObject.put("index", Integer.valueOf(localTransaction.getIndex()));
-/* 1996: 892 */           localJSONObject.put("timestamp", Integer.valueOf(localTransaction.getTimestamp()));
-/* 1997: 893 */           localJSONObject.put("deadline", Short.valueOf(localTransaction.getDeadline()));
-/* 1998: 894 */           localJSONObject.put("recipient", Convert.convert(localTransaction.getRecipientId()));
-/* 1999: 895 */           localJSONObject.put("amount", Integer.valueOf(localTransaction.getAmount()));
-/* 2000: 896 */           localJSONObject.put("fee", Integer.valueOf(localTransaction.getFee()));
-/* 2001: 897 */           localJSONObject.put("sender", Convert.convert(localTransaction.getSenderAccountId()));
-/* 2002: 898 */           localJSONObject.put("id", localTransaction.getStringId());
-/* 2003: 899 */           ((JSONArray)localObject3).add(localJSONObject);
-/* 2004: 901 */           if (bool) {
-/* 2005: 903 */             ((JSONObject)???).put("addedDoubleSpendingTransactions", localObject3);
-/* 2006:     */           } else {
-/* 2007: 907 */             ((JSONObject)???).put("addedUnconfirmedTransactions", localObject3);
-/* 2008:     */           }
-/* 2009: 911 */           User.sendToAll((JSONStreamAware)???);
-/* 2010:     */         }
-/* 2011:     */       }
-/* 2012:     */       catch (RuntimeException localRuntimeException)
-/* 2013:     */       {
-/* 2014: 915 */         Logger.logMessage("Error processing transaction", localRuntimeException);
-/* 2015:     */       }
-/* 2016:     */     }
-/* 2017: 921 */     if (localJSONArray.size() > 0)
-/* 2018:     */     {
-/* 2019: 923 */       localObject1 = new JSONObject();
-/* 2020: 924 */       ((JSONObject)localObject1).put("requestType", "processTransactions");
-/* 2021: 925 */       ((JSONObject)localObject1).put("transactions", localJSONArray);
-/* 2022:     */       
-/* 2023: 927 */       Peer.sendToSomePeers((JSONObject)localObject1);
-/* 2024:     */     }
-/* 2025:     */   }
-/* 2026:     */   
-/* 2027:     */   private static synchronized byte[] calculateTransactionsChecksum()
-/* 2028:     */   {
-/* 2029: 934 */     PriorityQueue localPriorityQueue = new PriorityQueue(getTransactionCount(), new Comparator()
-/* 2030:     */     {
-/* 2031:     */       public int compare(Transaction paramAnonymousTransaction1, Transaction paramAnonymousTransaction2)
-/* 2032:     */       {
-/* 2033: 937 */         long l1 = paramAnonymousTransaction1.getId().longValue();
-/* 2034: 938 */         long l2 = paramAnonymousTransaction2.getId().longValue();
-/* 2035: 939 */         return paramAnonymousTransaction1.getTimestamp() > paramAnonymousTransaction2.getTimestamp() ? 1 : paramAnonymousTransaction1.getTimestamp() < paramAnonymousTransaction2.getTimestamp() ? -1 : l1 > l2 ? 1 : l1 < l2 ? -1 : 0;
-/* 2036:     */       }
-/* 2037: 941 */     });
-/* 2038: 942 */     Object localObject1 = getAllTransactions();Object localObject2 = null;
-/* 2039:     */     try
-/* 2040:     */     {
-/* 2041: 943 */       while (((DbIterator)localObject1).hasNext()) {
-/* 2042: 944 */         localPriorityQueue.add(((DbIterator)localObject1).next());
-/* 2043:     */       }
-/* 2044:     */     }
-/* 2045:     */     catch (Throwable localThrowable2)
-/* 2046:     */     {
-/* 2047: 942 */       localObject2 = localThrowable2;throw localThrowable2;
+/* 1912:     */       }
+/* 1913:     */     }
+/* 1914:     */     catch (SQLException localSQLException1)
+/* 1915:     */     {
+/* 1916: 791 */       throw new RuntimeException(localSQLException1.toString(), localSQLException1);
+/* 1917:     */     }
+/* 1918:     */   }
+/* 1919:     */   
+/* 1920:     */   static void init()
+/* 1921:     */   {
+/* 1922: 797 */     if (!Block.hasBlock(Genesis.GENESIS_BLOCK_ID))
+/* 1923:     */     {
+/* 1924: 798 */       Logger.logMessage("Genesis block not in database, starting from scratch");
+/* 1925:     */       
+/* 1926: 800 */       TreeMap localTreeMap = new TreeMap();
+/* 1927:     */       try
+/* 1928:     */       {
+/* 1929: 804 */         for (int i = 0; i < Genesis.GENESIS_RECIPIENTS.length; i++)
+/* 1930:     */         {
+/* 1931: 805 */           localObject1 = Transaction.newTransaction(0, (short)0, Genesis.CREATOR_PUBLIC_KEY, Genesis.GENESIS_RECIPIENTS[i], Genesis.GENESIS_AMOUNTS[i], 0, null, Genesis.GENESIS_SIGNATURES[i]);
+/* 1932:     */           
+/* 1933: 807 */           ((Transaction)localObject1).setIndex(transactionCounter.incrementAndGet());
+/* 1934: 808 */           localTreeMap.put(((Transaction)localObject1).getId(), localObject1);
+/* 1935:     */         }
+/* 1936: 811 */         Block localBlock = new Block(-1, 0, null, localTreeMap.size(), 1000000000, 0, localTreeMap.size() * 128, null, Genesis.CREATOR_PUBLIC_KEY, new byte[64], Genesis.GENESIS_BLOCK_SIGNATURE);
+/* 1937:     */         
+/* 1938: 813 */         localBlock.setIndex(blockCounter.incrementAndGet());
+/* 1939:     */         
+/* 1940: 815 */         Object localObject1 = (Transaction[])localTreeMap.values().toArray(new Transaction[localTreeMap.size()]);
+/* 1941: 816 */         MessageDigest localMessageDigest = Crypto.sha256();
+/* 1942: 817 */         for (int j = 0; j < localObject1.length; j++)
+/* 1943:     */         {
+/* 1944: 818 */           Object localObject2 = localObject1[j];
+/* 1945: 819 */           localBlock.transactionIds[j] = localObject2.getId();
+/* 1946: 820 */           localBlock.blockTransactions[j] = localObject2;
+/* 1947: 821 */           localMessageDigest.update(localObject2.getBytes());
+/* 1948:     */         }
+/* 1949: 824 */         localBlock.setPayloadHash(localMessageDigest.digest());
+/* 1950: 826 */         for (Transaction localTransaction : localBlock.blockTransactions) {
+/* 1951: 827 */           localTransaction.setBlock(localBlock);
+/* 1952:     */         }
+/* 1953: 830 */         addBlock(localBlock);
+/* 1954:     */       }
+/* 1955:     */       catch (NxtException.ValidationException localValidationException)
+/* 1956:     */       {
+/* 1957: 833 */         Logger.logMessage(localValidationException.getMessage());
+/* 1958: 834 */         System.exit(1);
+/* 1959:     */       }
+/* 1960:     */     }
+/* 1961: 838 */     Logger.logMessage("Scanning blockchain...");
+/* 1962: 839 */     scan();
+/* 1963: 840 */     Logger.logMessage("...Done");
+/* 1964:     */   }
+/* 1965:     */   
+/* 1966:     */   private static void processUnconfirmedTransactions(JSONObject paramJSONObject)
+/* 1967:     */     throws NxtException.ValidationException
+/* 1968:     */   {
+/* 1969: 844 */     JSONArray localJSONArray = (JSONArray)paramJSONObject.get("unconfirmedTransactions");
+/* 1970: 845 */     processTransactions(localJSONArray, true);
+/* 1971:     */   }
+/* 1972:     */   
+/* 1973:     */   private static void processTransactions(JSONArray paramJSONArray, boolean paramBoolean)
+/* 1974:     */     throws NxtException.ValidationException
+/* 1975:     */   {
+/* 1976: 850 */     JSONArray localJSONArray = new JSONArray();
+/* 1977: 852 */     for (Object localObject1 = paramJSONArray.iterator(); ((Iterator)localObject1).hasNext();)
+/* 1978:     */     {
+/* 1979: 852 */       Object localObject2 = ((Iterator)localObject1).next();
+/* 1980:     */       try
+/* 1981:     */       {
+/* 1982: 856 */         Transaction localTransaction = Transaction.getTransaction((JSONObject)localObject2);
+/* 1983:     */         
+/* 1984: 858 */         int i = Convert.getEpochTime();
+/* 1985: 859 */         if ((localTransaction.getTimestamp() > i + 15) || (localTransaction.getExpiration() < i) || (localTransaction.getDeadline() <= 1440))
+/* 1986:     */         {
+/* 1987:     */           boolean bool;
+/* 1988: 866 */           synchronized (Blockchain.class)
+/* 1989:     */           {
+/* 1990: 868 */             localObject3 = localTransaction.getId();
+/* 1991: 869 */             if (((!Transaction.hasTransaction((Long)localObject3)) && (!unconfirmedTransactions.containsKey(localObject3)) && (!doubleSpendingTransactions.containsKey(localObject3)) && (!localTransaction.verify())) || 
+/* 1992:     */             
+/* 1993:     */ 
+/* 1994:     */ 
+/* 1995:     */ 
+/* 1996: 874 */               (transactionHashes.containsKey(localTransaction.getHash()))) {
+/* 1997:     */               continue;
+/* 1998:     */             }
+/* 1999: 878 */             bool = localTransaction.isDoubleSpending();
+/* 2000:     */             
+/* 2001: 880 */             localTransaction.setIndex(transactionCounter.incrementAndGet());
+/* 2002: 882 */             if (bool)
+/* 2003:     */             {
+/* 2004: 884 */               doubleSpendingTransactions.put(localObject3, localTransaction);
+/* 2005:     */             }
+/* 2006:     */             else
+/* 2007:     */             {
+/* 2008: 888 */               unconfirmedTransactions.put(localObject3, localTransaction);
+/* 2009: 890 */               if (!paramBoolean) {
+/* 2010: 892 */                 localJSONArray.add(localObject2);
+/* 2011:     */               }
+/* 2012:     */             }
+/* 2013:     */           }
+/* 2014: 900 */           ??? = new JSONObject();
+/* 2015: 901 */           ((JSONObject)???).put("response", "processNewData");
+/* 2016:     */           
+/* 2017: 903 */           Object localObject3 = new JSONArray();
+/* 2018: 904 */           JSONObject localJSONObject = new JSONObject();
+/* 2019: 905 */           localJSONObject.put("index", Integer.valueOf(localTransaction.getIndex()));
+/* 2020: 906 */           localJSONObject.put("timestamp", Integer.valueOf(localTransaction.getTimestamp()));
+/* 2021: 907 */           localJSONObject.put("deadline", Short.valueOf(localTransaction.getDeadline()));
+/* 2022: 908 */           localJSONObject.put("recipient", Convert.convert(localTransaction.getRecipientId()));
+/* 2023: 909 */           localJSONObject.put("amount", Integer.valueOf(localTransaction.getAmount()));
+/* 2024: 910 */           localJSONObject.put("fee", Integer.valueOf(localTransaction.getFee()));
+/* 2025: 911 */           localJSONObject.put("sender", Convert.convert(localTransaction.getSenderAccountId()));
+/* 2026: 912 */           localJSONObject.put("id", localTransaction.getStringId());
+/* 2027: 913 */           ((JSONArray)localObject3).add(localJSONObject);
+/* 2028: 915 */           if (bool) {
+/* 2029: 917 */             ((JSONObject)???).put("addedDoubleSpendingTransactions", localObject3);
+/* 2030:     */           } else {
+/* 2031: 921 */             ((JSONObject)???).put("addedUnconfirmedTransactions", localObject3);
+/* 2032:     */           }
+/* 2033: 925 */           User.sendToAll((JSONStreamAware)???);
+/* 2034:     */         }
+/* 2035:     */       }
+/* 2036:     */       catch (RuntimeException localRuntimeException)
+/* 2037:     */       {
+/* 2038: 929 */         Logger.logMessage("Error processing transaction", localRuntimeException);
+/* 2039:     */       }
+/* 2040:     */     }
+/* 2041: 935 */     if (localJSONArray.size() > 0)
+/* 2042:     */     {
+/* 2043: 937 */       localObject1 = new JSONObject();
+/* 2044: 938 */       ((JSONObject)localObject1).put("requestType", "processTransactions");
+/* 2045: 939 */       ((JSONObject)localObject1).put("transactions", localJSONArray);
+/* 2046:     */       
+/* 2047: 941 */       Peer.sendToSomePeers((JSONObject)localObject1);
 /* 2048:     */     }
-/* 2049:     */     finally
-/* 2050:     */     {
-/* 2051: 946 */       if (localObject1 != null) {
-/* 2052: 946 */         if (localObject2 != null) {
-/* 2053:     */           try
-/* 2054:     */           {
-/* 2055: 946 */             ((DbIterator)localObject1).close();
-/* 2056:     */           }
-/* 2057:     */           catch (Throwable localThrowable3)
-/* 2058:     */           {
-/* 2059: 946 */             localObject2.addSuppressed(localThrowable3);
-/* 2060:     */           }
-/* 2061:     */         } else {
-/* 2062: 946 */           ((DbIterator)localObject1).close();
-/* 2063:     */         }
-/* 2064:     */       }
-/* 2065:     */     }
-/* 2066: 947 */     localObject1 = Crypto.sha256();
-/* 2067: 948 */     while (!localPriorityQueue.isEmpty()) {
-/* 2068: 949 */       ((MessageDigest)localObject1).update(((Transaction)localPriorityQueue.poll()).getBytes());
-/* 2069:     */     }
-/* 2070: 951 */     return ((MessageDigest)localObject1).digest();
-/* 2071:     */   }
-/* 2072:     */   
-/* 2073:     */   private static boolean pushBlock(Block paramBlock, Transaction[] paramArrayOfTransaction)
-/* 2074:     */   {
-/* 2075: 958 */     int i = Convert.getEpochTime();
-/* 2076:     */     JSONArray localJSONArray1;
-/* 2077:     */     JSONArray localJSONArray2;
-/* 2078: 960 */     synchronized (Blockchain.class)
-/* 2079:     */     {
-/* 2080:     */       try
-/* 2081:     */       {
-/* 2082: 963 */         Block localBlock = (Block)lastBlock.get();
-/* 2083: 965 */         if (paramBlock.getVersion() != (localBlock.getHeight() < 30000 ? 1 : 2)) {
-/* 2084: 967 */           return false;
-/* 2085:     */         }
-/* 2086: 970 */         if (localBlock.getHeight() == 30000)
-/* 2087:     */         {
-/* 2088: 972 */           localObject1 = calculateTransactionsChecksum();
-/* 2089: 973 */           if (CHECKSUM_TRANSPARENT_FORGING == null)
-/* 2090:     */           {
-/* 2091: 974 */             Logger.logMessage("Checksum calculated:\n" + Arrays.toString((byte[])localObject1));
-/* 2092:     */           }
-/* 2093:     */           else
-/* 2094:     */           {
-/* 2095: 975 */             if (!Arrays.equals((byte[])localObject1, CHECKSUM_TRANSPARENT_FORGING))
-/* 2096:     */             {
-/* 2097: 976 */               Logger.logMessage("Checksum failed at block 30000");
-/* 2098: 977 */               return false;
-/* 2099:     */             }
-/* 2100: 979 */             Logger.logMessage("Checksum passed at block 30000");
-/* 2101:     */           }
-/* 2102:     */         }
-/* 2103: 984 */         if ((paramBlock.getVersion() != 1) && (!Arrays.equals(Crypto.sha256().digest(localBlock.getBytes()), paramBlock.getPreviousBlockHash()))) {
-/* 2104: 986 */           return false;
-/* 2105:     */         }
-/* 2106: 989 */         if ((paramBlock.getTimestamp() > i + 15) || (paramBlock.getTimestamp() <= localBlock.getTimestamp())) {
-/* 2107: 991 */           return false;
-/* 2108:     */         }
-/* 2109: 994 */         if ((!localBlock.getId().equals(paramBlock.getPreviousBlockId())) || (paramBlock.getId().equals(Long.valueOf(0L))) || (Block.hasBlock(paramBlock.getId())) || (!paramBlock.verifyGenerationSignature()) || (!paramBlock.verifyBlockSignature())) {
-/* 2110: 998 */           return false;
-/* 2111:     */         }
-/* 2112:1001 */         paramBlock.setIndex(blockCounter.incrementAndGet());
-/* 2113:     */         
-/* 2114:1003 */         localObject1 = new HashMap();
-/* 2115:1004 */         HashMap localHashMap1 = new HashMap();
-/* 2116:1005 */         for (int j = 0; j < paramBlock.transactionIds.length; j++)
-/* 2117:     */         {
-/* 2118:1007 */           localObject2 = paramArrayOfTransaction[j];
-/* 2119:1008 */           ((Transaction)localObject2).setIndex(transactionCounter.incrementAndGet());
-/* 2120:1010 */           if (((Map)localObject1).put(paramBlock.transactionIds[j] =  = ((Transaction)localObject2).getId(), localObject2) != null) {
-/* 2121:1012 */             return false;
-/* 2122:     */           }
-/* 2123:1015 */           if (((Transaction)localObject2).isDuplicate(localHashMap1)) {
-/* 2124:1017 */             return false;
-/* 2125:     */           }
-/* 2126:     */         }
-/* 2127:1021 */         Arrays.sort(paramBlock.transactionIds);
-/* 2128:     */         
-/* 2129:1023 */         HashMap localHashMap2 = new HashMap();
-/* 2130:1024 */         Object localObject2 = new HashMap();
-/* 2131:1025 */         int k = 0;int m = 0;
-/* 2132:1026 */         MessageDigest localMessageDigest = Crypto.sha256();
-/* 2133:     */         Object localObject5;
-/* 2134:1027 */         for (int n = 0; n < paramBlock.transactionIds.length; n++)
-/* 2135:     */         {
-/* 2136:1029 */           localObject4 = paramBlock.transactionIds[n];
-/* 2137:1030 */           localObject5 = (Transaction)((Map)localObject1).get(localObject4);
-/* 2138:1032 */           if ((((Transaction)localObject5).getTimestamp() > i + 15) || ((((Transaction)localObject5).getExpiration() < paramBlock.getTimestamp()) && (localBlock.getHeight() > 303)) || (Transaction.hasTransaction((Long)localObject4)) || ((((Transaction)localObject5).getReferencedTransactionId() != null) && (!Transaction.hasTransaction(((Transaction)localObject5).getReferencedTransactionId())) && (((Map)localObject1).get(((Transaction)localObject5).getReferencedTransactionId()) == null)) || ((unconfirmedTransactions.get(localObject4) == null) && (!((Transaction)localObject5).verify())) || (((Transaction)localObject5).getId().equals(Long.valueOf(0L)))) {
-/* 2139:1041 */             return false;
-/* 2140:     */           }
-/* 2141:1044 */           paramBlock.blockTransactions[n] = localObject5;
-/* 2142:     */           
-/* 2143:1046 */           k += ((Transaction)localObject5).getAmount();
-/* 2144:     */           
-/* 2145:1048 */           ((Transaction)localObject5).updateTotals(localHashMap2, (Map)localObject2);
-/* 2146:     */           
-/* 2147:1050 */           m += ((Transaction)localObject5).getFee();
-/* 2148:     */           
-/* 2149:1052 */           localMessageDigest.update(((Transaction)localObject5).getBytes());
-/* 2150:     */         }
-/* 2151:1056 */         if ((k != paramBlock.getTotalAmount()) || (m != paramBlock.getTotalFee())) {
-/* 2152:1058 */           return false;
+/* 2049:     */   }
+/* 2050:     */   
+/* 2051:     */   private static synchronized byte[] calculateTransactionsChecksum()
+/* 2052:     */   {
+/* 2053: 948 */     PriorityQueue localPriorityQueue = new PriorityQueue(getTransactionCount(), new Comparator()
+/* 2054:     */     {
+/* 2055:     */       public int compare(Transaction paramAnonymousTransaction1, Transaction paramAnonymousTransaction2)
+/* 2056:     */       {
+/* 2057: 951 */         long l1 = paramAnonymousTransaction1.getId().longValue();
+/* 2058: 952 */         long l2 = paramAnonymousTransaction2.getId().longValue();
+/* 2059: 953 */         return paramAnonymousTransaction1.getTimestamp() > paramAnonymousTransaction2.getTimestamp() ? 1 : paramAnonymousTransaction1.getTimestamp() < paramAnonymousTransaction2.getTimestamp() ? -1 : l1 > l2 ? 1 : l1 < l2 ? -1 : 0;
+/* 2060:     */       }
+/* 2061: 955 */     });
+/* 2062: 956 */     Object localObject1 = getAllTransactions();Object localObject2 = null;
+/* 2063:     */     try
+/* 2064:     */     {
+/* 2065: 957 */       while (((DbIterator)localObject1).hasNext()) {
+/* 2066: 958 */         localPriorityQueue.add(((DbIterator)localObject1).next());
+/* 2067:     */       }
+/* 2068:     */     }
+/* 2069:     */     catch (Throwable localThrowable2)
+/* 2070:     */     {
+/* 2071: 956 */       localObject2 = localThrowable2;throw localThrowable2;
+/* 2072:     */     }
+/* 2073:     */     finally
+/* 2074:     */     {
+/* 2075: 960 */       if (localObject1 != null) {
+/* 2076: 960 */         if (localObject2 != null) {
+/* 2077:     */           try
+/* 2078:     */           {
+/* 2079: 960 */             ((DbIterator)localObject1).close();
+/* 2080:     */           }
+/* 2081:     */           catch (Throwable localThrowable3)
+/* 2082:     */           {
+/* 2083: 960 */             localObject2.addSuppressed(localThrowable3);
+/* 2084:     */           }
+/* 2085:     */         } else {
+/* 2086: 960 */           ((DbIterator)localObject1).close();
+/* 2087:     */         }
+/* 2088:     */       }
+/* 2089:     */     }
+/* 2090: 961 */     localObject1 = Crypto.sha256();
+/* 2091: 962 */     while (!localPriorityQueue.isEmpty()) {
+/* 2092: 963 */       ((MessageDigest)localObject1).update(((Transaction)localPriorityQueue.poll()).getBytes());
+/* 2093:     */     }
+/* 2094: 965 */     return ((MessageDigest)localObject1).digest();
+/* 2095:     */   }
+/* 2096:     */   
+/* 2097:     */   private static void pushBlock(Block paramBlock, Transaction[] paramArrayOfTransaction)
+/* 2098:     */     throws Blockchain.BlockNotAcceptedException
+/* 2099:     */   {
+/* 2100: 972 */     int i = Convert.getEpochTime();
+/* 2101:     */     JSONArray localJSONArray1;
+/* 2102:     */     JSONArray localJSONArray2;
+/* 2103: 974 */     synchronized (Blockchain.class)
+/* 2104:     */     {
+/* 2105:     */       try
+/* 2106:     */       {
+/* 2107: 977 */         Block localBlock = (Block)lastBlock.get();
+/* 2108: 979 */         if (!localBlock.getId().equals(paramBlock.getPreviousBlockId())) {
+/* 2109: 980 */           throw new BlockOutOfOrderException("Previous block id doesn't match", null);
+/* 2110:     */         }
+/* 2111: 983 */         if (paramBlock.getVersion() != (localBlock.getHeight() < 30000 ? 1 : 2)) {
+/* 2112: 984 */           throw new BlockNotAcceptedException("Invalid version " + paramBlock.getVersion(), null);
+/* 2113:     */         }
+/* 2114: 987 */         if (localBlock.getHeight() == 30000)
+/* 2115:     */         {
+/* 2116: 988 */           localObject1 = calculateTransactionsChecksum();
+/* 2117: 989 */           if (CHECKSUM_TRANSPARENT_FORGING == null)
+/* 2118:     */           {
+/* 2119: 990 */             Logger.logMessage("Checksum calculated:\n" + Arrays.toString((byte[])localObject1));
+/* 2120:     */           }
+/* 2121:     */           else
+/* 2122:     */           {
+/* 2123: 991 */             if (!Arrays.equals((byte[])localObject1, CHECKSUM_TRANSPARENT_FORGING))
+/* 2124:     */             {
+/* 2125: 992 */               Logger.logMessage("Checksum failed at block 30000");
+/* 2126: 993 */               throw new BlockNotAcceptedException("Checksum failed", null);
+/* 2127:     */             }
+/* 2128: 995 */             Logger.logMessage("Checksum passed at block 30000");
+/* 2129:     */           }
+/* 2130:     */         }
+/* 2131: 999 */         if ((paramBlock.getVersion() != 1) && (!Arrays.equals(Crypto.sha256().digest(localBlock.getBytes()), paramBlock.getPreviousBlockHash()))) {
+/* 2132:1000 */           throw new BlockNotAcceptedException("Previos block hash doesn't match", null);
+/* 2133:     */         }
+/* 2134:1002 */         if ((paramBlock.getTimestamp() > i + 15) || (paramBlock.getTimestamp() <= localBlock.getTimestamp())) {
+/* 2135:1003 */           throw new BlockNotAcceptedException("Invalid timestamp: " + paramBlock.getTimestamp() + " current time is " + i + ", previous block timestamp is " + localBlock.getTimestamp(), null);
+/* 2136:     */         }
+/* 2137:1006 */         if ((paramBlock.getId().equals(Long.valueOf(0L))) || (Block.hasBlock(paramBlock.getId()))) {
+/* 2138:1007 */           throw new BlockNotAcceptedException("Duplicate block or invalid id", null);
+/* 2139:     */         }
+/* 2140:1009 */         if ((!paramBlock.verifyGenerationSignature()) || (!paramBlock.verifyBlockSignature())) {
+/* 2141:1010 */           throw new BlockNotAcceptedException("Signature verification failed", null);
+/* 2142:     */         }
+/* 2143:1013 */         paramBlock.setIndex(blockCounter.incrementAndGet());
+/* 2144:     */         
+/* 2145:1015 */         localObject1 = new HashMap();
+/* 2146:1016 */         for (int j = 0; j < paramBlock.transactionIds.length; j++)
+/* 2147:     */         {
+/* 2148:1017 */           localObject2 = paramArrayOfTransaction[j];
+/* 2149:1018 */           ((Transaction)localObject2).setIndex(transactionCounter.incrementAndGet());
+/* 2150:1019 */           if (((Map)localObject1).put(paramBlock.transactionIds[j] =  = ((Transaction)localObject2).getId(), localObject2) != null) {
+/* 2151:1020 */             throw new BlockNotAcceptedException("Block contains duplicate transactions: " + ((Transaction)localObject2).getStringId(), null);
+/* 2152:     */           }
 /* 2153:     */         }
-/* 2154:1061 */         if (!Arrays.equals(localMessageDigest.digest(), paramBlock.getPayloadHash())) {
-/* 2155:1063 */           return false;
-/* 2156:     */         }
-/* 2157:1066 */         for (Object localObject3 = localHashMap2.entrySet().iterator(); ((Iterator)localObject3).hasNext();)
-/* 2158:     */         {
-/* 2159:1066 */           localObject4 = (Map.Entry)((Iterator)localObject3).next();
-/* 2160:1067 */           localObject5 = Account.getAccount((Long)((Map.Entry)localObject4).getKey());
-/* 2161:1068 */           if (((Account)localObject5).getBalance() < ((Long)((Map.Entry)localObject4).getValue()).longValue()) {
-/* 2162:1070 */             return false;
-/* 2163:     */           }
-/* 2164:     */         }
-/* 2165:1074 */         for (localObject3 = ((Map)localObject2).entrySet().iterator(); ((Iterator)localObject3).hasNext();)
-/* 2166:     */         {
-/* 2167:1074 */           localObject4 = (Map.Entry)((Iterator)localObject3).next();
-/* 2168:1075 */           localObject5 = Account.getAccount((Long)((Map.Entry)localObject4).getKey());
-/* 2169:1076 */           for (localIterator = ((Map)((Map.Entry)localObject4).getValue()).entrySet().iterator(); localIterator.hasNext();)
-/* 2170:     */           {
-/* 2171:1076 */             localObject6 = (Map.Entry)localIterator.next();
-/* 2172:1077 */             long l1 = ((Long)((Map.Entry)localObject6).getKey()).longValue();
-/* 2173:1078 */             long l2 = ((Long)((Map.Entry)localObject6).getValue()).longValue();
-/* 2174:1079 */             if (((Account)localObject5).getAssetBalance(Long.valueOf(l1)).intValue() < l2) {
-/* 2175:1081 */               return false;
-/* 2176:     */             }
+/* 2154:1024 */         Arrays.sort(paramBlock.transactionIds);
+/* 2155:     */         
+/* 2156:1026 */         HashMap localHashMap1 = new HashMap();
+/* 2157:1027 */         Object localObject2 = new HashMap();
+/* 2158:1028 */         HashMap localHashMap2 = new HashMap();
+/* 2159:1029 */         int k = 0;int m = 0;
+/* 2160:1030 */         MessageDigest localMessageDigest = Crypto.sha256();
+/* 2161:     */         Object localObject5;
+/* 2162:1031 */         for (int n = 0; n < paramBlock.transactionIds.length; n++)
+/* 2163:     */         {
+/* 2164:1033 */           localObject4 = paramBlock.transactionIds[n];
+/* 2165:1034 */           localObject5 = (Transaction)((Map)localObject1).get(localObject4);
+/* 2166:1036 */           if ((((Transaction)localObject5).getTimestamp() > i + 15) || (((Transaction)localObject5).getTimestamp() > paramBlock.getTimestamp() + 15) || ((((Transaction)localObject5).getExpiration() < paramBlock.getTimestamp()) && (localBlock.getHeight() != 303))) {
+/* 2167:1038 */             throw new BlockNotAcceptedException("Invalid transaction timestamp " + ((Transaction)localObject5).getTimestamp() + " for transaction " + ((Transaction)localObject5).getStringId() + ", current time is " + i + ", block timestamp is " + paramBlock.getTimestamp(), null);
+/* 2168:     */           }
+/* 2169:1042 */           if (Transaction.hasTransaction((Long)localObject4)) {
+/* 2170:1043 */             throw new BlockNotAcceptedException("Transaction " + ((Transaction)localObject5).getStringId() + " is already in the blockchain", null);
+/* 2171:     */           }
+/* 2172:1045 */           if ((((Transaction)localObject5).getReferencedTransactionId() != null) && (!Transaction.hasTransaction(((Transaction)localObject5).getReferencedTransactionId())) && (((Map)localObject1).get(((Transaction)localObject5).getReferencedTransactionId()) == null)) {
+/* 2173:1048 */             throw new BlockNotAcceptedException("Missing referenced transaction " + Convert.convert(((Transaction)localObject5).getReferencedTransactionId()) + " for transaction " + ((Transaction)localObject5).getStringId(), null);
+/* 2174:     */           }
+/* 2175:1051 */           if ((unconfirmedTransactions.get(localObject4) == null) && (!((Transaction)localObject5).verify())) {
+/* 2176:1052 */             throw new BlockNotAcceptedException("Signature verification failed for transaction " + ((Transaction)localObject5).getStringId(), null);
 /* 2177:     */           }
-/* 2178:     */         }
-/* 2179:     */         Iterator localIterator;
-/* 2180:1086 */         paramBlock.setHeight(localBlock.getHeight() + 1);
-/* 2181:     */         
-/* 2182:1088 */         localObject3 = null;
-/* 2183:1089 */         for (localObject6 : paramBlock.blockTransactions)
-/* 2184:     */         {
-/* 2185:1090 */           ((Transaction)localObject6).setBlock(paramBlock);
-/* 2186:1092 */           if ((transactionHashes.putIfAbsent(((Transaction)localObject6).getHash(), localObject6) != null) && (paramBlock.getHeight() != 58294))
-/* 2187:     */           {
-/* 2188:1094 */             localObject3 = localObject6;
-/* 2189:1095 */             break;
-/* 2190:     */           }
-/* 2191:     */         }
-/* 2192:1099 */         if (localObject3 != null)
-/* 2193:     */         {
-/* 2194:1100 */           for (localObject6 : paramBlock.blockTransactions) {
-/* 2195:1101 */             if (!((Transaction)localObject6).equals(localObject3))
-/* 2196:     */             {
-/* 2197:1102 */               localTransaction2 = (Transaction)transactionHashes.get(((Transaction)localObject6).getHash());
-/* 2198:1103 */               if ((localTransaction2 != null) && (localTransaction2.equals(localObject6))) {
-/* 2199:1104 */                 transactionHashes.remove(((Transaction)localObject6).getHash());
-/* 2200:     */               }
-/* 2201:     */             }
-/* 2202:     */           }
-/* 2203:1108 */           return false;
-/* 2204:     */         }
-/* 2205:1111 */         paramBlock.calculateBaseTarget();
-/* 2206:     */         
-/* 2207:1113 */         addBlock(paramBlock);
-/* 2208:     */         
-/* 2209:1115 */         paramBlock.apply();
-/* 2210:     */         
-/* 2211:1117 */         localJSONArray1 = new JSONArray();
-/* 2212:1118 */         localJSONArray2 = new JSONArray();
-/* 2213:1120 */         for (localObject4 = ((Map)localObject1).entrySet().iterator(); ((Iterator)localObject4).hasNext();)
-/* 2214:     */         {
-/* 2215:1120 */           Map.Entry localEntry = (Map.Entry)((Iterator)localObject4).next();
-/* 2216:     */           
-/* 2217:1122 */           Transaction localTransaction1 = (Transaction)localEntry.getValue();
-/* 2218:     */           
-/* 2219:1124 */           localObject6 = new JSONObject();
-/* 2220:1125 */           ((JSONObject)localObject6).put("index", Integer.valueOf(localTransaction1.getIndex()));
-/* 2221:1126 */           ((JSONObject)localObject6).put("blockTimestamp", Integer.valueOf(paramBlock.getTimestamp()));
-/* 2222:1127 */           ((JSONObject)localObject6).put("transactionTimestamp", Integer.valueOf(localTransaction1.getTimestamp()));
-/* 2223:1128 */           ((JSONObject)localObject6).put("sender", Convert.convert(localTransaction1.getSenderAccountId()));
-/* 2224:1129 */           ((JSONObject)localObject6).put("recipient", Convert.convert(localTransaction1.getRecipientId()));
-/* 2225:1130 */           ((JSONObject)localObject6).put("amount", Integer.valueOf(localTransaction1.getAmount()));
-/* 2226:1131 */           ((JSONObject)localObject6).put("fee", Integer.valueOf(localTransaction1.getFee()));
-/* 2227:1132 */           ((JSONObject)localObject6).put("id", localTransaction1.getStringId());
-/* 2228:1133 */           localJSONArray1.add(localObject6);
-/* 2229:     */           
-/* 2230:1135 */           localTransaction2 = (Transaction)unconfirmedTransactions.remove(localEntry.getKey());
-/* 2231:1136 */           if (localTransaction2 != null)
-/* 2232:     */           {
-/* 2233:1137 */             JSONObject localJSONObject2 = new JSONObject();
-/* 2234:1138 */             localJSONObject2.put("index", Integer.valueOf(localTransaction2.getIndex()));
-/* 2235:1139 */             localJSONArray2.add(localJSONObject2);
-/* 2236:     */             
-/* 2237:1141 */             Account localAccount = Account.getAccount(localTransaction2.getSenderAccountId());
-/* 2238:1142 */             localAccount.addToUnconfirmedBalance((localTransaction2.getAmount() + localTransaction2.getFee()) * 100L);
-/* 2239:     */           }
-/* 2240:     */         }
-/* 2241:     */       }
-/* 2242:     */       catch (RuntimeException localRuntimeException)
-/* 2243:     */       {
-/* 2244:     */         Object localObject4;
-/* 2245:     */         Object localObject6;
-/* 2246:     */         Transaction localTransaction2;
-/* 2247:1150 */         Logger.logMessage("Error pushing block", localRuntimeException);
-/* 2248:1151 */         return false;
-/* 2249:     */       }
-/* 2250:     */     }
-/* 2251:1155 */     if (paramBlock.getTimestamp() >= i - 15)
-/* 2252:     */     {
-/* 2253:1157 */       ??? = paramBlock.getJSONObject();
-/* 2254:1158 */       ((JSONObject)???).put("requestType", "processBlock");
-/* 2255:     */       
-/* 2256:1160 */       Peer.sendToSomePeers((JSONObject)???);
-/* 2257:     */     }
-/* 2258:1164 */     ??? = new JSONArray();
-/* 2259:1165 */     JSONObject localJSONObject1 = new JSONObject();
-/* 2260:1166 */     localJSONObject1.put("index", Integer.valueOf(paramBlock.getIndex()));
-/* 2261:1167 */     localJSONObject1.put("timestamp", Integer.valueOf(paramBlock.getTimestamp()));
-/* 2262:1168 */     localJSONObject1.put("numberOfTransactions", Integer.valueOf(paramBlock.transactionIds.length));
-/* 2263:1169 */     localJSONObject1.put("totalAmount", Integer.valueOf(paramBlock.getTotalAmount()));
-/* 2264:1170 */     localJSONObject1.put("totalFee", Integer.valueOf(paramBlock.getTotalFee()));
-/* 2265:1171 */     localJSONObject1.put("payloadLength", Integer.valueOf(paramBlock.getPayloadLength()));
-/* 2266:1172 */     localJSONObject1.put("generator", Convert.convert(paramBlock.getGeneratorAccountId()));
-/* 2267:1173 */     localJSONObject1.put("height", Integer.valueOf(paramBlock.getHeight()));
-/* 2268:1174 */     localJSONObject1.put("version", Integer.valueOf(paramBlock.getVersion()));
-/* 2269:1175 */     localJSONObject1.put("block", paramBlock.getStringId());
-/* 2270:1176 */     localJSONObject1.put("baseTarget", BigInteger.valueOf(paramBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
-/* 2271:1177 */     ((JSONArray)???).add(localJSONObject1);
-/* 2272:     */     
-/* 2273:1179 */     Object localObject1 = new JSONObject();
-/* 2274:1180 */     ((JSONObject)localObject1).put("response", "processNewData");
-/* 2275:1181 */     ((JSONObject)localObject1).put("addedConfirmedTransactions", localJSONArray1);
-/* 2276:1182 */     if (localJSONArray2.size() > 0) {
-/* 2277:1183 */       ((JSONObject)localObject1).put("removedUnconfirmedTransactions", localJSONArray2);
-/* 2278:     */     }
-/* 2279:1185 */     ((JSONObject)localObject1).put("addedRecentBlocks", ???);
-/* 2280:     */     
-/* 2281:1187 */     User.sendToAll((JSONStreamAware)localObject1);
-/* 2282:     */     
-/* 2283:1189 */     return true;
-/* 2284:     */   }
-/* 2285:     */   
-/* 2286:     */   private static boolean popLastBlock()
-/* 2287:     */     throws Transaction.UndoNotSupportedException
-/* 2288:     */   {
-/* 2289:     */     try
-/* 2290:     */     {
-/* 2291:1197 */       JSONObject localJSONObject1 = new JSONObject();
-/* 2292:1198 */       localJSONObject1.put("response", "processNewData");
-/* 2293:     */       
-/* 2294:1200 */       JSONArray localJSONArray = new JSONArray();
-/* 2295:     */       Block localBlock;
-/* 2296:1204 */       synchronized (Blockchain.class)
-/* 2297:     */       {
-/* 2298:1206 */         localBlock = (Block)lastBlock.get();
-/* 2299:1208 */         if (localBlock.getId().equals(Genesis.GENESIS_BLOCK_ID)) {
-/* 2300:1209 */           return false;
-/* 2301:     */         }
-/* 2302:1212 */         localObject1 = Block.findBlock(localBlock.getPreviousBlockId());
-/* 2303:1213 */         if (localObject1 == null)
-/* 2304:     */         {
-/* 2305:1214 */           Logger.logMessage("Previous block is null");
-/* 2306:1215 */           throw new IllegalStateException();
-/* 2307:     */         }
-/* 2308:1217 */         if (!lastBlock.compareAndSet(localBlock, localObject1))
-/* 2309:     */         {
-/* 2310:1218 */           Logger.logMessage("This block is no longer last block");
-/* 2311:1219 */           throw new IllegalStateException();
-/* 2312:     */         }
-/* 2313:1222 */         Account localAccount = Account.getAccount(localBlock.getGeneratorAccountId());
-/* 2314:1223 */         localAccount.addToBalanceAndUnconfirmedBalance(-localBlock.getTotalFee() * 100L);
-/* 2315:1225 */         for (Transaction localTransaction1 : localBlock.blockTransactions)
-/* 2316:     */         {
-/* 2317:1227 */           Transaction localTransaction2 = (Transaction)transactionHashes.get(localTransaction1.getHash());
-/* 2318:1228 */           if ((localTransaction2 != null) && (localTransaction2.equals(localTransaction1))) {
-/* 2319:1229 */             transactionHashes.remove(localTransaction1.getHash());
-/* 2320:     */           }
-/* 2321:1232 */           unconfirmedTransactions.put(localTransaction1.getId(), localTransaction1);
-/* 2322:     */           
-/* 2323:1234 */           localTransaction1.undo();
-/* 2324:     */           
-/* 2325:1236 */           JSONObject localJSONObject2 = new JSONObject();
-/* 2326:1237 */           localJSONObject2.put("index", Integer.valueOf(localTransaction1.getIndex()));
-/* 2327:1238 */           localJSONObject2.put("timestamp", Integer.valueOf(localTransaction1.getTimestamp()));
-/* 2328:1239 */           localJSONObject2.put("deadline", Short.valueOf(localTransaction1.getDeadline()));
-/* 2329:1240 */           localJSONObject2.put("recipient", Convert.convert(localTransaction1.getRecipientId()));
-/* 2330:1241 */           localJSONObject2.put("amount", Integer.valueOf(localTransaction1.getAmount()));
-/* 2331:1242 */           localJSONObject2.put("fee", Integer.valueOf(localTransaction1.getFee()));
-/* 2332:1243 */           localJSONObject2.put("sender", Convert.convert(localTransaction1.getSenderAccountId()));
-/* 2333:1244 */           localJSONObject2.put("id", localTransaction1.getStringId());
-/* 2334:1245 */           localJSONArray.add(localJSONObject2);
-/* 2335:     */         }
-/* 2336:1249 */         Block.deleteBlock(localBlock.getId());
-/* 2337:     */       }
-/* 2338:1253 */       ??? = new JSONArray();
-/* 2339:1254 */       Object localObject1 = new JSONObject();
-/* 2340:1255 */       ((JSONObject)localObject1).put("index", Integer.valueOf(localBlock.getIndex()));
-/* 2341:1256 */       ((JSONObject)localObject1).put("timestamp", Integer.valueOf(localBlock.getTimestamp()));
-/* 2342:1257 */       ((JSONObject)localObject1).put("numberOfTransactions", Integer.valueOf(localBlock.transactionIds.length));
-/* 2343:1258 */       ((JSONObject)localObject1).put("totalAmount", Integer.valueOf(localBlock.getTotalAmount()));
-/* 2344:1259 */       ((JSONObject)localObject1).put("totalFee", Integer.valueOf(localBlock.getTotalFee()));
-/* 2345:1260 */       ((JSONObject)localObject1).put("payloadLength", Integer.valueOf(localBlock.getPayloadLength()));
-/* 2346:1261 */       ((JSONObject)localObject1).put("generator", Convert.convert(localBlock.getGeneratorAccountId()));
-/* 2347:1262 */       ((JSONObject)localObject1).put("height", Integer.valueOf(localBlock.getHeight()));
-/* 2348:1263 */       ((JSONObject)localObject1).put("version", Integer.valueOf(localBlock.getVersion()));
-/* 2349:1264 */       ((JSONObject)localObject1).put("block", localBlock.getStringId());
-/* 2350:1265 */       ((JSONObject)localObject1).put("baseTarget", BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
-/* 2351:1266 */       ((JSONArray)???).add(localObject1);
-/* 2352:1267 */       localJSONObject1.put("addedOrphanedBlocks", ???);
-/* 2353:1269 */       if (localJSONArray.size() > 0) {
-/* 2354:1270 */         localJSONObject1.put("addedUnconfirmedTransactions", localJSONArray);
-/* 2355:     */       }
-/* 2356:1273 */       User.sendToAll(localJSONObject1);
-/* 2357:     */     }
-/* 2358:     */     catch (RuntimeException localRuntimeException)
-/* 2359:     */     {
-/* 2360:1276 */       Logger.logMessage("Error popping last block", localRuntimeException);
-/* 2361:1277 */       return false;
-/* 2362:     */     }
-/* 2363:1279 */     return true;
-/* 2364:     */   }
-/* 2365:     */   
-/* 2366:     */   private static synchronized void scan()
-/* 2367:     */   {
-/* 2368:1283 */     Account.clear();
-/* 2369:1284 */     Alias.clear();
-/* 2370:1285 */     Asset.clear();
-/* 2371:1286 */     Order.clear();
-/* 2372:1287 */     unconfirmedTransactions.clear();
-/* 2373:1288 */     doubleSpendingTransactions.clear();
-/* 2374:1289 */     nonBroadcastedTransactions.clear();
-/* 2375:1290 */     transactionHashes.clear();
-/* 2376:     */     try
-/* 2377:     */     {
-/* 2378:1291 */       Connection localConnection = Db.getConnection();Object localObject1 = null;
-/* 2379:     */       try
-/* 2380:     */       {
-/* 2381:1291 */         PreparedStatement localPreparedStatement = localConnection.prepareStatement("SELECT * FROM block ORDER BY db_id ASC");Object localObject2 = null;
-/* 2382:     */         try
-/* 2383:     */         {
-/* 2384:1292 */           Long localLong = Genesis.GENESIS_BLOCK_ID;
-/* 2385:     */           
-/* 2386:1294 */           ResultSet localResultSet = localPreparedStatement.executeQuery();
-/* 2387:1295 */           while (localResultSet.next())
-/* 2388:     */           {
-/* 2389:1296 */             Block localBlock = Block.getBlock(localConnection, localResultSet);
-/* 2390:1297 */             if (!localBlock.getId().equals(localLong)) {
-/* 2391:1298 */               throw new NxtException.ValidationException("Database blocks in the wrong order!");
-/* 2392:     */             }
-/* 2393:1300 */             lastBlock.set(localBlock);
-/* 2394:1301 */             localBlock.apply();
-/* 2395:1302 */             localLong = localBlock.getNextBlockId();
-/* 2396:     */           }
-/* 2397:     */         }
-/* 2398:     */         catch (Throwable localThrowable4)
-/* 2399:     */         {
-/* 2400:1291 */           localObject2 = localThrowable4;throw localThrowable4;
-/* 2401:     */         }
-/* 2402:     */         finally {}
-/* 2403:     */       }
-/* 2404:     */       catch (Throwable localThrowable2)
-/* 2405:     */       {
-/* 2406:1291 */         localObject1 = localThrowable2;throw localThrowable2;
-/* 2407:     */       }
-/* 2408:     */       finally
-/* 2409:     */       {
-/* 2410:1304 */         if (localConnection != null) {
-/* 2411:1304 */           if (localObject1 != null) {
-/* 2412:     */             try
-/* 2413:     */             {
-/* 2414:1304 */               localConnection.close();
-/* 2415:     */             }
-/* 2416:     */             catch (Throwable localThrowable6)
-/* 2417:     */             {
-/* 2418:1304 */               localObject1.addSuppressed(localThrowable6);
-/* 2419:     */             }
-/* 2420:     */           } else {
-/* 2421:1304 */             localConnection.close();
-/* 2422:     */           }
-/* 2423:     */         }
-/* 2424:     */       }
-/* 2425:     */     }
-/* 2426:     */     catch (NxtException.ValidationException|SQLException localValidationException)
-/* 2427:     */     {
-/* 2428:1305 */       throw new RuntimeException(localValidationException.toString(), localValidationException);
-/* 2429:     */     }
-/* 2430:     */   }
-/* 2431:     */   
-/* 2432:     */   private static void generateBlock(String paramString)
-/* 2433:     */   {
-/* 2434:1311 */     TreeSet localTreeSet = new TreeSet();
-/* 2435:1313 */     for (Object localObject1 = unconfirmedTransactions.values().iterator(); ((Iterator)localObject1).hasNext();)
-/* 2436:     */     {
-/* 2437:1313 */       localObject2 = (Transaction)((Iterator)localObject1).next();
-/* 2438:1315 */       if ((((Transaction)localObject2).getReferencedTransactionId() == null) || (Transaction.hasTransaction(((Transaction)localObject2).getReferencedTransactionId()))) {
-/* 2439:1317 */         localTreeSet.add(localObject2);
-/* 2440:     */       }
-/* 2441:     */     }
-/* 2442:1323 */     localObject1 = new HashMap();
-/* 2443:1324 */     Object localObject2 = new HashMap();
-/* 2444:1325 */     HashMap localHashMap = new HashMap();
-/* 2445:     */     
-/* 2446:1327 */     int i = 0;
-/* 2447:1328 */     int j = 0;
-/* 2448:1329 */     int k = 0;
-/* 2449:     */     Object localObject3;
-/* 2450:1331 */     while (k <= 32640)
-/* 2451:     */     {
-/* 2452:1333 */       int m = ((Map)localObject1).size();
-/* 2453:1335 */       for (localObject3 = localTreeSet.iterator(); ((Iterator)localObject3).hasNext();)
-/* 2454:     */       {
-/* 2455:1335 */         localObject4 = (Transaction)((Iterator)localObject3).next();
-/* 2456:     */         
-/* 2457:1337 */         int n = ((Transaction)localObject4).getSize();
-/* 2458:1338 */         if ((((Map)localObject1).get(((Transaction)localObject4).getId()) == null) && (k + n <= 32640))
-/* 2459:     */         {
-/* 2460:1340 */           localObject5 = ((Transaction)localObject4).getSenderAccountId();
-/* 2461:1341 */           localObject6 = (Long)localHashMap.get(localObject5);
-/* 2462:1342 */           if (localObject6 == null) {
-/* 2463:1344 */             localObject6 = Long.valueOf(0L);
-/* 2464:     */           }
-/* 2465:1348 */           long l = (((Transaction)localObject4).getAmount() + ((Transaction)localObject4).getFee()) * 100L;
-/* 2466:1349 */           if (((Long)localObject6).longValue() + l <= Account.getAccount((Long)localObject5).getBalance()) {
-/* 2467:1351 */             if (!((Transaction)localObject4).isDuplicate((Map)localObject2))
-/* 2468:     */             {
-/* 2469:1355 */               localHashMap.put(localObject5, Long.valueOf(((Long)localObject6).longValue() + l));
-/* 2470:     */               
-/* 2471:1357 */               ((Map)localObject1).put(((Transaction)localObject4).getId(), localObject4);
-/* 2472:1358 */               k += n;
-/* 2473:1359 */               i += ((Transaction)localObject4).getAmount();
-/* 2474:1360 */               j += ((Transaction)localObject4).getFee();
-/* 2475:     */             }
-/* 2476:     */           }
-/* 2477:     */         }
-/* 2478:     */       }
-/* 2479:1368 */       if (((Map)localObject1).size() == m) {
-/* 2480:     */         break;
-/* 2481:     */       }
-/* 2482:     */     }
-/* 2483:1376 */     byte[] arrayOfByte1 = Crypto.getPublicKey(paramString);
-/* 2484:     */     
-/* 2485:     */ 
-/* 2486:1379 */     Object localObject4 = (Block)lastBlock.get();
-/* 2487:     */     try
-/* 2488:     */     {
-/* 2489:1382 */       if (((Block)localObject4).getHeight() < 30000)
-/* 2490:     */       {
-/* 2491:1384 */         localObject3 = new Block(1, Convert.getEpochTime(), ((Block)localObject4).getId(), ((Map)localObject1).size(), i, j, k, null, arrayOfByte1, null, new byte[64]);
-/* 2492:     */       }
-/* 2493:     */       else
-/* 2494:     */       {
-/* 2495:1389 */         byte[] arrayOfByte2 = Crypto.sha256().digest(((Block)localObject4).getBytes());
-/* 2496:1390 */         localObject3 = new Block(2, Convert.getEpochTime(), ((Block)localObject4).getId(), ((Map)localObject1).size(), i, j, k, null, arrayOfByte1, null, new byte[64], arrayOfByte2);
-/* 2497:     */       }
-/* 2498:     */     }
-/* 2499:     */     catch (NxtException.ValidationException localValidationException)
-/* 2500:     */     {
-/* 2501:1396 */       Logger.logMessage("Error generating block", localValidationException);
-/* 2502:1397 */       return;
-/* 2503:     */     }
-/* 2504:1400 */     int i1 = 0;
-/* 2505:1401 */     for (Object localObject5 = ((Map)localObject1).keySet().iterator(); ((Iterator)localObject5).hasNext();)
-/* 2506:     */     {
-/* 2507:1401 */       localObject6 = (Long)((Iterator)localObject5).next();
-/* 2508:1402 */       ((Block)localObject3).transactionIds[(i1++)] = localObject6;
-/* 2509:     */     }
-/* 2510:1405 */     Arrays.sort(((Block)localObject3).transactionIds);
-/* 2511:1406 */     localObject5 = Crypto.sha256();
-/* 2512:1407 */     for (i1 = 0; i1 < ((Block)localObject3).transactionIds.length; i1++)
-/* 2513:     */     {
-/* 2514:1408 */       localObject6 = (Transaction)((Map)localObject1).get(localObject3.transactionIds[i1]);
-/* 2515:1409 */       ((MessageDigest)localObject5).update(((Transaction)localObject6).getBytes());
-/* 2516:1410 */       ((Block)localObject3).blockTransactions[i1] = localObject6;
-/* 2517:     */     }
-/* 2518:1412 */     ((Block)localObject3).setPayloadHash(((MessageDigest)localObject5).digest());
-/* 2519:1414 */     if (((Block)localObject4).getHeight() < 30000)
-/* 2520:     */     {
-/* 2521:1416 */       ((Block)localObject3).setGenerationSignature(Crypto.sign(((Block)localObject4).getGenerationSignature(), paramString));
-/* 2522:     */     }
-/* 2523:     */     else
-/* 2524:     */     {
-/* 2525:1420 */       ((MessageDigest)localObject5).update(((Block)localObject4).getGenerationSignature());
-/* 2526:1421 */       ((Block)localObject3).setGenerationSignature(((MessageDigest)localObject5).digest(arrayOfByte1));
-/* 2527:     */     }
-/* 2528:1425 */     Object localObject6 = ((Block)localObject3).getBytes();
-/* 2529:1426 */     byte[] arrayOfByte3 = new byte[localObject6.length - 64];
-/* 2530:1427 */     System.arraycopy(localObject6, 0, arrayOfByte3, 0, arrayOfByte3.length);
-/* 2531:1428 */     ((Block)localObject3).setBlockSignature(Crypto.sign(arrayOfByte3, paramString));
-/* 2532:1430 */     if ((((Block)localObject3).verifyBlockSignature()) && (((Block)localObject3).verifyGenerationSignature()))
-/* 2533:     */     {
-/* 2534:1432 */       JSONObject localJSONObject = ((Block)localObject3).getJSONObject();
-/* 2535:1433 */       localJSONObject.put("requestType", "processBlock");
-/* 2536:1434 */       Peer.sendToSomePeers(localJSONObject);
-/* 2537:     */     }
-/* 2538:     */     else
-/* 2539:     */     {
-/* 2540:1438 */       Logger.logMessage("Generated an incorrect block. Waiting for the next one...");
-/* 2541:     */     }
-/* 2542:     */   }
-/* 2543:     */   
-/* 2544:     */   static void purgeExpiredHashes(int paramInt)
-/* 2545:     */   {
-/* 2546:1445 */     Iterator localIterator = transactionHashes.entrySet().iterator();
-/* 2547:1446 */     while (localIterator.hasNext()) {
-/* 2548:1447 */       if (((Transaction)((Map.Entry)localIterator.next()).getValue()).getExpiration() < paramInt) {
-/* 2549:1448 */         localIterator.remove();
-/* 2550:     */       }
-/* 2551:     */     }
-/* 2552:     */   }
-/* 2553:     */ }
+/* 2178:1054 */           if (((Transaction)localObject5).getId().equals(Long.valueOf(0L))) {
+/* 2179:1055 */             throw new BlockNotAcceptedException("Invalid transaction id", null);
+/* 2180:     */           }
+/* 2181:1057 */           if (((Transaction)localObject5).isDuplicate(localHashMap1)) {
+/* 2182:1058 */             throw new BlockNotAcceptedException("Transaction is a duplicate: " + ((Transaction)localObject5).getStringId(), null);
+/* 2183:     */           }
+/* 2184:1061 */           paramBlock.blockTransactions[n] = localObject5;
+/* 2185:     */           
+/* 2186:1063 */           k += ((Transaction)localObject5).getAmount();
+/* 2187:     */           
+/* 2188:1065 */           ((Transaction)localObject5).updateTotals((Map)localObject2, localHashMap2);
+/* 2189:     */           
+/* 2190:1067 */           m += ((Transaction)localObject5).getFee();
+/* 2191:     */           
+/* 2192:1069 */           localMessageDigest.update(((Transaction)localObject5).getBytes());
+/* 2193:     */         }
+/* 2194:1073 */         if ((k != paramBlock.getTotalAmount()) || (m != paramBlock.getTotalFee())) {
+/* 2195:1074 */           throw new BlockNotAcceptedException("Total amount or fee don't match transaction totals", null);
+/* 2196:     */         }
+/* 2197:1076 */         if (!Arrays.equals(localMessageDigest.digest(), paramBlock.getPayloadHash())) {
+/* 2198:1077 */           throw new BlockNotAcceptedException("Payload hash doesn't match", null);
+/* 2199:     */         }
+/* 2200:1079 */         for (Object localObject3 = ((Map)localObject2).entrySet().iterator(); ((Iterator)localObject3).hasNext();)
+/* 2201:     */         {
+/* 2202:1079 */           localObject4 = (Map.Entry)((Iterator)localObject3).next();
+/* 2203:1080 */           localObject5 = Account.getAccount((Long)((Map.Entry)localObject4).getKey());
+/* 2204:1081 */           if (((Account)localObject5).getBalance() < ((Long)((Map.Entry)localObject4).getValue()).longValue()) {
+/* 2205:1082 */             throw new BlockNotAcceptedException("Not enough funds in sender account: " + Convert.convert(((Account)localObject5).getId()), null);
+/* 2206:     */           }
+/* 2207:     */         }
+/* 2208:1086 */         for (localObject3 = localHashMap2.entrySet().iterator(); ((Iterator)localObject3).hasNext();)
+/* 2209:     */         {
+/* 2210:1086 */           localObject4 = (Map.Entry)((Iterator)localObject3).next();
+/* 2211:1087 */           localObject5 = Account.getAccount((Long)((Map.Entry)localObject4).getKey());
+/* 2212:1088 */           for (localIterator = ((Map)((Map.Entry)localObject4).getValue()).entrySet().iterator(); localIterator.hasNext();)
+/* 2213:     */           {
+/* 2214:1088 */             localObject6 = (Map.Entry)localIterator.next();
+/* 2215:1089 */             localObject7 = (Long)((Map.Entry)localObject6).getKey();
+/* 2216:1090 */             localObject8 = (Long)((Map.Entry)localObject6).getValue();
+/* 2217:1091 */             if (((Account)localObject5).getAssetBalance((Long)localObject7).intValue() < ((Long)localObject8).longValue()) {
+/* 2218:1092 */               throw new BlockNotAcceptedException("Asset balance not sufficient in sender account " + Convert.convert(((Account)localObject5).getId()), null);
+/* 2219:     */             }
+/* 2220:     */           }
+/* 2221:     */         }
+/* 2222:     */         Iterator localIterator;
+/* 2223:1097 */         paramBlock.setHeight(localBlock.getHeight() + 1);
+/* 2224:     */         
+/* 2225:1099 */         localObject3 = null;
+/* 2226:1100 */         for (localObject6 : paramBlock.blockTransactions)
+/* 2227:     */         {
+/* 2228:1101 */           ((Transaction)localObject6).setBlock(paramBlock);
+/* 2229:1103 */           if ((transactionHashes.putIfAbsent(((Transaction)localObject6).getHash(), localObject6) != null) && (paramBlock.getHeight() != 58294))
+/* 2230:     */           {
+/* 2231:1104 */             localObject3 = localObject6;
+/* 2232:1105 */             break;
+/* 2233:     */           }
+/* 2234:     */         }
+/* 2235:1109 */         if (localObject3 != null)
+/* 2236:     */         {
+/* 2237:1110 */           for (localObject6 : paramBlock.blockTransactions) {
+/* 2238:1111 */             if (!((Transaction)localObject6).equals(localObject3))
+/* 2239:     */             {
+/* 2240:1112 */               localObject7 = (Transaction)transactionHashes.get(((Transaction)localObject6).getHash());
+/* 2241:1113 */               if ((localObject7 != null) && (((Transaction)localObject7).equals(localObject6))) {
+/* 2242:1114 */                 transactionHashes.remove(((Transaction)localObject6).getHash());
+/* 2243:     */               }
+/* 2244:     */             }
+/* 2245:     */           }
+/* 2246:1118 */           throw new BlockNotAcceptedException("Duplicate hash of transaction " + ((Transaction)localObject3).getStringId(), null);
+/* 2247:     */         }
+/* 2248:1121 */         paramBlock.calculateBaseTarget();
+/* 2249:     */         
+/* 2250:1123 */         addBlock(paramBlock);
+/* 2251:     */         
+/* 2252:1125 */         paramBlock.apply();
+/* 2253:     */         
+/* 2254:1127 */         localJSONArray1 = new JSONArray();
+/* 2255:1128 */         localJSONArray2 = new JSONArray();
+/* 2256:1130 */         for (localObject4 = ((Map)localObject1).entrySet().iterator(); ((Iterator)localObject4).hasNext();)
+/* 2257:     */         {
+/* 2258:1130 */           Map.Entry localEntry = (Map.Entry)((Iterator)localObject4).next();
+/* 2259:     */           
+/* 2260:1132 */           Transaction localTransaction = (Transaction)localEntry.getValue();
+/* 2261:     */           
+/* 2262:1134 */           localObject6 = new JSONObject();
+/* 2263:1135 */           ((JSONObject)localObject6).put("index", Integer.valueOf(localTransaction.getIndex()));
+/* 2264:1136 */           ((JSONObject)localObject6).put("blockTimestamp", Integer.valueOf(paramBlock.getTimestamp()));
+/* 2265:1137 */           ((JSONObject)localObject6).put("transactionTimestamp", Integer.valueOf(localTransaction.getTimestamp()));
+/* 2266:1138 */           ((JSONObject)localObject6).put("sender", Convert.convert(localTransaction.getSenderAccountId()));
+/* 2267:1139 */           ((JSONObject)localObject6).put("recipient", Convert.convert(localTransaction.getRecipientId()));
+/* 2268:1140 */           ((JSONObject)localObject6).put("amount", Integer.valueOf(localTransaction.getAmount()));
+/* 2269:1141 */           ((JSONObject)localObject6).put("fee", Integer.valueOf(localTransaction.getFee()));
+/* 2270:1142 */           ((JSONObject)localObject6).put("id", localTransaction.getStringId());
+/* 2271:1143 */           localJSONArray1.add(localObject6);
+/* 2272:     */           
+/* 2273:1145 */           localObject7 = (Transaction)unconfirmedTransactions.remove(localEntry.getKey());
+/* 2274:1146 */           if (localObject7 != null)
+/* 2275:     */           {
+/* 2276:1147 */             localObject8 = new JSONObject();
+/* 2277:1148 */             ((JSONObject)localObject8).put("index", Integer.valueOf(((Transaction)localObject7).getIndex()));
+/* 2278:1149 */             localJSONArray2.add(localObject8);
+/* 2279:     */             
+/* 2280:1151 */             Account localAccount = Account.getAccount(((Transaction)localObject7).getSenderAccountId());
+/* 2281:1152 */             localAccount.addToUnconfirmedBalance((((Transaction)localObject7).getAmount() + ((Transaction)localObject7).getFee()) * 100L);
+/* 2282:     */           }
+/* 2283:     */         }
+/* 2284:     */       }
+/* 2285:     */       catch (RuntimeException localRuntimeException)
+/* 2286:     */       {
+/* 2287:     */         Object localObject4;
+/* 2288:     */         Object localObject6;
+/* 2289:     */         Object localObject7;
+/* 2290:     */         Object localObject8;
+/* 2291:1160 */         Logger.logMessage("Error pushing block", localRuntimeException);
+/* 2292:1161 */         throw new BlockNotAcceptedException(localRuntimeException.toString(), null);
+/* 2293:     */       }
+/* 2294:     */     }
+/* 2295:1165 */     if (paramBlock.getTimestamp() >= i - 15)
+/* 2296:     */     {
+/* 2297:1167 */       ??? = paramBlock.getJSONObject();
+/* 2298:1168 */       ((JSONObject)???).put("requestType", "processBlock");
+/* 2299:     */       
+/* 2300:1170 */       Peer.sendToSomePeers((JSONObject)???);
+/* 2301:     */     }
+/* 2302:1174 */     ??? = new JSONArray();
+/* 2303:1175 */     JSONObject localJSONObject = new JSONObject();
+/* 2304:1176 */     localJSONObject.put("index", Integer.valueOf(paramBlock.getIndex()));
+/* 2305:1177 */     localJSONObject.put("timestamp", Integer.valueOf(paramBlock.getTimestamp()));
+/* 2306:1178 */     localJSONObject.put("numberOfTransactions", Integer.valueOf(paramBlock.transactionIds.length));
+/* 2307:1179 */     localJSONObject.put("totalAmount", Integer.valueOf(paramBlock.getTotalAmount()));
+/* 2308:1180 */     localJSONObject.put("totalFee", Integer.valueOf(paramBlock.getTotalFee()));
+/* 2309:1181 */     localJSONObject.put("payloadLength", Integer.valueOf(paramBlock.getPayloadLength()));
+/* 2310:1182 */     localJSONObject.put("generator", Convert.convert(paramBlock.getGeneratorAccountId()));
+/* 2311:1183 */     localJSONObject.put("height", Integer.valueOf(paramBlock.getHeight()));
+/* 2312:1184 */     localJSONObject.put("version", Integer.valueOf(paramBlock.getVersion()));
+/* 2313:1185 */     localJSONObject.put("block", paramBlock.getStringId());
+/* 2314:1186 */     localJSONObject.put("baseTarget", BigInteger.valueOf(paramBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
+/* 2315:1187 */     ((JSONArray)???).add(localJSONObject);
+/* 2316:     */     
+/* 2317:1189 */     Object localObject1 = new JSONObject();
+/* 2318:1190 */     ((JSONObject)localObject1).put("response", "processNewData");
+/* 2319:1191 */     ((JSONObject)localObject1).put("addedConfirmedTransactions", localJSONArray1);
+/* 2320:1192 */     if (localJSONArray2.size() > 0) {
+/* 2321:1193 */       ((JSONObject)localObject1).put("removedUnconfirmedTransactions", localJSONArray2);
+/* 2322:     */     }
+/* 2323:1195 */     ((JSONObject)localObject1).put("addedRecentBlocks", ???);
+/* 2324:     */     
+/* 2325:1197 */     User.sendToAll((JSONStreamAware)localObject1);
+/* 2326:     */   }
+/* 2327:     */   
+/* 2328:     */   private static boolean popLastBlock()
+/* 2329:     */     throws Transaction.UndoNotSupportedException
+/* 2330:     */   {
+/* 2331:     */     try
+/* 2332:     */     {
+/* 2333:1205 */       JSONObject localJSONObject1 = new JSONObject();
+/* 2334:1206 */       localJSONObject1.put("response", "processNewData");
+/* 2335:     */       
+/* 2336:1208 */       JSONArray localJSONArray = new JSONArray();
+/* 2337:     */       Block localBlock;
+/* 2338:1212 */       synchronized (Blockchain.class)
+/* 2339:     */       {
+/* 2340:1214 */         localBlock = (Block)lastBlock.get();
+/* 2341:     */         
+/* 2342:1216 */         Logger.logDebugMessage("Will pop block " + localBlock.getStringId() + " at height " + localBlock.getHeight());
+/* 2343:1217 */         if (localBlock.getId().equals(Genesis.GENESIS_BLOCK_ID)) {
+/* 2344:1218 */           return false;
+/* 2345:     */         }
+/* 2346:1221 */         localObject1 = Block.findBlock(localBlock.getPreviousBlockId());
+/* 2347:1222 */         if (localObject1 == null)
+/* 2348:     */         {
+/* 2349:1223 */           Logger.logMessage("Previous block is null");
+/* 2350:1224 */           throw new IllegalStateException();
+/* 2351:     */         }
+/* 2352:1226 */         if (!lastBlock.compareAndSet(localBlock, localObject1))
+/* 2353:     */         {
+/* 2354:1227 */           Logger.logMessage("This block is no longer last block");
+/* 2355:1228 */           throw new IllegalStateException();
+/* 2356:     */         }
+/* 2357:1231 */         Account localAccount = Account.getAccount(localBlock.getGeneratorAccountId());
+/* 2358:1232 */         localAccount.addToBalanceAndUnconfirmedBalance(-localBlock.getTotalFee() * 100L);
+/* 2359:1234 */         for (Transaction localTransaction1 : localBlock.blockTransactions)
+/* 2360:     */         {
+/* 2361:1236 */           Transaction localTransaction2 = (Transaction)transactionHashes.get(localTransaction1.getHash());
+/* 2362:1237 */           if ((localTransaction2 != null) && (localTransaction2.equals(localTransaction1))) {
+/* 2363:1238 */             transactionHashes.remove(localTransaction1.getHash());
+/* 2364:     */           }
+/* 2365:1241 */           unconfirmedTransactions.put(localTransaction1.getId(), localTransaction1);
+/* 2366:     */           
+/* 2367:1243 */           localTransaction1.undo();
+/* 2368:     */           
+/* 2369:1245 */           JSONObject localJSONObject2 = new JSONObject();
+/* 2370:1246 */           localJSONObject2.put("index", Integer.valueOf(localTransaction1.getIndex()));
+/* 2371:1247 */           localJSONObject2.put("timestamp", Integer.valueOf(localTransaction1.getTimestamp()));
+/* 2372:1248 */           localJSONObject2.put("deadline", Short.valueOf(localTransaction1.getDeadline()));
+/* 2373:1249 */           localJSONObject2.put("recipient", Convert.convert(localTransaction1.getRecipientId()));
+/* 2374:1250 */           localJSONObject2.put("amount", Integer.valueOf(localTransaction1.getAmount()));
+/* 2375:1251 */           localJSONObject2.put("fee", Integer.valueOf(localTransaction1.getFee()));
+/* 2376:1252 */           localJSONObject2.put("sender", Convert.convert(localTransaction1.getSenderAccountId()));
+/* 2377:1253 */           localJSONObject2.put("id", localTransaction1.getStringId());
+/* 2378:1254 */           localJSONArray.add(localJSONObject2);
+/* 2379:     */         }
+/* 2380:1258 */         Block.deleteBlock(localBlock.getId());
+/* 2381:     */       }
+/* 2382:1262 */       ??? = new JSONArray();
+/* 2383:1263 */       Object localObject1 = new JSONObject();
+/* 2384:1264 */       ((JSONObject)localObject1).put("index", Integer.valueOf(localBlock.getIndex()));
+/* 2385:1265 */       ((JSONObject)localObject1).put("timestamp", Integer.valueOf(localBlock.getTimestamp()));
+/* 2386:1266 */       ((JSONObject)localObject1).put("numberOfTransactions", Integer.valueOf(localBlock.transactionIds.length));
+/* 2387:1267 */       ((JSONObject)localObject1).put("totalAmount", Integer.valueOf(localBlock.getTotalAmount()));
+/* 2388:1268 */       ((JSONObject)localObject1).put("totalFee", Integer.valueOf(localBlock.getTotalFee()));
+/* 2389:1269 */       ((JSONObject)localObject1).put("payloadLength", Integer.valueOf(localBlock.getPayloadLength()));
+/* 2390:1270 */       ((JSONObject)localObject1).put("generator", Convert.convert(localBlock.getGeneratorAccountId()));
+/* 2391:1271 */       ((JSONObject)localObject1).put("height", Integer.valueOf(localBlock.getHeight()));
+/* 2392:1272 */       ((JSONObject)localObject1).put("version", Integer.valueOf(localBlock.getVersion()));
+/* 2393:1273 */       ((JSONObject)localObject1).put("block", localBlock.getStringId());
+/* 2394:1274 */       ((JSONObject)localObject1).put("baseTarget", BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
+/* 2395:1275 */       ((JSONArray)???).add(localObject1);
+/* 2396:1276 */       localJSONObject1.put("addedOrphanedBlocks", ???);
+/* 2397:1278 */       if (localJSONArray.size() > 0) {
+/* 2398:1279 */         localJSONObject1.put("addedUnconfirmedTransactions", localJSONArray);
+/* 2399:     */       }
+/* 2400:1282 */       User.sendToAll(localJSONObject1);
+/* 2401:     */     }
+/* 2402:     */     catch (RuntimeException localRuntimeException)
+/* 2403:     */     {
+/* 2404:1285 */       Logger.logMessage("Error popping last block", localRuntimeException);
+/* 2405:1286 */       return false;
+/* 2406:     */     }
+/* 2407:1288 */     return true;
+/* 2408:     */   }
+/* 2409:     */   
+/* 2410:     */   private static synchronized void scan()
+/* 2411:     */   {
+/* 2412:1292 */     Account.clear();
+/* 2413:1293 */     Alias.clear();
+/* 2414:1294 */     Asset.clear();
+/* 2415:1295 */     Order.clear();
+/* 2416:1296 */     unconfirmedTransactions.clear();
+/* 2417:1297 */     doubleSpendingTransactions.clear();
+/* 2418:1298 */     nonBroadcastedTransactions.clear();
+/* 2419:1299 */     transactionHashes.clear();
+/* 2420:     */     try
+/* 2421:     */     {
+/* 2422:1300 */       Connection localConnection = Db.getConnection();Object localObject1 = null;
+/* 2423:     */       try
+/* 2424:     */       {
+/* 2425:1300 */         PreparedStatement localPreparedStatement = localConnection.prepareStatement("SELECT * FROM block ORDER BY db_id ASC");Object localObject2 = null;
+/* 2426:     */         try
+/* 2427:     */         {
+/* 2428:1301 */           Long localLong = Genesis.GENESIS_BLOCK_ID;
+/* 2429:     */           
+/* 2430:1303 */           ResultSet localResultSet = localPreparedStatement.executeQuery();
+/* 2431:1304 */           while (localResultSet.next())
+/* 2432:     */           {
+/* 2433:1305 */             Block localBlock = Block.getBlock(localConnection, localResultSet);
+/* 2434:1306 */             if (!localBlock.getId().equals(localLong)) {
+/* 2435:1307 */               throw new NxtException.ValidationException("Database blocks in the wrong order!");
+/* 2436:     */             }
+/* 2437:1309 */             lastBlock.set(localBlock);
+/* 2438:1310 */             localBlock.apply();
+/* 2439:1311 */             localLong = localBlock.getNextBlockId();
+/* 2440:     */           }
+/* 2441:     */         }
+/* 2442:     */         catch (Throwable localThrowable4)
+/* 2443:     */         {
+/* 2444:1300 */           localObject2 = localThrowable4;throw localThrowable4;
+/* 2445:     */         }
+/* 2446:     */         finally {}
+/* 2447:     */       }
+/* 2448:     */       catch (Throwable localThrowable2)
+/* 2449:     */       {
+/* 2450:1300 */         localObject1 = localThrowable2;throw localThrowable2;
+/* 2451:     */       }
+/* 2452:     */       finally
+/* 2453:     */       {
+/* 2454:1313 */         if (localConnection != null) {
+/* 2455:1313 */           if (localObject1 != null) {
+/* 2456:     */             try
+/* 2457:     */             {
+/* 2458:1313 */               localConnection.close();
+/* 2459:     */             }
+/* 2460:     */             catch (Throwable localThrowable6)
+/* 2461:     */             {
+/* 2462:1313 */               localObject1.addSuppressed(localThrowable6);
+/* 2463:     */             }
+/* 2464:     */           } else {
+/* 2465:1313 */             localConnection.close();
+/* 2466:     */           }
+/* 2467:     */         }
+/* 2468:     */       }
+/* 2469:     */     }
+/* 2470:     */     catch (NxtException.ValidationException|SQLException localValidationException)
+/* 2471:     */     {
+/* 2472:1314 */       throw new RuntimeException(localValidationException.toString(), localValidationException);
+/* 2473:     */     }
+/* 2474:     */   }
+/* 2475:     */   
+/* 2476:     */   private static void generateBlock(String paramString)
+/* 2477:     */   {
+/* 2478:1320 */     TreeSet localTreeSet = new TreeSet();
+/* 2479:1322 */     for (Object localObject1 = unconfirmedTransactions.values().iterator(); ((Iterator)localObject1).hasNext();)
+/* 2480:     */     {
+/* 2481:1322 */       localObject2 = (Transaction)((Iterator)localObject1).next();
+/* 2482:1323 */       if ((((Transaction)localObject2).getReferencedTransactionId() == null) || (Transaction.hasTransaction(((Transaction)localObject2).getReferencedTransactionId()))) {
+/* 2483:1324 */         localTreeSet.add(localObject2);
+/* 2484:     */       }
+/* 2485:     */     }
+/* 2486:1328 */     localObject1 = new HashMap();
+/* 2487:1329 */     Object localObject2 = new HashMap();
+/* 2488:1330 */     HashMap localHashMap = new HashMap();
+/* 2489:     */     
+/* 2490:1332 */     int i = 0;
+/* 2491:1333 */     int j = 0;
+/* 2492:1334 */     int k = 0;
+/* 2493:     */     
+/* 2494:1336 */     int m = Convert.getEpochTime();
+/* 2495:     */     Object localObject3;
+/* 2496:1338 */     while (k <= 32640)
+/* 2497:     */     {
+/* 2498:1340 */       int n = ((Map)localObject1).size();
+/* 2499:1342 */       for (localObject3 = localTreeSet.iterator(); ((Iterator)localObject3).hasNext();)
+/* 2500:     */       {
+/* 2501:1342 */         localObject4 = (Transaction)((Iterator)localObject3).next();
+/* 2502:     */         
+/* 2503:1344 */         int i1 = ((Transaction)localObject4).getSize();
+/* 2504:1345 */         if ((((Map)localObject1).get(((Transaction)localObject4).getId()) == null) && (k + i1 <= 32640))
+/* 2505:     */         {
+/* 2506:1347 */           localObject5 = ((Transaction)localObject4).getSenderAccountId();
+/* 2507:1348 */           localObject6 = (Long)localHashMap.get(localObject5);
+/* 2508:1349 */           if (localObject6 == null) {
+/* 2509:1350 */             localObject6 = Long.valueOf(0L);
+/* 2510:     */           }
+/* 2511:1353 */           long l = (((Transaction)localObject4).getAmount() + ((Transaction)localObject4).getFee()) * 100L;
+/* 2512:1354 */           if (((Long)localObject6).longValue() + l <= Account.getAccount((Long)localObject5).getBalance()) {
+/* 2513:1356 */             if ((((Transaction)localObject4).getTimestamp() <= m + 15) && (((Transaction)localObject4).getExpiration() >= m) && 
+/* 2514:     */             
+/* 2515:     */ 
+/* 2516:     */ 
+/* 2517:1360 */               (!((Transaction)localObject4).isDuplicate((Map)localObject2)))
+/* 2518:     */             {
+/* 2519:1364 */               localHashMap.put(localObject5, Long.valueOf(((Long)localObject6).longValue() + l));
+/* 2520:     */               
+/* 2521:1366 */               ((Map)localObject1).put(((Transaction)localObject4).getId(), localObject4);
+/* 2522:1367 */               k += i1;
+/* 2523:1368 */               i += ((Transaction)localObject4).getAmount();
+/* 2524:1369 */               j += ((Transaction)localObject4).getFee();
+/* 2525:     */             }
+/* 2526:     */           }
+/* 2527:     */         }
+/* 2528:     */       }
+/* 2529:1377 */       if (((Map)localObject1).size() == n) {
+/* 2530:     */         break;
+/* 2531:     */       }
+/* 2532:     */     }
+/* 2533:1385 */     byte[] arrayOfByte1 = Crypto.getPublicKey(paramString);
+/* 2534:     */     
+/* 2535:     */ 
+/* 2536:1388 */     Object localObject4 = (Block)lastBlock.get();
+/* 2537:     */     try
+/* 2538:     */     {
+/* 2539:1391 */       if (((Block)localObject4).getHeight() < 30000)
+/* 2540:     */       {
+/* 2541:1393 */         localObject3 = new Block(1, m, ((Block)localObject4).getId(), ((Map)localObject1).size(), i, j, k, null, arrayOfByte1, null, new byte[64]);
+/* 2542:     */       }
+/* 2543:     */       else
+/* 2544:     */       {
+/* 2545:1398 */         byte[] arrayOfByte2 = Crypto.sha256().digest(((Block)localObject4).getBytes());
+/* 2546:1399 */         localObject3 = new Block(2, m, ((Block)localObject4).getId(), ((Map)localObject1).size(), i, j, k, null, arrayOfByte1, null, new byte[64], arrayOfByte2);
+/* 2547:     */       }
+/* 2548:     */     }
+/* 2549:     */     catch (NxtException.ValidationException localValidationException)
+/* 2550:     */     {
+/* 2551:1405 */       Logger.logMessage("Error generating block", localValidationException);
+/* 2552:1406 */       return;
+/* 2553:     */     }
+/* 2554:1409 */     int i2 = 0;
+/* 2555:1410 */     for (Object localObject5 = ((Map)localObject1).keySet().iterator(); ((Iterator)localObject5).hasNext();)
+/* 2556:     */     {
+/* 2557:1410 */       localObject6 = (Long)((Iterator)localObject5).next();
+/* 2558:1411 */       ((Block)localObject3).transactionIds[(i2++)] = localObject6;
+/* 2559:     */     }
+/* 2560:1414 */     Arrays.sort(((Block)localObject3).transactionIds);
+/* 2561:1415 */     localObject5 = Crypto.sha256();
+/* 2562:1416 */     for (i2 = 0; i2 < ((Block)localObject3).transactionIds.length; i2++)
+/* 2563:     */     {
+/* 2564:1417 */       localObject6 = (Transaction)((Map)localObject1).get(localObject3.transactionIds[i2]);
+/* 2565:1418 */       ((MessageDigest)localObject5).update(((Transaction)localObject6).getBytes());
+/* 2566:1419 */       ((Block)localObject3).blockTransactions[i2] = localObject6;
+/* 2567:     */     }
+/* 2568:1421 */     ((Block)localObject3).setPayloadHash(((MessageDigest)localObject5).digest());
+/* 2569:1423 */     if (((Block)localObject4).getHeight() < 30000)
+/* 2570:     */     {
+/* 2571:1425 */       ((Block)localObject3).setGenerationSignature(Crypto.sign(((Block)localObject4).getGenerationSignature(), paramString));
+/* 2572:     */     }
+/* 2573:     */     else
+/* 2574:     */     {
+/* 2575:1429 */       ((MessageDigest)localObject5).update(((Block)localObject4).getGenerationSignature());
+/* 2576:1430 */       ((Block)localObject3).setGenerationSignature(((MessageDigest)localObject5).digest(arrayOfByte1));
+/* 2577:     */     }
+/* 2578:1434 */     Object localObject6 = ((Block)localObject3).getBytes();
+/* 2579:1435 */     byte[] arrayOfByte3 = new byte[localObject6.length - 64];
+/* 2580:1436 */     System.arraycopy(localObject6, 0, arrayOfByte3, 0, arrayOfByte3.length);
+/* 2581:1437 */     ((Block)localObject3).setBlockSignature(Crypto.sign(arrayOfByte3, paramString));
+/* 2582:1439 */     if ((((Block)localObject3).verifyBlockSignature()) && (((Block)localObject3).verifyGenerationSignature()))
+/* 2583:     */     {
+/* 2584:1441 */       JSONObject localJSONObject = ((Block)localObject3).getJSONObject();
+/* 2585:1442 */       localJSONObject.put("requestType", "processBlock");
+/* 2586:1443 */       Peer.sendToSomePeers(localJSONObject);
+/* 2587:     */     }
+/* 2588:     */     else
+/* 2589:     */     {
+/* 2590:1447 */       Logger.logMessage("Generated an incorrect block. Waiting for the next one...");
+/* 2591:     */     }
+/* 2592:     */   }
+/* 2593:     */   
+/* 2594:     */   static void purgeExpiredHashes(int paramInt)
+/* 2595:     */   {
+/* 2596:1454 */     Iterator localIterator = transactionHashes.entrySet().iterator();
+/* 2597:1455 */     while (localIterator.hasNext()) {
+/* 2598:1456 */       if (((Transaction)((Map.Entry)localIterator.next()).getValue()).getExpiration() < paramInt) {
+/* 2599:1457 */         localIterator.remove();
+/* 2600:     */       }
+/* 2601:     */     }
+/* 2602:     */   }
+/* 2603:     */   
+/* 2604:     */   public static class BlockNotAcceptedException
+/* 2605:     */     extends NxtException
+/* 2606:     */   {
+/* 2607:     */     private BlockNotAcceptedException(String paramString)
+/* 2608:     */     {
+/* 2609:1465 */       super();
+/* 2610:     */     }
+/* 2611:     */   }
+/* 2612:     */   
+/* 2613:     */   public static class BlockOutOfOrderException
+/* 2614:     */     extends Blockchain.BlockNotAcceptedException
+/* 2615:     */   {
+/* 2616:     */     private BlockOutOfOrderException(String paramString)
+/* 2617:     */     {
+/* 2618:1473 */       super(null);
+/* 2619:     */     }
+/* 2620:     */   }
+/* 2621:     */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.Blockchain
  * JD-Core Version:    0.7.0.1
  */

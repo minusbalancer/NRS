@@ -8,12 +8,12 @@
 /*  8:   */ import org.json.simple.JSONObject;
 /*  9:   */ import org.json.simple.JSONStreamAware;
 /* 10:   */ 
-/* 11:   */ final class BroadcastTransaction
+/* 11:   */ public final class BroadcastTransaction
 /* 12:   */   extends HttpRequestHandler
 /* 13:   */ {
 /* 14:17 */   static final BroadcastTransaction instance = new BroadcastTransaction();
 /* 15:   */   
-/* 16:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 16:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 17:   */     throws NxtException.ValidationException
 /* 18:   */   {
 /* 19:24 */     String str = paramHttpServletRequest.getParameter("transactionBytes");
@@ -37,7 +37,7 @@
 /* 37:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.BroadcastTransaction
  * JD-Core Version:    0.7.0.1
  */

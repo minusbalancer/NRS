@@ -9,12 +9,12 @@
 /*  9:   */ import org.json.simple.JSONObject;
 /* 10:   */ import org.json.simple.JSONStreamAware;
 /* 11:   */ 
-/* 12:   */ final class GetUnconfirmedTransactionIds
+/* 12:   */ public final class GetUnconfirmedTransactionIds
 /* 13:   */   extends HttpRequestHandler
 /* 14:   */ {
 /* 15:13 */   static final GetUnconfirmedTransactionIds instance = new GetUnconfirmedTransactionIds();
 /* 16:   */   
-/* 17:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 17:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 18:   */   {
 /* 19:20 */     JSONArray localJSONArray = new JSONArray();
 /* 20:21 */     for (Object localObject = Blockchain.getAllUnconfirmedTransactions().iterator(); ((Iterator)localObject).hasNext();)
@@ -29,7 +29,7 @@
 /* 29:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetUnconfirmedTransactionIds
  * JD-Core Version:    0.7.0.1
  */

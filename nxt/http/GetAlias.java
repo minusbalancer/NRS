@@ -7,12 +7,12 @@
 /*  7:   */ import org.json.simple.JSONObject;
 /*  8:   */ import org.json.simple.JSONStreamAware;
 /*  9:   */ 
-/* 10:   */ final class GetAlias
+/* 10:   */ public final class GetAlias
 /* 11:   */   extends HttpRequestHandler
 /* 12:   */ {
 /* 13:16 */   static final GetAlias instance = new GetAlias();
 /* 14:   */   
-/* 15:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 15:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 16:   */   {
 /* 17:23 */     String str = paramHttpServletRequest.getParameter("alias");
 /* 18:24 */     if (str == null) {
@@ -42,7 +42,7 @@
 /* 42:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAlias
  * JD-Core Version:    0.7.0.1
  */

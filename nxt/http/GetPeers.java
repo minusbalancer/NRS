@@ -8,12 +8,12 @@
 /*  8:   */ import org.json.simple.JSONObject;
 /*  9:   */ import org.json.simple.JSONStreamAware;
 /* 10:   */ 
-/* 11:   */ final class GetPeers
+/* 11:   */ public final class GetPeers
 /* 12:   */   extends HttpRequestHandler
 /* 13:   */ {
 /* 14:12 */   static final GetPeers instance = new GetPeers();
 /* 15:   */   
-/* 16:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 16:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 17:   */   {
 /* 18:19 */     JSONArray localJSONArray = new JSONArray();
 /* 19:20 */     for (Object localObject = Peer.getAllPeers().iterator(); ((Iterator)localObject).hasNext();)
@@ -28,7 +28,7 @@
 /* 28:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetPeers
  * JD-Core Version:    0.7.0.1
  */

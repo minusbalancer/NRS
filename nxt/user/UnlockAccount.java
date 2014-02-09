@@ -25,7 +25,7 @@
 /*  25:    */ {
 /*  26: 28 */   static final UnlockAccount instance = new UnlockAccount();
 /*  27:    */   
-/*  28:    */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+/*  28:    */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
 /*  29:    */     throws IOException
 /*  30:    */   {
 /*  31: 34 */     String str = paramHttpServletRequest.getParameter("secretPhrase");
@@ -240,7 +240,7 @@
 /* 240:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.user.UnlockAccount
  * JD-Core Version:    0.7.0.1
  */

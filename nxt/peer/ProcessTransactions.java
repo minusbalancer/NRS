@@ -11,7 +11,7 @@
 /* 11:   */ {
 /* 12:11 */   static final ProcessTransactions instance = new ProcessTransactions();
 /* 13:   */   
-/* 14:   */   public JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+/* 14:   */   JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
 /* 15:   */   {
 /* 16:   */     try
 /* 17:   */     {
@@ -26,7 +26,7 @@
 /* 26:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.peer.ProcessTransactions
  * JD-Core Version:    0.7.0.1
  */

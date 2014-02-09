@@ -9,12 +9,12 @@
 /*  9:   */ import org.json.simple.JSONObject;
 /* 10:   */ import org.json.simple.JSONStreamAware;
 /* 11:   */ 
-/* 12:   */ final class GetAliasIds
+/* 12:   */ public final class GetAliasIds
 /* 13:   */   extends HttpRequestHandler
 /* 14:   */ {
 /* 15:16 */   static final GetAliasIds instance = new GetAliasIds();
 /* 16:   */   
-/* 17:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 17:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 18:   */   {
 /* 19:23 */     String str = paramHttpServletRequest.getParameter("timestamp");
 /* 20:24 */     if (str == null) {
@@ -48,7 +48,7 @@
 /* 48:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAliasIds
  * JD-Core Version:    0.7.0.1
  */

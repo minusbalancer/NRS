@@ -1708,72 +1708,76 @@
 /* 1708:     */         {
 /* 1709:1255 */           Attachment.ColoredCoinsAskOrderCancellation localColoredCoinsAskOrderCancellation = (Attachment.ColoredCoinsAskOrderCancellation)paramAnonymousTransaction.attachment;
 /* 1710:1256 */           Order.Ask localAsk = Order.Ask.removeOrder(localColoredCoinsAskOrderCancellation.getOrderId());
-/* 1711:1257 */           paramAnonymousAccount1.addToAssetAndUnconfirmedAssetBalance(localAsk.getAssetId(), localAsk.getQuantity());
-/* 1712:     */         }
-/* 1713:     */       };
-/* 1714:1262 */       public static final Transaction.Type BID_ORDER_CANCELLATION = new ColoredCoinsOrderCancellation()
-/* 1715:     */       {
-/* 1716:     */         public final byte getSubtype()
-/* 1717:     */         {
-/* 1718:1266 */           return 5;
-/* 1719:     */         }
-/* 1720:     */         
-/* 1721:     */         boolean loadAttachment(Transaction paramAnonymousTransaction, ByteBuffer paramAnonymousByteBuffer)
-/* 1722:     */         {
-/* 1723:1271 */           paramAnonymousTransaction.attachment = new Attachment.ColoredCoinsBidOrderCancellation(Convert.zeroToNull(paramAnonymousByteBuffer.getLong()));
-/* 1724:1272 */           return validateAttachment(paramAnonymousTransaction);
-/* 1725:     */         }
-/* 1726:     */         
-/* 1727:     */         boolean loadAttachment(Transaction paramAnonymousTransaction, JSONObject paramAnonymousJSONObject)
-/* 1728:     */         {
-/* 1729:1277 */           paramAnonymousTransaction.attachment = new Attachment.ColoredCoinsBidOrderCancellation(Convert.parseUnsignedLong((String)paramAnonymousJSONObject.get("order")));
-/* 1730:1278 */           return validateAttachment(paramAnonymousTransaction);
-/* 1731:     */         }
-/* 1732:     */         
-/* 1733:     */         void apply(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2)
-/* 1734:     */         {
-/* 1735:1283 */           Attachment.ColoredCoinsBidOrderCancellation localColoredCoinsBidOrderCancellation = (Attachment.ColoredCoinsBidOrderCancellation)paramAnonymousTransaction.attachment;
-/* 1736:1284 */           Order.Bid localBid = Order.Bid.removeOrder(localColoredCoinsBidOrderCancellation.getOrderId());
-/* 1737:1285 */           paramAnonymousAccount1.addToBalanceAndUnconfirmedBalance(localBid.getQuantity() * localBid.getPrice());
-/* 1738:     */         }
-/* 1739:     */       };
-/* 1740:     */     }
-/* 1741:     */   }
-/* 1742:     */   
-/* 1743:     */   public static final class UndoNotSupportedException
-/* 1744:     */     extends NxtException
-/* 1745:     */   {
-/* 1746:     */     private final Transaction transaction;
-/* 1747:     */     
-/* 1748:     */     public UndoNotSupportedException(Transaction paramTransaction, String paramString)
-/* 1749:     */     {
-/* 1750:1313 */       super();
-/* 1751:1314 */       this.transaction = paramTransaction;
-/* 1752:     */     }
-/* 1753:     */     
-/* 1754:     */     public Transaction getTransaction()
-/* 1755:     */     {
-/* 1756:1318 */       return this.transaction;
-/* 1757:     */     }
-/* 1758:     */   }
-/* 1759:     */   
-/* 1760:     */   public static final class NotYetEnabledException
-/* 1761:     */     extends NxtException.ValidationException
-/* 1762:     */   {
-/* 1763:     */     public NotYetEnabledException(String paramString)
-/* 1764:     */     {
-/* 1765:1326 */       super();
-/* 1766:     */     }
-/* 1767:     */     
-/* 1768:     */     public NotYetEnabledException(String paramString, Throwable paramThrowable)
-/* 1769:     */     {
-/* 1770:1330 */       super(paramThrowable);
-/* 1771:     */     }
-/* 1772:     */   }
-/* 1773:     */ }
+/* 1711:1257 */           if (localAsk != null) {
+/* 1712:1258 */             paramAnonymousAccount1.addToAssetAndUnconfirmedAssetBalance(localAsk.getAssetId(), localAsk.getQuantity());
+/* 1713:     */           }
+/* 1714:     */         }
+/* 1715:     */       };
+/* 1716:1264 */       public static final Transaction.Type BID_ORDER_CANCELLATION = new ColoredCoinsOrderCancellation()
+/* 1717:     */       {
+/* 1718:     */         public final byte getSubtype()
+/* 1719:     */         {
+/* 1720:1268 */           return 5;
+/* 1721:     */         }
+/* 1722:     */         
+/* 1723:     */         boolean loadAttachment(Transaction paramAnonymousTransaction, ByteBuffer paramAnonymousByteBuffer)
+/* 1724:     */         {
+/* 1725:1273 */           paramAnonymousTransaction.attachment = new Attachment.ColoredCoinsBidOrderCancellation(Convert.zeroToNull(paramAnonymousByteBuffer.getLong()));
+/* 1726:1274 */           return validateAttachment(paramAnonymousTransaction);
+/* 1727:     */         }
+/* 1728:     */         
+/* 1729:     */         boolean loadAttachment(Transaction paramAnonymousTransaction, JSONObject paramAnonymousJSONObject)
+/* 1730:     */         {
+/* 1731:1279 */           paramAnonymousTransaction.attachment = new Attachment.ColoredCoinsBidOrderCancellation(Convert.parseUnsignedLong((String)paramAnonymousJSONObject.get("order")));
+/* 1732:1280 */           return validateAttachment(paramAnonymousTransaction);
+/* 1733:     */         }
+/* 1734:     */         
+/* 1735:     */         void apply(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2)
+/* 1736:     */         {
+/* 1737:1285 */           Attachment.ColoredCoinsBidOrderCancellation localColoredCoinsBidOrderCancellation = (Attachment.ColoredCoinsBidOrderCancellation)paramAnonymousTransaction.attachment;
+/* 1738:1286 */           Order.Bid localBid = Order.Bid.removeOrder(localColoredCoinsBidOrderCancellation.getOrderId());
+/* 1739:1287 */           if (localBid != null) {
+/* 1740:1288 */             paramAnonymousAccount1.addToBalanceAndUnconfirmedBalance(localBid.getQuantity() * localBid.getPrice());
+/* 1741:     */           }
+/* 1742:     */         }
+/* 1743:     */       };
+/* 1744:     */     }
+/* 1745:     */   }
+/* 1746:     */   
+/* 1747:     */   public static final class UndoNotSupportedException
+/* 1748:     */     extends NxtException
+/* 1749:     */   {
+/* 1750:     */     private final Transaction transaction;
+/* 1751:     */     
+/* 1752:     */     public UndoNotSupportedException(Transaction paramTransaction, String paramString)
+/* 1753:     */     {
+/* 1754:1317 */       super();
+/* 1755:1318 */       this.transaction = paramTransaction;
+/* 1756:     */     }
+/* 1757:     */     
+/* 1758:     */     public Transaction getTransaction()
+/* 1759:     */     {
+/* 1760:1322 */       return this.transaction;
+/* 1761:     */     }
+/* 1762:     */   }
+/* 1763:     */   
+/* 1764:     */   public static final class NotYetEnabledException
+/* 1765:     */     extends NxtException.ValidationException
+/* 1766:     */   {
+/* 1767:     */     public NotYetEnabledException(String paramString)
+/* 1768:     */     {
+/* 1769:1330 */       super();
+/* 1770:     */     }
+/* 1771:     */     
+/* 1772:     */     public NotYetEnabledException(String paramString, Throwable paramThrowable)
+/* 1773:     */     {
+/* 1774:1334 */       super(paramThrowable);
+/* 1775:     */     }
+/* 1776:     */   }
+/* 1777:     */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.Transaction
  * JD-Core Version:    0.7.0.1
  */

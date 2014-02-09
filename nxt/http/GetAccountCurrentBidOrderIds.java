@@ -10,12 +10,12 @@
 /* 10:   */ import org.json.simple.JSONObject;
 /* 11:   */ import org.json.simple.JSONStreamAware;
 /* 12:   */ 
-/* 13:   */ final class GetAccountCurrentBidOrderIds
+/* 13:   */ public final class GetAccountCurrentBidOrderIds
 /* 14:   */   extends HttpRequestHandler
 /* 15:   */ {
 /* 16:18 */   static final GetAccountCurrentBidOrderIds instance = new GetAccountCurrentBidOrderIds();
 /* 17:   */   
-/* 18:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 18:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 19:   */   {
 /* 20:25 */     String str = paramHttpServletRequest.getParameter("account");
 /* 21:26 */     if (str == null) {
@@ -54,7 +54,7 @@
 /* 54:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAccountCurrentBidOrderIds
  * JD-Core Version:    0.7.0.1
  */

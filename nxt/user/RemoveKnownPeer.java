@@ -12,7 +12,7 @@
 /* 12:   */ {
 /* 13:15 */   static final RemoveKnownPeer instance = new RemoveKnownPeer();
 /* 14:   */   
-/* 15:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+/* 15:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
 /* 16:   */     throws IOException
 /* 17:   */   {
 /* 18:21 */     if ((Nxt.allowedUserHosts == null) && (!InetAddress.getByName(paramHttpServletRequest.getRemoteAddr()).isLoopbackAddress())) {
@@ -31,7 +31,7 @@
 /* 31:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.user.RemoveKnownPeer
  * JD-Core Version:    0.7.0.1
  */

@@ -9,7 +9,7 @@
 /*  9:   */ {
 /* 10:10 */   static final GetNewData instance = new GetNewData();
 /* 11:   */   
-/* 12:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+/* 12:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
 /* 13:   */     throws IOException
 /* 14:   */   {
 /* 15:16 */     return null;
@@ -17,7 +17,7 @@
 /* 17:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.7.0e\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.7.1\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.user.GetNewData
  * JD-Core Version:    0.7.0.1
  */
