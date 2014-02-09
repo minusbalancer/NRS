@@ -8,12 +8,12 @@
 /*  8:   */ import org.json.simple.JSONObject;
 /*  9:   */ import org.json.simple.JSONStreamAware;
 /* 10:   */ 
-/* 11:   */ final class GetBlock
+/* 11:   */ public final class GetBlock
 /* 12:   */   extends HttpRequestHandler
 /* 13:   */ {
 /* 14:18 */   static final GetBlock instance = new GetBlock();
 /* 15:   */   
-/* 16:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 16:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 17:   */   {
 /* 18:25 */     String str = paramHttpServletRequest.getParameter("block");
 /* 19:26 */     if (str == null) {
@@ -64,7 +64,7 @@
 /* 64:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetBlock
  * JD-Core Version:    0.7.0.1
  */

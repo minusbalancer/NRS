@@ -6,12 +6,12 @@
 /*  6:   */ import org.json.simple.JSONObject;
 /*  7:   */ import org.json.simple.JSONStreamAware;
 /*  8:   */ 
-/*  9:   */ final class GetPeer
+/*  9:   */ public final class GetPeer
 /* 10:   */   extends HttpRequestHandler
 /* 11:   */ {
 /* 12:14 */   static final GetPeer instance = new GetPeer();
 /* 13:   */   
-/* 14:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 14:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 15:   */   {
 /* 16:21 */     String str = paramHttpServletRequest.getParameter("peer");
 /* 17:22 */     if (str == null) {
@@ -39,7 +39,7 @@
 /* 39:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetPeer
  * JD-Core Version:    0.7.0.1
  */

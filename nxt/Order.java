@@ -145,111 +145,115 @@
 /* 145:    */     static Ask removeOrder(Long paramLong)
 /* 146:    */     {
 /* 147:162 */       Ask localAsk = (Ask)askOrders.remove(paramLong);
-/* 148:163 */       ((SortedSet)sortedAskOrders.get(localAsk.getAssetId())).remove(localAsk);
-/* 149:164 */       return localAsk;
-/* 150:    */     }
-/* 151:    */     
-/* 152:    */     private Ask(Long paramLong1, Account paramAccount, Long paramLong2, int paramInt, long paramLong)
-/* 153:    */     {
-/* 154:168 */       super(paramAccount, paramLong2, paramInt, paramLong, null);
-/* 155:    */     }
-/* 156:    */     
-/* 157:    */     public int compareTo(Ask paramAsk)
-/* 158:    */     {
-/* 159:174 */       if (getPrice() < paramAsk.getPrice()) {
-/* 160:176 */         return -1;
-/* 161:    */       }
-/* 162:178 */       if (getPrice() > paramAsk.getPrice()) {
-/* 163:180 */         return 1;
-/* 164:    */       }
-/* 165:184 */       return super.compareTo(paramAsk);
-/* 166:    */     }
-/* 167:    */     
-/* 168:    */     public boolean equals(Object paramObject)
-/* 169:    */     {
-/* 170:192 */       return ((paramObject instanceof Ask)) && (getId().equals(((Ask)paramObject).getId()));
-/* 171:    */     }
-/* 172:    */     
-/* 173:    */     public int hashCode()
-/* 174:    */     {
-/* 175:197 */       return getId().hashCode();
-/* 176:    */     }
-/* 177:    */   }
-/* 178:    */   
-/* 179:    */   public static final class Bid
-/* 180:    */     extends Order
-/* 181:    */     implements Comparable<Bid>
-/* 182:    */   {
-/* 183:204 */     private static final ConcurrentMap<Long, Bid> bidOrders = new ConcurrentHashMap();
-/* 184:205 */     private static final ConcurrentMap<Long, SortedSet<Bid>> sortedBidOrders = new ConcurrentHashMap();
-/* 185:207 */     private static final Collection<Bid> allBidOrders = Collections.unmodifiableCollection(bidOrders.values());
-/* 186:    */     
-/* 187:    */     public static Collection<Bid> getAllBidOrders()
-/* 188:    */     {
-/* 189:210 */       return allBidOrders;
-/* 190:    */     }
-/* 191:    */     
-/* 192:    */     public static Bid getBidOrder(Long paramLong)
-/* 193:    */     {
-/* 194:214 */       return (Bid)bidOrders.get(paramLong);
-/* 195:    */     }
-/* 196:    */     
-/* 197:    */     public static SortedSet<Bid> getSortedOrders(Long paramLong)
-/* 198:    */     {
-/* 199:218 */       return Collections.unmodifiableSortedSet((SortedSet)sortedBidOrders.get(paramLong));
-/* 200:    */     }
-/* 201:    */     
-/* 202:    */     static void addOrder(Long paramLong1, Account paramAccount, Long paramLong2, int paramInt, long paramLong)
-/* 203:    */     {
-/* 204:222 */       Bid localBid = new Bid(paramLong1, paramAccount, paramLong2, paramInt, paramLong);
-/* 205:223 */       paramAccount.addToBalanceAndUnconfirmedBalance(-paramInt * paramLong);
-/* 206:224 */       bidOrders.put(localBid.getId(), localBid);
-/* 207:225 */       Object localObject = (SortedSet)sortedBidOrders.get(paramLong2);
-/* 208:226 */       if (localObject == null)
-/* 209:    */       {
-/* 210:227 */         localObject = new TreeSet();
-/* 211:228 */         sortedBidOrders.put(paramLong2, localObject);
-/* 212:    */       }
-/* 213:230 */       Order.matchOrders(paramLong2);
-/* 214:    */     }
-/* 215:    */     
-/* 216:    */     static Bid removeOrder(Long paramLong)
-/* 217:    */     {
-/* 218:234 */       Bid localBid = (Bid)bidOrders.remove(paramLong);
-/* 219:235 */       ((SortedSet)sortedBidOrders.get(localBid.getAssetId())).remove(localBid);
-/* 220:236 */       return localBid;
-/* 221:    */     }
-/* 222:    */     
-/* 223:    */     private Bid(Long paramLong1, Account paramAccount, Long paramLong2, int paramInt, long paramLong)
-/* 224:    */     {
-/* 225:240 */       super(paramAccount, paramLong2, paramInt, paramLong, null);
-/* 226:    */     }
-/* 227:    */     
-/* 228:    */     public int compareTo(Bid paramBid)
-/* 229:    */     {
-/* 230:246 */       if (getPrice() > paramBid.getPrice()) {
-/* 231:248 */         return -1;
-/* 232:    */       }
-/* 233:250 */       if (getPrice() < paramBid.getPrice()) {
-/* 234:252 */         return 1;
-/* 235:    */       }
-/* 236:256 */       return super.compareTo(paramBid);
-/* 237:    */     }
-/* 238:    */     
-/* 239:    */     public boolean equals(Object paramObject)
-/* 240:    */     {
-/* 241:264 */       return ((paramObject instanceof Bid)) && (getId().equals(((Bid)paramObject).getId()));
-/* 242:    */     }
-/* 243:    */     
-/* 244:    */     public int hashCode()
-/* 245:    */     {
-/* 246:269 */       return getId().hashCode();
-/* 247:    */     }
-/* 248:    */   }
-/* 249:    */ }
+/* 148:163 */       if (localAsk != null) {
+/* 149:164 */         ((SortedSet)sortedAskOrders.get(localAsk.getAssetId())).remove(localAsk);
+/* 150:    */       }
+/* 151:166 */       return localAsk;
+/* 152:    */     }
+/* 153:    */     
+/* 154:    */     private Ask(Long paramLong1, Account paramAccount, Long paramLong2, int paramInt, long paramLong)
+/* 155:    */     {
+/* 156:170 */       super(paramAccount, paramLong2, paramInt, paramLong, null);
+/* 157:    */     }
+/* 158:    */     
+/* 159:    */     public int compareTo(Ask paramAsk)
+/* 160:    */     {
+/* 161:176 */       if (getPrice() < paramAsk.getPrice()) {
+/* 162:178 */         return -1;
+/* 163:    */       }
+/* 164:180 */       if (getPrice() > paramAsk.getPrice()) {
+/* 165:182 */         return 1;
+/* 166:    */       }
+/* 167:186 */       return super.compareTo(paramAsk);
+/* 168:    */     }
+/* 169:    */     
+/* 170:    */     public boolean equals(Object paramObject)
+/* 171:    */     {
+/* 172:194 */       return ((paramObject instanceof Ask)) && (getId().equals(((Ask)paramObject).getId()));
+/* 173:    */     }
+/* 174:    */     
+/* 175:    */     public int hashCode()
+/* 176:    */     {
+/* 177:199 */       return getId().hashCode();
+/* 178:    */     }
+/* 179:    */   }
+/* 180:    */   
+/* 181:    */   public static final class Bid
+/* 182:    */     extends Order
+/* 183:    */     implements Comparable<Bid>
+/* 184:    */   {
+/* 185:206 */     private static final ConcurrentMap<Long, Bid> bidOrders = new ConcurrentHashMap();
+/* 186:207 */     private static final ConcurrentMap<Long, SortedSet<Bid>> sortedBidOrders = new ConcurrentHashMap();
+/* 187:209 */     private static final Collection<Bid> allBidOrders = Collections.unmodifiableCollection(bidOrders.values());
+/* 188:    */     
+/* 189:    */     public static Collection<Bid> getAllBidOrders()
+/* 190:    */     {
+/* 191:212 */       return allBidOrders;
+/* 192:    */     }
+/* 193:    */     
+/* 194:    */     public static Bid getBidOrder(Long paramLong)
+/* 195:    */     {
+/* 196:216 */       return (Bid)bidOrders.get(paramLong);
+/* 197:    */     }
+/* 198:    */     
+/* 199:    */     public static SortedSet<Bid> getSortedOrders(Long paramLong)
+/* 200:    */     {
+/* 201:220 */       return Collections.unmodifiableSortedSet((SortedSet)sortedBidOrders.get(paramLong));
+/* 202:    */     }
+/* 203:    */     
+/* 204:    */     static void addOrder(Long paramLong1, Account paramAccount, Long paramLong2, int paramInt, long paramLong)
+/* 205:    */     {
+/* 206:224 */       Bid localBid = new Bid(paramLong1, paramAccount, paramLong2, paramInt, paramLong);
+/* 207:225 */       paramAccount.addToBalanceAndUnconfirmedBalance(-paramInt * paramLong);
+/* 208:226 */       bidOrders.put(localBid.getId(), localBid);
+/* 209:227 */       Object localObject = (SortedSet)sortedBidOrders.get(paramLong2);
+/* 210:228 */       if (localObject == null)
+/* 211:    */       {
+/* 212:229 */         localObject = new TreeSet();
+/* 213:230 */         sortedBidOrders.put(paramLong2, localObject);
+/* 214:    */       }
+/* 215:232 */       Order.matchOrders(paramLong2);
+/* 216:    */     }
+/* 217:    */     
+/* 218:    */     static Bid removeOrder(Long paramLong)
+/* 219:    */     {
+/* 220:236 */       Bid localBid = (Bid)bidOrders.remove(paramLong);
+/* 221:237 */       if (localBid != null) {
+/* 222:238 */         ((SortedSet)sortedBidOrders.get(localBid.getAssetId())).remove(localBid);
+/* 223:    */       }
+/* 224:240 */       return localBid;
+/* 225:    */     }
+/* 226:    */     
+/* 227:    */     private Bid(Long paramLong1, Account paramAccount, Long paramLong2, int paramInt, long paramLong)
+/* 228:    */     {
+/* 229:244 */       super(paramAccount, paramLong2, paramInt, paramLong, null);
+/* 230:    */     }
+/* 231:    */     
+/* 232:    */     public int compareTo(Bid paramBid)
+/* 233:    */     {
+/* 234:250 */       if (getPrice() > paramBid.getPrice()) {
+/* 235:252 */         return -1;
+/* 236:    */       }
+/* 237:254 */       if (getPrice() < paramBid.getPrice()) {
+/* 238:256 */         return 1;
+/* 239:    */       }
+/* 240:260 */       return super.compareTo(paramBid);
+/* 241:    */     }
+/* 242:    */     
+/* 243:    */     public boolean equals(Object paramObject)
+/* 244:    */     {
+/* 245:268 */       return ((paramObject instanceof Bid)) && (getId().equals(((Bid)paramObject).getId()));
+/* 246:    */     }
+/* 247:    */     
+/* 248:    */     public int hashCode()
+/* 249:    */     {
+/* 250:273 */       return getId().hashCode();
+/* 251:    */     }
+/* 252:    */   }
+/* 253:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.Order
  * JD-Core Version:    0.7.0.1
  */

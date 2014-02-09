@@ -7,12 +7,12 @@
 /*  7:   */ import org.json.simple.JSONObject;
 /*  8:   */ import org.json.simple.JSONStreamAware;
 /*  9:   */ 
-/* 10:   */ final class GetAskOrder
+/* 10:   */ public final class GetAskOrder
 /* 11:   */   extends HttpRequestHandler
 /* 12:   */ {
 /* 13:16 */   static final GetAskOrder instance = new GetAskOrder();
 /* 14:   */   
-/* 15:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 15:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 16:   */   {
 /* 17:23 */     String str = paramHttpServletRequest.getParameter("order");
 /* 18:24 */     if (str == null) {
@@ -41,7 +41,7 @@
 /* 41:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAskOrder
  * JD-Core Version:    0.7.0.1
  */

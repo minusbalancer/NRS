@@ -65,7 +65,7 @@
 /*  65:    */     throws ServletException, IOException
 /*  66:    */   {
 /*  67: 62 */     Peer localPeer = null;
-/*  68: 63 */     Object localObject1 = null;
+/*  68:    */     Object localObject1;
 /*  69:    */     try
 /*  70:    */     {
 /*  71: 67 */       localObject2 = new CountingInputStream(paramHttpServletRequest.getInputStream());
@@ -102,72 +102,75 @@
 /* 102: 75 */       localPeer = Peer.addPeer(paramHttpServletRequest.getRemoteHost(), "");
 /* 103: 76 */       if (localPeer != null)
 /* 104:    */       {
-/* 105: 77 */         if (localPeer.getState() == Peer.State.DISCONNECTED) {
-/* 106: 78 */           localPeer.setState(Peer.State.CONNECTED);
+/* 105: 77 */         if (localPeer.isBlacklisted()) {
+/* 106: 78 */           return;
 /* 107:    */         }
-/* 108: 80 */         localPeer.updateDownloadedVolume(((CountingInputStream)localObject2).getCount());
-/* 109: 81 */         if (localPeer.analyzeHallmark(paramHttpServletRequest.getRemoteHost(), (String)localJSONObject.get("hallmark"))) {
-/* 110: 82 */           localPeer.setState(Peer.State.CONNECTED);
-/* 111:    */         }
-/* 112:    */       }
-/* 113: 86 */       if ((localJSONObject.get("protocol") != null) && (((Number)localJSONObject.get("protocol")).intValue() == 1))
-/* 114:    */       {
-/* 115: 87 */         localObject3 = (HttpJSONRequestHandler)jsonRequestHandlers.get((String)localJSONObject.get("requestType"));
-/* 116: 88 */         if (localObject3 != null) {
-/* 117: 89 */           localObject1 = ((HttpJSONRequestHandler)localObject3).processJSONRequest(localJSONObject, localPeer);
-/* 118:    */         } else {
-/* 119: 91 */           localObject1 = UNSUPPORTED_REQUEST_TYPE;
-/* 120:    */         }
-/* 121:    */       }
-/* 122:    */       else
-/* 123:    */       {
-/* 124: 94 */         Logger.logDebugMessage("Unsupported protocol " + localJSONObject.get("protocol"));
-/* 125: 95 */         localObject1 = UNSUPPORTED_PROTOCOL;
-/* 126:    */       }
-/* 127:    */     }
-/* 128:    */     catch (RuntimeException localRuntimeException)
-/* 129:    */     {
-/* 130: 99 */       Logger.logDebugMessage("Error processing POST request", localRuntimeException);
-/* 131:100 */       localObject2 = new JSONObject();
-/* 132:101 */       ((JSONObject)localObject2).put("error", localRuntimeException.toString());
-/* 133:102 */       localObject1 = localObject2;
-/* 134:    */     }
-/* 135:105 */     paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
-/* 136:106 */     CountingOutputStream localCountingOutputStream = new CountingOutputStream(paramHttpServletResponse.getOutputStream());
-/* 137:107 */     Object localObject2 = new BufferedWriter(new OutputStreamWriter(localCountingOutputStream, "UTF-8"));Object localObject3 = null;
-/* 138:    */     try
-/* 139:    */     {
-/* 140:108 */       ((JSONStreamAware)localObject1).writeJSONString((Writer)localObject2);
-/* 141:    */     }
-/* 142:    */     catch (Throwable localThrowable2)
-/* 143:    */     {
-/* 144:107 */       localObject3 = localThrowable2;throw localThrowable2;
-/* 145:    */     }
-/* 146:    */     finally
-/* 147:    */     {
-/* 148:109 */       if (localObject2 != null) {
-/* 149:109 */         if (localObject3 != null) {
-/* 150:    */           try
-/* 151:    */           {
-/* 152:109 */             ((Writer)localObject2).close();
-/* 153:    */           }
-/* 154:    */           catch (Throwable localThrowable6)
-/* 155:    */           {
-/* 156:109 */             ((Throwable)localObject3).addSuppressed(localThrowable6);
-/* 157:    */           }
-/* 158:    */         } else {
-/* 159:109 */           ((Writer)localObject2).close();
-/* 160:    */         }
-/* 161:    */       }
-/* 162:    */     }
-/* 163:111 */     if (localPeer != null) {
-/* 164:112 */       localPeer.updateUploadedVolume(localCountingOutputStream.getCount());
+/* 108: 80 */         if (localPeer.getState() == Peer.State.DISCONNECTED) {
+/* 109: 81 */           localPeer.setState(Peer.State.CONNECTED);
+/* 110:    */         }
+/* 111: 83 */         localPeer.updateDownloadedVolume(((CountingInputStream)localObject2).getCount());
+/* 112: 84 */         if (localPeer.analyzeHallmark(paramHttpServletRequest.getRemoteHost(), (String)localJSONObject.get("hallmark"))) {
+/* 113: 85 */           localPeer.setState(Peer.State.CONNECTED);
+/* 114:    */         }
+/* 115:    */       }
+/* 116: 89 */       if ((localJSONObject.get("protocol") != null) && (((Number)localJSONObject.get("protocol")).intValue() == 1))
+/* 117:    */       {
+/* 118: 90 */         localObject3 = (HttpJSONRequestHandler)jsonRequestHandlers.get((String)localJSONObject.get("requestType"));
+/* 119: 91 */         if (localObject3 != null) {
+/* 120: 92 */           localObject1 = ((HttpJSONRequestHandler)localObject3).processJSONRequest(localJSONObject, localPeer);
+/* 121:    */         } else {
+/* 122: 94 */           localObject1 = UNSUPPORTED_REQUEST_TYPE;
+/* 123:    */         }
+/* 124:    */       }
+/* 125:    */       else
+/* 126:    */       {
+/* 127: 97 */         Logger.logDebugMessage("Unsupported protocol " + localJSONObject.get("protocol"));
+/* 128: 98 */         localObject1 = UNSUPPORTED_PROTOCOL;
+/* 129:    */       }
+/* 130:    */     }
+/* 131:    */     catch (RuntimeException localRuntimeException)
+/* 132:    */     {
+/* 133:102 */       Logger.logDebugMessage("Error processing POST request", localRuntimeException);
+/* 134:103 */       localObject2 = new JSONObject();
+/* 135:104 */       ((JSONObject)localObject2).put("error", localRuntimeException.toString());
+/* 136:105 */       localObject1 = localObject2;
+/* 137:    */     }
+/* 138:108 */     paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
+/* 139:109 */     CountingOutputStream localCountingOutputStream = new CountingOutputStream(paramHttpServletResponse.getOutputStream());
+/* 140:110 */     Object localObject2 = new BufferedWriter(new OutputStreamWriter(localCountingOutputStream, "UTF-8"));Object localObject3 = null;
+/* 141:    */     try
+/* 142:    */     {
+/* 143:111 */       ((JSONStreamAware)localObject1).writeJSONString((Writer)localObject2);
+/* 144:    */     }
+/* 145:    */     catch (Throwable localThrowable2)
+/* 146:    */     {
+/* 147:110 */       localObject3 = localThrowable2;throw localThrowable2;
+/* 148:    */     }
+/* 149:    */     finally
+/* 150:    */     {
+/* 151:112 */       if (localObject2 != null) {
+/* 152:112 */         if (localObject3 != null) {
+/* 153:    */           try
+/* 154:    */           {
+/* 155:112 */             ((Writer)localObject2).close();
+/* 156:    */           }
+/* 157:    */           catch (Throwable localThrowable6)
+/* 158:    */           {
+/* 159:112 */             ((Throwable)localObject3).addSuppressed(localThrowable6);
+/* 160:    */           }
+/* 161:    */         } else {
+/* 162:112 */           ((Writer)localObject2).close();
+/* 163:    */         }
+/* 164:    */       }
 /* 165:    */     }
-/* 166:    */   }
-/* 167:    */ }
+/* 166:114 */     if (localPeer != null) {
+/* 167:115 */       localPeer.updateUploadedVolume(localCountingOutputStream.getCount());
+/* 168:    */     }
+/* 169:    */   }
+/* 170:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.peer.HttpJSONRequestHandler
  * JD-Core Version:    0.7.0.1
  */

@@ -258,71 +258,77 @@
 /* 258:238 */     for (int k = 0; k < this.guaranteedBalances.size(); k++)
 /* 259:    */     {
 /* 260:239 */       GuaranteedBalance localGuaranteedBalance3 = (GuaranteedBalance)this.guaranteedBalances.get(k);
-/* 261:240 */       if ((localGuaranteedBalance3.height < i - 2881) && (k < this.guaranteedBalances.size() - 1) && (((GuaranteedBalance)this.guaranteedBalances.get(k + 1)).height >= i - 2881)) {
-/* 262:243 */         j = k;
-/* 263:244 */       } else if (paramLong < 0L) {
-/* 264:245 */         localGuaranteedBalance3.balance += paramLong;
-/* 265:    */       }
-/* 266:    */     }
-/* 267:249 */     if (j > 0)
-/* 268:    */     {
-/* 269:250 */       Iterator localIterator2 = this.guaranteedBalances.iterator();
-/* 270:251 */       while ((localIterator2.hasNext()) && (j > 0))
-/* 271:    */       {
-/* 272:252 */         localIterator2.next();
-/* 273:253 */         localIterator2.remove();
-/* 274:254 */         j--;
-/* 275:    */       }
-/* 276:    */     }
-/* 277:257 */     if ((this.guaranteedBalances.size() == 0) || (localGuaranteedBalance1.height < i))
-/* 278:    */     {
-/* 279:259 */       this.guaranteedBalances.add(new GuaranteedBalance(i, this.balance, null));
-/* 280:    */     }
-/* 281:260 */     else if (localGuaranteedBalance1.height == i)
-/* 282:    */     {
-/* 283:263 */       localGuaranteedBalance1.balance = this.balance;
-/* 284:264 */       localGuaranteedBalance1.ignore = false;
-/* 285:    */     }
-/* 286:    */     else
-/* 287:    */     {
-/* 288:267 */       throw new IllegalStateException("last guaranteed balance height exceeds blockchain height");
-/* 289:    */     }
-/* 290:    */   }
-/* 291:    */   
-/* 292:    */   private static class GuaranteedBalance
-/* 293:    */     implements Comparable<GuaranteedBalance>
-/* 294:    */   {
-/* 295:    */     final int height;
-/* 296:    */     long balance;
-/* 297:    */     boolean ignore;
-/* 298:    */     
-/* 299:    */     private GuaranteedBalance(int paramInt, long paramLong)
-/* 300:    */     {
-/* 301:278 */       this.height = paramInt;
-/* 302:279 */       this.balance = paramLong;
-/* 303:280 */       this.ignore = false;
-/* 304:    */     }
-/* 305:    */     
-/* 306:    */     public int compareTo(GuaranteedBalance paramGuaranteedBalance)
-/* 307:    */     {
-/* 308:285 */       if (this.height < paramGuaranteedBalance.height) {
-/* 309:286 */         return -1;
-/* 310:    */       }
-/* 311:287 */       if (this.height > paramGuaranteedBalance.height) {
-/* 312:288 */         return 1;
-/* 313:    */       }
-/* 314:290 */       return 0;
-/* 315:    */     }
-/* 316:    */     
-/* 317:    */     public String toString()
-/* 318:    */     {
-/* 319:295 */       return "height: " + this.height + ", guaranteed: " + this.balance;
-/* 320:    */     }
-/* 321:    */   }
-/* 322:    */ }
+/* 261:240 */       if ((localGuaranteedBalance3.height < i - 2881) && (k < this.guaranteedBalances.size() - 1) && (((GuaranteedBalance)this.guaranteedBalances.get(k + 1)).height >= i - 2881))
+/* 262:    */       {
+/* 263:243 */         j = k;
+/* 264:244 */         if (i >= 64000) {
+/* 265:245 */           localGuaranteedBalance3.balance += paramLong;
+/* 266:    */         }
+/* 267:    */       }
+/* 268:247 */       else if (paramLong < 0L)
+/* 269:    */       {
+/* 270:248 */         localGuaranteedBalance3.balance += paramLong;
+/* 271:    */       }
+/* 272:    */     }
+/* 273:252 */     if (j > 0)
+/* 274:    */     {
+/* 275:253 */       Iterator localIterator2 = this.guaranteedBalances.iterator();
+/* 276:254 */       while ((localIterator2.hasNext()) && (j > 0))
+/* 277:    */       {
+/* 278:255 */         localIterator2.next();
+/* 279:256 */         localIterator2.remove();
+/* 280:257 */         j--;
+/* 281:    */       }
+/* 282:    */     }
+/* 283:260 */     if ((this.guaranteedBalances.size() == 0) || (localGuaranteedBalance1.height < i))
+/* 284:    */     {
+/* 285:262 */       this.guaranteedBalances.add(new GuaranteedBalance(i, this.balance, null));
+/* 286:    */     }
+/* 287:263 */     else if (localGuaranteedBalance1.height == i)
+/* 288:    */     {
+/* 289:266 */       localGuaranteedBalance1.balance = this.balance;
+/* 290:267 */       localGuaranteedBalance1.ignore = false;
+/* 291:    */     }
+/* 292:    */     else
+/* 293:    */     {
+/* 294:270 */       throw new IllegalStateException("last guaranteed balance height exceeds blockchain height");
+/* 295:    */     }
+/* 296:    */   }
+/* 297:    */   
+/* 298:    */   private static class GuaranteedBalance
+/* 299:    */     implements Comparable<GuaranteedBalance>
+/* 300:    */   {
+/* 301:    */     final int height;
+/* 302:    */     long balance;
+/* 303:    */     boolean ignore;
+/* 304:    */     
+/* 305:    */     private GuaranteedBalance(int paramInt, long paramLong)
+/* 306:    */     {
+/* 307:281 */       this.height = paramInt;
+/* 308:282 */       this.balance = paramLong;
+/* 309:283 */       this.ignore = false;
+/* 310:    */     }
+/* 311:    */     
+/* 312:    */     public int compareTo(GuaranteedBalance paramGuaranteedBalance)
+/* 313:    */     {
+/* 314:288 */       if (this.height < paramGuaranteedBalance.height) {
+/* 315:289 */         return -1;
+/* 316:    */       }
+/* 317:290 */       if (this.height > paramGuaranteedBalance.height) {
+/* 318:291 */         return 1;
+/* 319:    */       }
+/* 320:293 */       return 0;
+/* 321:    */     }
+/* 322:    */     
+/* 323:    */     public String toString()
+/* 324:    */     {
+/* 325:298 */       return "height: " + this.height + ", guaranteed: " + this.balance;
+/* 326:    */     }
+/* 327:    */   }
+/* 328:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.Account
  * JD-Core Version:    0.7.0.1
  */

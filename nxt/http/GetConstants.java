@@ -12,7 +12,7 @@
 /*  12:    */ import org.json.simple.JSONObject;
 /*  13:    */ import org.json.simple.JSONStreamAware;
 /*  14:    */ 
-/*  15:    */ final class GetConstants
+/*  15:    */ public final class GetConstants
 /*  16:    */   extends HttpRequestHandler
 /*  17:    */ {
 /*  18: 16 */   static final GetConstants instance = new GetConstants();
@@ -101,14 +101,14 @@
 /* 101:100 */     CONSTANTS = JSON.prepare(localJSONObject1);
 /* 102:    */   }
 /* 103:    */   
-/* 104:    */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 104:    */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 105:    */   {
 /* 106:108 */     return CONSTANTS;
 /* 107:    */   }
 /* 108:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetConstants
  * JD-Core Version:    0.7.0.1
  */

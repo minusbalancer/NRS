@@ -11,12 +11,12 @@
 /*  11:    */ import org.json.simple.JSONObject;
 /*  12:    */ import org.json.simple.JSONStreamAware;
 /*  13:    */ 
-/*  14:    */ final class TransferAsset
+/*  14:    */ public final class TransferAsset
 /*  15:    */   extends HttpRequestHandler
 /*  16:    */ {
 /*  17: 32 */   static final TransferAsset instance = new TransferAsset();
 /*  18:    */   
-/*  19:    */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/*  19:    */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /*  20:    */     throws NxtException.ValidationException
 /*  21:    */   {
 /*  22: 39 */     String str1 = paramHttpServletRequest.getParameter("secretPhrase");
@@ -133,7 +133,7 @@
 /* 133:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.TransferAsset
  * JD-Core Version:    0.7.0.1
  */

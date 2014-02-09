@@ -1,7 +1,7 @@
 /*  1:   */ package nxt.peer;
 /*  2:   */ 
 /*  3:   */ import nxt.Blockchain;
-/*  4:   */ import nxt.NxtException.ValidationException;
+/*  4:   */ import nxt.NxtException;
 /*  5:   */ import nxt.util.JSON;
 /*  6:   */ import org.json.simple.JSONObject;
 /*  7:   */ import org.json.simple.JSONStreamAware;
@@ -27,24 +27,25 @@
 /* 27:26 */     NOT_ACCEPTED = JSON.prepare(localJSONObject);
 /* 28:   */   }
 /* 29:   */   
-/* 30:   */   public JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+/* 30:   */   JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
 /* 31:   */   {
 /* 32:   */     try
 /* 33:   */     {
-/* 34:34 */       return Blockchain.pushBlock(paramJSONObject) ? ACCEPTED : NOT_ACCEPTED;
-/* 35:   */     }
-/* 36:   */     catch (NxtException.ValidationException localValidationException)
-/* 37:   */     {
-/* 38:37 */       if (paramPeer != null) {
-/* 39:38 */         paramPeer.blacklist(localValidationException);
-/* 40:   */       }
-/* 41:   */     }
-/* 42:40 */     return NOT_ACCEPTED;
-/* 43:   */   }
-/* 44:   */ }
+/* 34:34 */       boolean bool = Blockchain.pushBlock(paramJSONObject);
+/* 35:35 */       return bool ? ACCEPTED : NOT_ACCEPTED;
+/* 36:   */     }
+/* 37:   */     catch (NxtException localNxtException)
+/* 38:   */     {
+/* 39:38 */       if (paramPeer != null) {
+/* 40:39 */         paramPeer.blacklist(localNxtException);
+/* 41:   */       }
+/* 42:   */     }
+/* 43:41 */     return NOT_ACCEPTED;
+/* 44:   */   }
+/* 45:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.peer.ProcessBlock
  * JD-Core Version:    0.7.0.1
  */

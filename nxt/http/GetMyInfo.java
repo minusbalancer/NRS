@@ -4,12 +4,12 @@
 /*  4:   */ import org.json.simple.JSONObject;
 /*  5:   */ import org.json.simple.JSONStreamAware;
 /*  6:   */ 
-/*  7:   */ final class GetMyInfo
+/*  7:   */ public final class GetMyInfo
 /*  8:   */   extends HttpRequestHandler
 /*  9:   */ {
 /* 10:10 */   static final GetMyInfo instance = new GetMyInfo();
 /* 11:   */   
-/* 12:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 12:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 13:   */   {
 /* 14:17 */     JSONObject localJSONObject = new JSONObject();
 /* 15:18 */     localJSONObject.put("host", paramHttpServletRequest.getRemoteHost());
@@ -19,7 +19,7 @@
 /* 19:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetMyInfo
  * JD-Core Version:    0.7.0.1
  */

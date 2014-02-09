@@ -13,7 +13,7 @@
 /* 13:   */ {
 /* 14:15 */   static final RemoveActivePeer instance = new RemoveActivePeer();
 /* 15:   */   
-/* 16:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+/* 16:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
 /* 17:   */     throws IOException
 /* 18:   */   {
 /* 19:21 */     if ((Nxt.allowedUserHosts == null) && (!InetAddress.getByName(paramHttpServletRequest.getRemoteAddr()).isLoopbackAddress())) {
@@ -23,7 +23,7 @@
 /* 23:25 */     for (Peer localPeer : Peer.getAllPeers()) {
 /* 24:26 */       if (localPeer.getIndex() == i)
 /* 25:   */       {
-/* 26:27 */         if ((localPeer.getBlacklistingTime() != 0L) || (localPeer.getState() == Peer.State.NON_CONNECTED)) {
+/* 26:27 */         if ((localPeer.isBlacklisted()) || (localPeer.getState() == Peer.State.NON_CONNECTED)) {
 /* 27:   */           break;
 /* 28:   */         }
 /* 29:28 */         localPeer.deactivate(); break;
@@ -34,7 +34,7 @@
 /* 34:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.user.RemoveActivePeer
  * JD-Core Version:    0.7.0.1
  */

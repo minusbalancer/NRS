@@ -7,12 +7,12 @@
 /*  7:   */ import org.json.simple.JSONObject;
 /*  8:   */ import org.json.simple.JSONStreamAware;
 /*  9:   */ 
-/* 10:   */ final class GetAccountPublicKey
+/* 10:   */ public final class GetAccountPublicKey
 /* 11:   */   extends HttpRequestHandler
 /* 12:   */ {
 /* 13:17 */   static final GetAccountPublicKey instance = new GetAccountPublicKey();
 /* 14:   */   
-/* 15:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 15:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 16:   */   {
 /* 17:24 */     String str = paramHttpServletRequest.getParameter("account");
 /* 18:25 */     if (str == null) {
@@ -41,7 +41,7 @@
 /* 41:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAccountPublicKey
  * JD-Core Version:    0.7.0.1
  */

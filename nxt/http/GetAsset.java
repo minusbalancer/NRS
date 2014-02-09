@@ -6,12 +6,12 @@
 /*  6:   */ import org.json.simple.JSONObject;
 /*  7:   */ import org.json.simple.JSONStreamAware;
 /*  8:   */ 
-/*  9:   */ final class GetAsset
+/*  9:   */ public final class GetAsset
 /* 10:   */   extends HttpRequestHandler
 /* 11:   */ {
 /* 12:16 */   static final GetAsset instance = new GetAsset();
 /* 13:   */   
-/* 14:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 14:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 15:   */   {
 /* 16:23 */     String str = paramHttpServletRequest.getParameter("asset");
 /* 17:24 */     if (str == null) {
@@ -42,7 +42,7 @@
 /* 42:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAsset
  * JD-Core Version:    0.7.0.1
  */

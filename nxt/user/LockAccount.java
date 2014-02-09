@@ -9,7 +9,7 @@
 /*  9:   */ {
 /* 10:12 */   static final LockAccount instance = new LockAccount();
 /* 11:   */   
-/* 12:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+/* 12:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
 /* 13:   */     throws IOException
 /* 14:   */   {
 /* 15:19 */     paramUser.deinitializeKeyPair();
@@ -19,7 +19,7 @@
 /* 19:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.user.LockAccount
  * JD-Core Version:    0.7.0.1
  */

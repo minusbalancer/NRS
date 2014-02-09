@@ -12,12 +12,12 @@
 /*  12:    */ import org.json.simple.JSONObject;
 /*  13:    */ import org.json.simple.JSONStreamAware;
 /*  14:    */ 
-/*  15:    */ final class PlaceBidOrder
+/*  15:    */ public final class PlaceBidOrder
 /*  16:    */   extends HttpRequestHandler
 /*  17:    */ {
 /*  18: 33 */   static final PlaceBidOrder instance = new PlaceBidOrder();
 /*  19:    */   
-/*  20:    */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/*  20:    */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /*  21:    */     throws NxtException.ValidationException
 /*  22:    */   {
 /*  23: 40 */     String str1 = paramHttpServletRequest.getParameter("secretPhrase");
@@ -133,7 +133,7 @@
 /* 133:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.PlaceBidOrder
  * JD-Core Version:    0.7.0.1
  */

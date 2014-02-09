@@ -9,7 +9,7 @@
 /*  9:   */ import org.json.simple.JSONObject;
 /* 10:   */ import org.json.simple.JSONStreamAware;
 /* 11:   */ 
-/* 12:   */ final class GetAccount
+/* 12:   */ public final class GetAccount
 /* 13:   */   extends HttpRequestHandler
 /* 14:   */ {
 /* 15:18 */   static final GetAccount instance = new GetAccount();
@@ -58,7 +58,7 @@
 /* 58:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAccount
  * JD-Core Version:    0.7.0.1
  */

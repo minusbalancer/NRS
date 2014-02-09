@@ -7,12 +7,12 @@
 /*  7:   */ import org.json.simple.JSONObject;
 /*  8:   */ import org.json.simple.JSONStreamAware;
 /*  9:   */ 
-/* 10:   */ final class GetAccountId
+/* 10:   */ public final class GetAccountId
 /* 11:   */   extends HttpRequestHandler
 /* 12:   */ {
 /* 13:15 */   static final GetAccountId instance = new GetAccountId();
 /* 14:   */   
-/* 15:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 15:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 16:   */   {
 /* 17:22 */     String str = paramHttpServletRequest.getParameter("secretPhrase");
 /* 18:23 */     if (str == null) {
@@ -28,7 +28,7 @@
 /* 28:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAccountId
  * JD-Core Version:    0.7.0.1
  */

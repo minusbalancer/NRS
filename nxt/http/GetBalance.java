@@ -6,12 +6,12 @@
 /*  6:   */ import org.json.simple.JSONObject;
 /*  7:   */ import org.json.simple.JSONStreamAware;
 /*  8:   */ 
-/*  9:   */ final class GetBalance
+/*  9:   */ public final class GetBalance
 /* 10:   */   extends HttpRequestHandler
 /* 11:   */ {
 /* 12:15 */   static final GetBalance instance = new GetBalance();
 /* 13:   */   
-/* 14:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 14:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 15:   */   {
 /* 16:22 */     String str = paramHttpServletRequest.getParameter("account");
 /* 17:23 */     if (str == null) {
@@ -47,7 +47,7 @@
 /* 47:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetBalance
  * JD-Core Version:    0.7.0.1
  */

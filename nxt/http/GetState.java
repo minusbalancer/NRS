@@ -17,16 +17,16 @@
 /* 17:   */ import org.json.simple.JSONObject;
 /* 18:   */ import org.json.simple.JSONStreamAware;
 /* 19:   */ 
-/* 20:   */ final class GetState
+/* 20:   */ public final class GetState
 /* 21:   */   extends HttpRequestHandler
 /* 22:   */ {
 /* 23:19 */   static final GetState instance = new GetState();
 /* 24:   */   
-/* 25:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 25:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 26:   */   {
 /* 27:26 */     JSONObject localJSONObject = new JSONObject();
 /* 28:   */     
-/* 29:28 */     localJSONObject.put("version", "0.6.1");
+/* 29:28 */     localJSONObject.put("version", "0.6.2");
 /* 30:29 */     localJSONObject.put("time", Integer.valueOf(Convert.getEpochTime()));
 /* 31:30 */     localJSONObject.put("lastBlock", Blockchain.getLastBlock().getStringId());
 /* 32:31 */     localJSONObject.put("cumulativeDifficulty", Blockchain.getLastBlock().getCumulativeDifficulty().toString());
@@ -71,7 +71,7 @@
 /* 71:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetState
  * JD-Core Version:    0.7.0.1
  */

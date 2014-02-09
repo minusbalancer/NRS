@@ -15,12 +15,12 @@
 /* 15:   */ import org.json.simple.JSONObject;
 /* 16:   */ import org.json.simple.JSONStreamAware;
 /* 17:   */ 
-/* 18:   */ final class GetAccountTransactionIds
+/* 18:   */ public final class GetAccountTransactionIds
 /* 19:   */   extends HttpRequestHandler
 /* 20:   */ {
 /* 21:23 */   static final GetAccountTransactionIds instance = new GetAccountTransactionIds();
 /* 22:   */   
-/* 23:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 23:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 24:   */   {
 /* 25:30 */     String str1 = paramHttpServletRequest.getParameter("account");
 /* 26:31 */     String str2 = paramHttpServletRequest.getParameter("timestamp");
@@ -92,7 +92,7 @@
 /* 92:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAccountTransactionIds
  * JD-Core Version:    0.7.0.1
  */

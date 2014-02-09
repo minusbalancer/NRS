@@ -13,12 +13,12 @@
 /* 13:   */ import org.json.simple.JSONObject;
 /* 14:   */ import org.json.simple.JSONStreamAware;
 /* 15:   */ 
-/* 16:   */ final class GetAccountBlockIds
+/* 16:   */ public final class GetAccountBlockIds
 /* 17:   */   extends HttpRequestHandler
 /* 18:   */ {
 /* 19:23 */   static final GetAccountBlockIds instance = new GetAccountBlockIds();
 /* 20:   */   
-/* 21:   */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/* 21:   */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /* 22:   */   {
 /* 23:30 */     String str1 = paramHttpServletRequest.getParameter("account");
 /* 24:31 */     String str2 = paramHttpServletRequest.getParameter("timestamp");
@@ -73,7 +73,7 @@
 /* 73:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.GetAccountBlockIds
  * JD-Core Version:    0.7.0.1
  */

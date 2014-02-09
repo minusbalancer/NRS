@@ -74,10 +74,15 @@
 /* 74:   */   {
 /* 75:77 */     return paramLong == null ? 0L : paramLong.longValue();
 /* 76:   */   }
-/* 77:   */ }
+/* 77:   */   
+/* 78:   */   public static String truncate(String paramString1, String paramString2, int paramInt, boolean paramBoolean)
+/* 79:   */   {
+/* 80:81 */     return paramString1.length() > paramInt ? paramString1.substring(0, paramBoolean ? paramInt - 3 : paramInt) + (paramBoolean ? "..." : "") : paramString1 == null ? paramString2 : paramString1;
+/* 81:   */   }
+/* 82:   */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.util.Convert
  * JD-Core Version:    0.7.0.1
  */

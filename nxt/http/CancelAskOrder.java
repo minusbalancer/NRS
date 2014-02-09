@@ -13,12 +13,12 @@
 /*  13:    */ import org.json.simple.JSONObject;
 /*  14:    */ import org.json.simple.JSONStreamAware;
 /*  15:    */ 
-/*  16:    */ final class CancelAskOrder
+/*  16:    */ public final class CancelAskOrder
 /*  17:    */   extends HttpRequestHandler
 /*  18:    */ {
 /*  19: 30 */   static final CancelAskOrder instance = new CancelAskOrder();
 /*  20:    */   
-/*  21:    */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+/*  21:    */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
 /*  22:    */     throws NxtException.ValidationException
 /*  23:    */   {
 /*  24: 37 */     String str1 = paramHttpServletRequest.getParameter("secretPhrase");
@@ -99,7 +99,7 @@
 /*  99:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.http.CancelAskOrder
  * JD-Core Version:    0.7.0.1
  */

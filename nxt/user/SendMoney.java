@@ -15,7 +15,7 @@
 /*  15:    */ {
 /*  16: 19 */   static final SendMoney instance = new SendMoney();
 /*  17:    */   
-/*  18:    */   public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+/*  18:    */   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
 /*  19:    */     throws NxtException.ValidationException, IOException
 /*  20:    */   {
 /*  21: 25 */     if (paramUser.getSecretPhrase() == null) {
@@ -125,7 +125,7 @@
 /* 125:    */ }
 
 
-/* Location:           D:\Downloads\nxt-client-0.6.1\nxt\webapps\root\WEB-INF\classes\
+/* Location:           D:\Downloads\nxt-client-0.6.2\nxt\webapps\root\WEB-INF\classes\
  * Qualified Name:     nxt.user.SendMoney
  * JD-Core Version:    0.7.0.1
  */
